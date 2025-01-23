@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>撰写新文章 - 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <style>
+        .write-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    {%include 'head.html' %}
+
+    <!-- 撰写页面内容 -->
+    <div class="container write-container">
+        <h1 class="mb-4">撰写新文章</h1>
+        <form id="write-form" action="/submit_write" method="post">
+            <div class="mb-3">
+                <label for="title" class="form-label">文章标题</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label">文章内容</label>
+                <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">发布文章</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 页脚 -->
+    {% include 'footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

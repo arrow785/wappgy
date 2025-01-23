@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <style>
+        .register-container {
+            max-width: 400px;
+            margin: 5rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control,
+        .btn {
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">个人论坛</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">首页</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 注册页面内容 -->
+    <div class="container register-container">
+        <h2 class="text-center mb-4">重置密码</h2>
+        <form id="register-form" action="/reset_pwd1" method="post">
+            <div class="mb-3">
+                <label for="username" id="tips" class="form-label">用户名</label>
+                <input type="text" onblur="check_name()" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">密码</label>
+                <input type="password" id="pwd" class="form-control" name="password" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">确认密码</label>
+                <input type="password" onblur="checkPwd()" id="pwd1" class="form-control" name="password-test" required>
+            </div>
+            <div class="text-center">
+                <button type="submit" id="sub" class="btn btn-primary">提交</button>
+            </div>
+        </form>
+
+    </div>
+
+    <!-- 页脚 -->
+    {% include 'footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        function check_name() {
+            var username = document.getElementById('username').value;
+            var tips = document.getElementById('tips');
+            var pwd1 = document.getElementById('pwd1');
+            var pwd2 = document.getElementById('pwd2');
+            var sub = document.getElementById('sub');
+            var url = `check_username/${username}`
+            console.log(url);
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.exists) {
+                        tips.style.color = 'red';
+                        tips.innerHTML = '用户名不存在!';
+                        // 输入框不允许输入
+                        pwd1.disabled = true;
+                        pwd.disabled = true;
+                        sub.disabled = 'disabled';
+                    }  else{
+                        tips.style.color = 'black';
+                        tips.innerHTML = '用户名';
+                        pwd1.disabled = false;
+                        pwd.disabled = false;
+                        sub.disabled = false;
+                    }
+                })
+                .catch(error => {})
+        }
+
+        function checkPwd() {
+            var pwd1 = document.getElementById('pwd1');
+            var pwd = document.getElementById('pwd');
+            var sub = document.getElementById('sub');
+            if (pwd1.value !== pwd.value) {
+                sub.style.color = 'red';
+                sub.innerText = '密码不一致';
+                sub.disabled = 'disabled';
+            } else {
+                sub.style.color = 'white';
+                sub.innerText = '提交';
+                sub.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>评论 - 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <style>
+        .comments-container {
+            max-width: 800px;
+            margin: 2rem auto 2rem auto; /* 调整顶部和底部的间距 */
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-control, .btn {
+            border-radius: 8px;
+        }
+        .comment-item {
+            border-bottom: 1px solid #ddd;
+            padding: 1rem 0;
+        }
+        .comment-item:last-child {
+            border-bottom: none;
+        }
+        .article {
+            background-color: #f9f9f9;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        /* 固定在屏幕右下角的按钮 */
+        .fixed-comment-button {
+            position: fixed;
+            border-radius: 10px 10px 10px 10px;
+            bottom: 70px;
+            right: 50px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+{% include './head.html' %}
+
+<!-- 评论页面内容 -->
+<div class="container comments-container">
+    <!-- 文章内容 -->
+    <div class="article">
+        <h2><strong>{{ data['title'] }}</strong></h2>
+        {% if data['modify_date'] == None %}
+        <p class="text-muted">作者：<i>{{ data['username'] }}</i> | 发布时间：{{ data['date'] }}</p>
+        {% else %}
+        <p class="text-muted">作者：<i>{{ data['username'] }}</i> | 发布时间：{{ data['date'] }} | 修改时间：{{
+            data['modify_date'] }}</p>
+        {% endif %}
+        <textarea class="form-control" id="contents" name="contents" rows="8" disabled>{{ data['contents'] }}</textarea>
+    </div>
+
+    <!-- 评论列表 -->
+    <h2 class="text-center mb-4">评论区</h2>
+    <hr>
+    <div class="comment-list">
+        {% for i in comments %}
+        <div class="comment-item">
+            <strong>{{ i['username'] }}</strong>
+            <p class="text-muted">{{ i['comment_time'] }}</p>
+            <p>{{ i['comment_context'] }}</p>
+        </div>
+        {% else %}
+        <p class="text-center">这篇文章没有任何评论，期待你的评论😉</p>
+        {% endfor %}
+
+
+    </div>
+
+</div>
+
+{% if username == 'd' %}
+<!-- 固定在屏幕右下角的评论按钮 -->
+<button type="button" class="btn btn-primary fixed-comment-button" disabled data-bs-toggle="modal"
+        data-bs-target="#commentModal">发表评论
+</button>
+{% else %}
+<button type="button" class="btn btn-primary fixed-comment-button" data-bs-toggle="modal"
+        data-bs-target="#commentModal">
+    发表评论
+</button>
+{% endif %}
+
+<!-- 评论模态框 -->
+<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="commentModalLabel">发表评论</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="comment-form" action="{{url_for('comment_submit',title_id=data['id'],name=username,zhuti=data['title'])}}" method="post">
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">评论内容</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">提交评论</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 页脚 -->
+{% include './footer.html' %}
+
+<!-- Bootstrap JS -->
+<script src="../static/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

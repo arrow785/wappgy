@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <style>
+        .register-container {
+            max-width: 400px;
+            margin: 5rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control,
+        .btn {
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">个人论坛</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">首页</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 注册页面内容 -->
+    <div class="container register-container">
+        <h2 class="text-center mb-4">注册新账号</h2>
+        <form id="register-form" action="/submit_register" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">用户名</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">电子邮箱（不是必须）</label>
+                <input type="email" class="form-control" id="email" name="email">
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">密码</label>
+                <input type="password" id="pwd" class="form-control" name="password" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">确认密码</label>
+                <input type="password" id="pwd1" class="form-control" name="password-test" required>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">提交注册</button>
+            </div>
+        </form>
+        <div class="text-center mt-3">
+            <p>已有账号？<a class="text-muted" href="/login">登录</a></p>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    {% include 'footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // js判断两次输入的密码是否一致
+        const registerForm = document.getElementById('register-form');
+        registerForm.addEventListener('submit', function(event) {
+            var password = document.getElementById('pwd').value;
+            var confirmPassword = document.getElementById('pwd1').value;
+            console.log(password, confirmPassword);
+            if (password !== confirmPassword) {
+                alert('两次输入的密码不一致');
+                event.preventDefault(); // 阻止表单提交
+            }
+        });
+    </script>
+</body>
+
+</html>

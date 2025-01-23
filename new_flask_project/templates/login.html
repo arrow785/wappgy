@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 5rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control,
+        .btn {
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    {% include 'login_head.html' %}
+
+    <!-- 登录页面内容 -->
+    <div class="container login-container">
+        <h2 class="text-center mb-4">登录</h2>
+        <form id="login-form" action="/submit" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">用户名</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">密码</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">登录</button>
+            </div>
+        </form>
+        <div class="text-center mt-3">
+            <p>还没有账号？👉<a class="text-muted" href="/register">注册新账号</a></p>
+        </div>
+        <div class="text-center mt-3">
+            <p>忘记密码？🤔<a class="text-muted" href="/reset_pwd">重置密码</a></p>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    {% include 'footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

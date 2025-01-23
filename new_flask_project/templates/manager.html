@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理文章 - 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <style>
+        .manage-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .table {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    {% include 'head.html'%}
+
+    <!-- 管理页面内容 -->
+    <div class="container mt-4 manage-container">
+        <h1 class="mb-4">管理我的文章</h1>
+        {% if datas %}
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">标题</th>
+                    <th scope="col">发布日期</th>
+                    <th scope="col">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in datas %}
+                <tr>
+                    <td>{{ i['title'] }}</td>
+                    <td>{{ i['date']}}</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary btn-sm" href="{{ url_for('edit',title_id=i['id']) }}">编辑</a>
+                        <a type="submit" href="#" onclick="delete1(`{{i['id']}}`)" class="btn btn-danger btn-sm">删除</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-center">您还没有发布任何文章。</p>
+        {% endif %}
+    </div>
+
+    <!-- 页脚 -->
+    {% include './footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function delete1(id) {
+            var baseUrl = `delete`
+            var fullpath = `${baseUrl}/${parseInt(id)}`
+            console.log(fullpath)
+            if (confirm("确定删除吗？")) {
+                fetch(fullpath)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data)
+                        if (data.flg == true) {
+                            alert("删除成功！！！");
+                            location.assign('/manager')
+                        } else {
+                            alert("删除失败！！！");
+                            location.assign('/manager')
+                        }
+                    })
+                    .catch(error => {
+                        alert("删除错误！！！",error);
+                    });
+            }
+        }
+    </script>
+
+</body>
+
+</html>

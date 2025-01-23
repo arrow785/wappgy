@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主页 - 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            background-image: url('');
+            background-size: cover;
+        }
+
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel {
+            margin-top: 10px;
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        .carousel-inner img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            margin-right: 20px;
+            margin-left: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-message h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .welcome-message p {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .featured-content {
+            margin: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .featured-content h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .featured-content p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .featured-content a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .featured-content a:hover {
+            text-decoration: underline;
+        }
+
+        .social-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            margin: 0 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            text-decoration: underline;
+        }
+
+        .news-section {
+            margin: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .news-section h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .news-section p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .news-section a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .news-section a:hover {
+            text-decoration: underline;
+        }
+
+        .music-section {
+            margin: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .music-section h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .tools-section {
+            margin: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .tools-section h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .tools-section .tool {
+            margin-bottom: 10px;
+        }
+
+        .tools-section .tool a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .tools-section .tool a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{url_for('main')}}">首页</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index">文章</a>
+                    </li>
+                    {% if username == 'd' or username == None %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">登录</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#">个人主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">登出</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 欢迎信息 -->
+    <div class="welcome-message">
+        {% if username == 'd' or username == None %}
+        <h1>欢迎！🥰</h1>
+        <p>登录后，您可以查看更多内容、参与讨论和分享您的观点🖊。</p>
+        {% else %}
+        <h1>欢迎回来，{{ username }}🎈！</h1>
+        <p>继续探索我们的论坛，享受更多内容和互动。</p>
+        {% endif %}
+        <p id="curr_weather">正在获取天气信息.....</p>
+    </div>
+    <!-- 轮播图 -->
+    <div class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <!-- 自适应 图片 -->
+                <img onclick="next()" style="width: 100%; display: block;" id="img1" src="" alt="请耐心等待"></img>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 新闻摘要 -->
+    <div class="news-section">
+        <h2>新闻摘要</h2>
+        <p>以下是最近的热门新闻，来源于{{ news['from'] }}，最后更新于{{ news['update'] }}</p>
+        <ul>
+            {% for i in news['data'] %}
+            <li><a class="text-muted" href="{{i['url']}}" target="_blank">{{ i['title']
+                    }}&nbsp;&nbsp;&nbsp;<i>（{{ i['hot']}}）</i></a></li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- 哔哩哔哩在线视频 -->
+    <div class="music-section">
+        <h2>看两部短片吧</h2>
+        <iframe style="border-radius:12px"
+            src="//player.bilibili.com/player.html?isOutside=true&aid=52012946&bvid=BV1z4411Y7tX&cid=365220412&p=1&high_quality=1"
+            scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" width="100%"
+            height="400px"></iframe>
+        <!--  -->
+        <iframe style="border-radius:12px"
+            src="//player.bilibili.com/player.html?isOutside=true&aid=320668905&bvid=BV17w411U7qm&cid=1259280876&p=1&high_quality=1"
+            scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" width="100%"
+            height="400px"></iframe>
+    </div>
+
+    <!-- 实用小工具 -->
+    <div class="tools-section">
+        <h2>不是那么实用的实用小工具（滑稽Doge）</h2>
+        <div class="tool">
+            <a href="https://www.calculator.net/" target="_blank">在线计算器</a>
+        </div>
+        <div class="tool">
+            <a href="https://www.weather.com/" target="_blank">天气查询</a>
+        </div>
+    </div>
+
+
+
+    <!-- 页脚 -->
+    {% include 'footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function onl() {
+            fetch('https://bing.biturl.top')
+                .then(response => response.json())
+                .then(data => {
+                    url = data.url
+                    document.body.style.backgroundImage = `url(${url})`
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            next();
+        }
+        function next() {
+            var baseUrl = "{{ url_for('next1') }}"
+            fetch(baseUrl)
+                .then(response => response.json())
+                .then(data => {
+                    url = data.url
+                    document.getElementById('img1').src = url
+                    document.getElementById('img1').title = data.title
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function curr_weather() {
+            var baseUrl = "{{ url_for('curr_weather') }}"
+            fetch(baseUrl)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    document.getElementById('curr_weather').innerHTML = data.city + '，' + data.data.type;
+                }).catch(error => {
+                    console.error('Error:', error);
+                });
+
+        }
+        var time = 1 * 60 * 1000;
+        setInterval(next, time);
+        window.onload = function () {
+            onl();
+        };
+        const apiKey = "b58e1f74ceee1e528b6c633db2549731";
+        function getCurrentCity() {
+            if ("geolocation" in navigator) {
+                console.log("正在获取位置信息...");
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        const latitude = position.coords.latitude; // 纬度
+                        const longitude = position.coords.longitude; // 经度
+                        getCityNameByLocation(latitude, longitude);
+                    },
+                    function (error) {
+                        setTimeout(function () {
+                            document.getElementById('curr_weather').innerHTML = `无法获取位置信息......`;
+                        }, 3000);
+                        console.error("获取位置信息失败：", error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000
+                    }
+                );
+            } else {
+                console.error("浏览器不支持Geolocation API");
+            }
+        }
+
+        function getCityNameByLocation(lat, lng) {
+            // 替换为你的高德地图API Key
+            const url = `https://restapi.amap.com/v3/geocode/regeo?key=${apiKey}&location=${lng},${lat}&extensions=all`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "1" && data.info === "OK") {
+                        // 处理获取到的城市信息
+                        const adcode = data.regeocode.addressComponent.adcode;
+                        curr_weather(adcode);
+                    } else {
+                        // 延迟3s
+                        setTimeout(function () {
+                            document.getElementById('curr_weather').innerHTML = `无法获取位置信息......`;
+                        }, 3000);
+                       
+                        console.error("无法获取城市信息：", data.info);
+                    }
+                })
+                .catch(error => {
+                    console.error("请求逆地理编码失败：", error);
+                });
+        }
+        function curr_weather(adcode) {
+            fetch(`https://restapi.amap.com/v3/weather/weatherInfo?key=${apiKey}&city=${adcode}&extensions=base`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                document.getElementById('curr_weather').innerHTML = `${data.lives[0].city}，${data.lives[0].weather}，${data.lives[0].temperature_float}℃`;
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+
+        }
+        // 调用函数获取当前城市
+        getCurrentCity();
+    </script>
+</body>
+
+</html>

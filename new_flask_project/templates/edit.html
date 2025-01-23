@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+</head>
+<body>
+{% include 'head.html' %}
+<!-- 撰写页面内容 -->
+<div class="container write-container">
+    <h1 class="mb-4">编辑文章</h1>
+    <form id="write-form" action="/submit_edit" method="post">
+        <div class="mb-3" hidden>
+            <label for="title_id" class="form-label">id</label>
+            <input type="text" class="form-control" id="title_id" name="title_id" value="{{ title_id }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="title1" class="form-label">文章标题</label>
+            <input type="text" class="form-control" id="title1" name="title" value="{{ datas['title'] }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">文章内容</label>
+            <textarea class="form-control" id="content" name="content" rows="10"
+                      required>{{ datas['contents'] }}</textarea>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">保存修改</button>
+            <a type="submit" hidden href="#" onclick="delete1()" class="btn btn-danger">删除</a>
+        </div>
+    </form>
+</div>
+{% include 'footer.html' %}
+<script>
+    function delete1() {
+        if (confirm("确定删除吗？")) {
+            location.assign(`{{ url_for('delete',t_id=title_id) }}`)
+        }
+    }
+</script>
+</body>
+</html>
