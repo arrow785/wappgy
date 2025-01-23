@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>留言板</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .guestbook-header {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .guestbook-header h2 {
+            margin: 0;
+        }
+        .guestbook-header p {
+            margin: 0;
+            color: #666;
+        }
+        .guestbook-list {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .guestbook-item {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+        }
+        .guestbook-item:last-child {
+            border-bottom: none;
+        }
+        .guestbook-item h3 {
+            margin: 0 0 0.5rem;
+        }
+        .guestbook-item p {
+            margin: 0;
+            color: #666;
+        }
+        .guestbook-form {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+            text-align: center;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">留言板</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/callme">联系我</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 容器 -->
+    <div class="container">
+        <!-- 留言板标题 -->
+        <div class="guestbook-header">
+            <h2>留言板</h2>
+            <p>在这里留下你的足迹、想法或者遇到的问题！如果不好描述问题请跟我联系。</p>
+        </div>
+
+        <!-- 留言列表 -->
+        <div class="guestbook-list">
+            <h2>留言列表</h2>
+            <div class="guestbook-item">
+                <h3>John Doe</h3>
+                <p>2025-01-20</p>
+                <p>这是一条测试留言，欢迎来到我的留言板！</p>
+            </div>
+            <div class="guestbook-item">
+                <h3>Jane Smith</h3>
+                <p>2025-01-19</p>
+                <p>非常有趣的留言板，期待更多留言！</p>
+            </div>
+        </div>
+
+        <!-- 留言表单 -->
+        <div class="guestbook-form">
+            <h2>留下你的留言</h2>
+            <form>
+                <div class="mb-3">
+                    <label for="username" class="form-label">用户名</label>
+                    <input type="text" class="form-control" id="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">留言内容</label>
+                    <textarea class="form-control" id="message" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">提交留言</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 留言板. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

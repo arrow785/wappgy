@@ -20,6 +20,17 @@ def check_(username):
     print(result)
     return result
 
+
+# 登录时，检测账号密码是否正确
+def d_login_check(username, password):
+    sql = """
+            SELECT COUNT(*) AS c FROM admin AS a WHERE a.username = %s AND a.pwd = %s;
+        """
+    cursor.execute(sql, (username, md5(password)))
+    result = cursor.fetchone()['c']
+    print(result)
+    return result
+
 def resetPwd(new_pwd, username):
     sql = """
             UPDATE admin SET pwd = %s WHERE username = %s;
@@ -27,4 +38,15 @@ def resetPwd(new_pwd, username):
     cursor.execute(sql, (md5(new_pwd), username))
     connect.commit()
     return cursor.rowcount
+
+def selectAll(username):
+    if username == 'd':
+        return None
+    sql = """
+            SELECT * FROM admin AS a WHERE a.username = %s;
+        """
+    cursor.execute(sql, (username))
+    result = cursor.fetchone()
+    print(result)
+    return result
     

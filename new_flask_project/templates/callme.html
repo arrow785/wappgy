@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>联系我</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .contact-header {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .contact-header h2 {
+            margin: 0;
+        }
+
+        .contact-header p {
+            margin: 0;
+            color: #666;
+        }
+
+        .contact-form {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+            text-align: center;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">联系我</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">主页</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 容器 -->
+    <div class="container">
+        <!-- 联系我标题 -->
+        <div class="contact-header">
+            <h2>联系我 <img src="../static/img/pne.png" style="width: 30px;height: 30px;" alt="图片走丢了"></h2>
+            <p>有任何问题或合作意向，欢迎随时联系我！</p>
+        </div>
+
+        <!-- 联系表单 -->
+        <div class="contact-form">
+            <h2>发送消息</h2>
+            <form action="/send_email" method="post">
+                {% if username != 'd'%}
+                <div class="mb-3">
+                    <label for="name" class="form-label">昵称</label>
+                    <input placeholder="如果是游客，则填游客即可" disabled value="{{ username }}" name="username"
+                        type="text" class="form-control" id="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">邮箱</label>
+                    <input type="email" name="email" disabled value="{{ mail }}" class="form-control"
+                        id="email" required>
+                </div>
+
+                {% else %}
+                <div class="mb-3">
+                    <label for="name" class="form-label">昵称</label>
+                    <input placeholder="如果是游客，则填游客即可"  name="username"
+                        type="text" class="form-control" id="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">邮箱</label>
+                    <input type="email" name="email"  class="form-control"
+                        id="email" required>
+                </div>
+                {% endif %}
+                <div class="mb-3">
+                    <label for="message" class="form-label">留言内容</label>
+                    <textarea class="form-control" name="msg" id="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">发送</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 联系我. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

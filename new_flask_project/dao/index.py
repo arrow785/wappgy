@@ -7,11 +7,29 @@ connect, cursor = ConMySQL().mSQL()
 def select_all(page, sqldb, per_page=5, ):
     offset = (page - 1) * per_page
     sql = f"SELECT * FROM context AS c ORDER BY c.date DESC LIMIT %s OFFSET %s"
-    c, cur = sqldb.mSQL()
-    cur.execute(sql, (per_page, offset))
-    result = cur.fetchall()
-    return result
-
+    try:
+        c, cur = sqldb.mSQL()
+        cur.execute(sql, (per_page, offset))
+        result = cur.fetchall()
+        return result
+    except Exception as e:
+        print(f'select_all() 错误=>{e}')
+    
+def select_all_context(username: str,sqldb):
+    if username == 'd':
+        print('未知用户！')
+        return None
+    sql = f"""
+        SELECT * FROM context AS c
+        WHERE c.username = %s
+        ORDER BY c.date DESC
+        """
+    try:
+        c,cur = sqldb.mSQL()
+        cur.execute(sql, (username,))
+        return cur.fetchall()[0]
+    except Exception as e:
+        print(f'select_all_context() 错误=>{e}')
 
 # 获取总文章数
 def get_total_articles(sqldb):

@@ -1,20 +1,26 @@
 # 主程序
 from sql_flask.settings import MyFlask
-from flask import render_template, request, session, redirect, url_for, jsonify
+from flask import render_template, request, session, redirect, url_for, jsonify,send_from_directory
+from flask_mail import Mail,Message
 from dao.index import *
 from dao.login import *
-from dao.manager import *
+from dao.manager import *   
 from dao.register import *
 from dao.write import *
 from dao.detailed import *
-from tools.mytools import md5
+from dao.email import *
+import os
+
 from sql_flask.mymysql import ConMySQL
-from tools.mytools import getImage, getNews, getWearther
+from tools.mytools import *
 
 flask = MyFlask(__name__)
 app = flask.app
+
 # 设置密钥
 app.config['SECRET_KEY'] = 'lisi_55assdasw'
+
+loginUser:dict = {}
 
 msqk = ConMySQL()
 
@@ -61,6 +67,7 @@ def login():
     return render_template('login.html', **locals())
 
 
+# 登录功能
 @app.route('/submit', methods=['POST'])
 def submit():
     data = request.form
@@ -68,7 +75,6 @@ def submit():
     password = data.get('password')
     md5pasword = md5(password)
     rows = check_user(username, md5pasword)
-
     if rows == 0:
         return """
                   <script>
@@ -208,7 +214,6 @@ def curr_weather():
 
 @app.route('/reset_pwd',methods=['GET'])
 def reset_pwd():
-
     return render_template('resetpwd.html')
 
 
@@ -241,6 +246,110 @@ def reset_pwd1():
                 </script>
                """
                
-               
+@app.route('/pep_dev',methods=['GET'])
+def pep():
+    username = session.get('username','d')
+    datas = select_all_context(username=username,sqldb=msqk)
+    print(datas)
+    if datas is not None:
+        return render_template('dev_people.html',**locals())
+
+
+@app.route('/people',methods=['GET'])
+def people():
+
+    username = session.get('username','d')
+    datas = select_all_context(username=username,sqldb=msqk)
+    contents = select_emial(username=username,sqldb=msqk)
+    # 图片地址要求是相对地址
+    avatar = get_avatar(username=username)
+    avatar_url = ''
+    if avatar != 'xxx':
+        avatar_url = os.path.relpath(avatar,os.path.dirname(__file__))
+    else:
+        avatar_url = 'static/upload_img/mr.png'
+    return render_template('people.html',**locals())
+
+# 留言板
+@app.route('/boards',methods=['GET'])
+def boards():
+    return render_template('guestbook.html')
+
+
+# 联系我
+@app.route('/callme',methods=['GET'])
+def callme():
+    username = session.get('username', 'd')
+    loginUser['username'] = username
+    data = selectAll(username)
+    if data is not None:
+        loginUser['username'] = data['username']
+        loginUser['email'] = data['email']
+    else:
+        loginUser['username'] = 'd'
+        loginUser['email'] = '未知邮箱'
+    return render_template('callme.html',username=loginUser.get('username','d'),mail=loginUser.get('email'))
+
+
+# 发送邮件
+@app.route('/send_email',methods=['POST'])
+def send_email():
+
+    data = request.form
+    name = data.get('username','未知用户')
+    email:str = data.get('email')
+    content = data.get('msg')
+
+    print('===@@>',name,email,content)
+    # 配置 Flask-Mail
+    app.config['MAIL_SERVER'] = 'smtp.163.com'
+    app.config['MAIL_PORT'] = 465
+    app.config['MAIL_USE_SSL'] = True
+    app.config['MAIL_USERNAME'] = 'xttdfix@163.com'
+    app.config['MAIL_PASSWORD'] = 'LVgPZrqcMmmWFUdq'
+    mail = Mail(app)
+    msg = Message(subject=f"来自{name}的留言",sender='xttdfix@163.com',recipients=['luoruiGeng@163.com'])
+    msg.body = f"来自{name}({email})的留言：{content}"
+    if insert_emial(username=name,email=email,content=content,sqldb=msqk) is not None:
+            print('插入成功！')
+    else:
+        print('插入失败！')
+    
+    try:
+        mail.send(msg)
+        if update_emial(username=name,sqldb=msqk) is not None:
+            print('更新成功！')
+        else:
+            print('更新失败！')
+        return """
+            <script>
+                alert('发送成功！')
+                location.assign('/callme')
+            </script>
+
+    """
+    except Exception as e:
+        print(e)
+        return """
+            <script>
+                alert('发送失败！')
+                location.assign('/callme')
+            </script>
+        """
+
+
+@app.route('/update_info',methods=['POST'])
+def update_info():
+    data = request.form
+    imgfile = request.files.get('imgf')
+    save_image(imgfile=imgfile,curr_path=__file__,username=session.get('username','d'))
+    print(type(imgfile))
+    newnick = data.get('newnick')
+    newemail = data.get('newemail')
+    introduce = data.get('introduce')
+    print(newnick,newemail,introduce)
+    return jsonify(send=True)
+
+
 if __name__ == '__main__':
     flask.run()

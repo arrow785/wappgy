@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户主页</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .profile-header {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .profile-header img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+
+        .profile-header .info {
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-header .info h2 {
+            margin: 0;
+        }
+
+        .profile-header .info p {
+            margin: 0;
+            color: #666;
+        }
+
+        .profile-header .bio {
+            margin-top: 1rem;
+        }
+
+        .profile-header .edit-profile {
+            margin-top: 1rem;
+        }
+
+        .posts {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .post-item {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+        }
+
+        .post-item:last-child {
+            border-bottom: none;
+        }
+
+        .post-item h3 {
+            margin: 0 0 0.5rem;
+        }
+
+        .post-item p {
+            margin: 0;
+            color: #666;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+            text-align: center;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <p class="navbar-brand">{{username}}的主页</p>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" hidden href="about.html">关于我</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" hidden href="contact.html">联系我</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 容器 -->
+    <div class="container">
+        <!-- 用户简介 -->
+        <div class="profile-header">
+            <div class="info">
+                <img src="{{avatar_url}}" alt="Profile Picture">
+                <div>
+                    <h2>{{ username }}</h2>
+
+
+                </div>
+            </div>
+            <p class="bio">
+                这是你的个人主页！
+            </p>
+            <div class="edit-profile">
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#editProfileModal">编辑资料</button>
+                <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#editProfileModal">修改密码</button>
+            </div>
+        </div>
+
+        <!-- 文章列表 -->
+        <div class="posts">
+            <h2>你的文章</h2>
+            {% for i in datas%}
+            <div class="post-item">
+                <h3><a href="#">{{ i['title'] }}</a></h3>
+                {% if i['modify_date'] == None %}
+                <p>发布于 {{ i['date'] }}</p>
+                {% else %}
+                <p>发布于 {{ i['date'] }} | 修改于 {{ i['modify_date'] }}</p>
+                {% endif %}
+            </div>
+            {% else %}
+            <p>没有发布任何文章。<a class="text-muted" href="/write">点击去发布</a></p>
+            {% endfor %}
+        </div>
+
+        <div class="posts">
+            <h2>邮件发送记录</h2>
+            {% for i in contents%}
+            <p>发送内容：{{ i['send_content'] }}</p>
+            <small>发送时间：{{ i['send_date'] }} <i style="color: green;">发送{{ i['is_send'] }}</i></small>
+            {% else %}
+            <p>没有发送任何内容。</p>
+            {% endfor %}
+        </div>
+
+        <!-- 编辑资料模态框 -->
+        <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProfileModalLabel">编辑资料</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/update_info" method="post" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="profilePicture" class="form-label">头像</label>
+                                <input accept=".png,.jpg" name="imgf" type="file"
+                                    class="form-control" id="profilePicture">
+                            </div>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">新的昵称</label>
+                                <input type="text" name="newnick" class="form-control" id="username">
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">邮箱</label>
+                                <input type="email" name="email" class="form-control" id="email">
+                            </div>
+                            <div class="mb-3">
+                                <label for="bio" class="form-label">简介</label>
+                                <textarea name="introduce" class="form-control" id="introduce" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">保存更改</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 用户主页. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <!-- Bootstrap JS -->
+        <script src="../static/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

@@ -19,3 +19,7 @@ body {
     text-align: center;
     margin-top: 2rem;
 }
+
+ul li:hover {
+    border-bottom: 2px solid #f56e07;
+}

@@ -18,6 +18,9 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+    .fr:hover {
+        background-color: #dee4e8;
+    }
 </style>
 
 <body>
@@ -39,9 +42,9 @@
             <div class="col-md-8">
                 <h2>最新文章</h2>
                 <br>
-                <ul class="list-group" id="article-list">
+                <ul class="list-group" id="article-list" style="margin-bottom: 10px;">
                     {% for i in datas %}
-                    <li class="list-group-item" data-id="{{ i['id'] }}">
+                    <li class="list-group-item fr" data-id="{{ i['id'] }}">
                         <h3>{{ i['title'] }}</h3>
                         {% if i['modify_date'] == None %}
                         <p class="text-muted"><strong><i>{{ i['username'] }}</i></strong> - 发布于: {{ i['date'] }}</p>

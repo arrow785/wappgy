@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTML5 图片裁剪与缩放</title>
+    <style>
+        #canvas {
+            border: 1px solid black;
+            cursor: move;
+        }
+        #croppedImage {
+            max-width: 300px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>图片裁剪与缩放</h1>
+    <input type="file" id="upload" accept="image/*">
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <button id="crop">裁剪图片</button>
+    <h2>裁剪后的图片：</h2>
+    <img id="croppedImage" alt="裁剪后的图片">
+
+    <script>
+        const upload = document.getElementById('upload');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const cropButton = document.getElementById('crop');
+        const croppedImage = document.getElementById('croppedImage');
+
+        let image = null;
+        let scale = 1; // 缩放比例
+        let offsetX = 0; // 图片的偏移量
+        let offsetY = 0;
+        let isDragging = false; // 是否正在拖动
+        let startX, startY; // 拖动的起始位置
+
+        // 加载图片
+        upload.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    image = new Image();
+                    image.onload = function() {
+                        // 初始化图片位置和大小
+                        scale = Math.min(canvas.width / image.width, canvas.height / image.height);
+                        offsetX = (canvas.width - image.width * scale) / 2;
+                        offsetY = (canvas.height - image.height * scale) / 2;
+                        drawImage();
+                    };
+                    image.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 绘制图片
+        function drawImage() {
+            if (!image) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(image, offsetX, offsetY, image.width * scale, image.height * scale);
+        }
+
+        // 拖动图片
+        canvas.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.offsetX;
+            startY = e.offsetY;
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            offsetX += e.offsetX - startX;
+            offsetY += e.offsetY - startY;
+            startX = e.offsetX;
+            startY = e.offsetY;
+            drawImage();
+        });
+
+        canvas.addEventListener('mouseup', function() {
+            isDragging = false;
+        });
+
+        // 缩放图片
+        canvas.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            const delta = e.deltaY;
+            const zoomFactor = delta < 0 ? 1.1 : 0.9;
+            scale *= zoomFactor;
+            drawImage();
+        });
+
+        // 裁剪图片
+        cropButton.addEventListener('click', function() {
+            if (!image) {
+                alert("请先上传图片！");
+                return;
+            }
+            const cropCanvas = document.createElement('canvas');
+            const cropCtx = cropCanvas.getContext('2d');
+            cropCanvas.width = canvas.width;
+            cropCanvas.height = canvas.height;
+            cropCtx.drawImage(image, offsetX, offsetY, image.width * scale, image.height * scale, 0, 0, image.width * scale, image.height * scale);
+            croppedImage.src = cropCanvas.toDataURL();
+        });
+    </script>
+</body>
+</html>

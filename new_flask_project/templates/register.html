@@ -38,6 +38,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/">首页</a>
                     </li>
+
                 </ul>
             </div>
         </div>
@@ -48,12 +49,12 @@
         <h2 class="text-center mb-4">注册新账号</h2>
         <form id="register-form" action="/submit_register" method="post">
             <div class="mb-3">
-                <label for="username" class="form-label">用户名</label>
-                <input type="text" class="form-control" id="username" name="username" required>
+                <label for="username" id="tips" class="form-label">用户名</label>
+                <input type="text" onblur="checkUsername()" class="form-control" id="username" name="username" required>
             </div>
             <div class="mb-3">
-                <label for="email" class="form-label">电子邮箱（不是必须）</label>
-                <input type="email" class="form-control" id="email" name="email">
+                <label for="email" class="form-label">电子邮箱</label>
+                <input type="email" class="form-control" id="email" name="email" required>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">密码</label>
@@ -61,10 +62,10 @@
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">确认密码</label>
-                <input type="password" id="pwd1" class="form-control" name="password-test" required>
+                <input type="password" onblur="checkPassword()" id="pwd1" class="form-control" name="password-test" required>
             </div>
             <div class="text-center">
-                <button type="submit" class="btn btn-primary">提交注册</button>
+                <button type="submit" id="sub" class="btn btn-primary">注册</button>
             </div>
         </form>
         <div class="text-center mt-3">
@@ -78,17 +79,62 @@
     <!-- Bootstrap JS -->
     <script src="../static/js/bootstrap.bundle.min.js"></script>
     <script>
+
+        function checkUsername() {
+            var username = document.getElementById('username').value;
+            var tips = document.getElementById('tips');
+            var pwd1 = document.getElementById('pwd1');
+            var pwd2 = document.getElementById('pwd2');
+            var sub = document.getElementById('sub');
+            var email = document.getElementById('email');
+            var url = `check_username/${username}`
+            console.log(url);
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.exists == false) {
+                        tips.style.color = 'red';
+                        tips.innerHTML = `${username} 已经存在!`;
+                        // 输入框不允许输入
+                        pwd1.disabled = true;
+                        pwd.disabled = true;
+                        sub.disabled = true;
+                        email.disabled = true;
+                    }  else{
+                        tips.style.color = 'black';
+                        tips.innerHTML = '用户名';
+                        pwd1.disabled = false;
+                        pwd.disabled = false;
+                        sub.disabled = false;
+                        email.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    alert('请求失败.....');
+                    console.log(error);
+                })
+        }
+
         // js判断两次输入的密码是否一致
-        const registerForm = document.getElementById('register-form');
-        registerForm.addEventListener('submit', function(event) {
+        function checkPassword() {
             var password = document.getElementById('pwd').value;
             var confirmPassword = document.getElementById('pwd1').value;
             console.log(password, confirmPassword);
             if (password !== confirmPassword) {
-                alert('两次输入的密码不一致');
-                event.preventDefault(); // 阻止表单提交
+                var sub = document.getElementById('sub');
+                sub.disabled = true;
+                sub.className = 'btn btn-danger';
+                sub.innerText = '两次密码不一致';
+            } else {
+                var sub = document.getElementById('sub');
+                sub.disabled = false;
+                sub.className = 'btn btn-primary';
+                sub.innerText = '注册';
             }
-        });
+
+        }
     </script>
 </body>
 

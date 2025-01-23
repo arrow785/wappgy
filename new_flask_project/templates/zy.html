@@ -110,7 +110,9 @@
         }
 
         .news-section {
-            margin: 20px;
+            margin-top: 10px;
+            margin-left: 20px;
+            margin-right: 20px;
             padding: 20px;
             background-color: rgba(255, 255, 255, 0.8);
             border-radius: 10px;
@@ -138,7 +140,9 @@
         }
 
         .music-section {
-            margin: 20px;
+            margin-top: 10px;
+            margin-left: 20px;
+            margin-right: 20px;
             padding: 20px;
             background-color: rgba(255, 255, 255, 0.8);
             border-radius: 10px;
@@ -152,7 +156,10 @@
         }
 
         .tools-section {
-            margin: 20px;
+            margin-top: 10px;
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-bottom: 10px;
             padding: 20px;
             background-color: rgba(255, 255, 255, 0.8);
             border-radius: 10px;
@@ -194,13 +201,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/index">文章</a>
                     </li>
+                    
                     {% if username == 'd' or username == None %}
                     <li class="nav-item">
                         <a class="nav-link" href="/login">登录</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link disabled" href="#">个人主页</a>
+                        <a class="nav-link" href="/boards">留言板</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/people">个人主页</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/logout">登出</a>
@@ -237,12 +248,12 @@
     <div class="news-section">
         <h2>新闻摘要</h2>
         <p>以下是最近的热门新闻，来源于{{ news['from'] }}，最后更新于{{ news['update'] }}</p>
-        <ul>
+        <ol>
             {% for i in news['data'] %}
             <li><a class="text-muted" href="{{i['url']}}" target="_blank">{{ i['title']
                     }}&nbsp;&nbsp;&nbsp;<i>（{{ i['hot']}}）</i></a></li>
             {% endfor %}
-        </ul>
+        </ol>
     </div>
 
     <!-- 哔哩哔哩在线视频 -->
