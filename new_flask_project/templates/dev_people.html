@@ -83,9 +83,17 @@
             margin: 0 0 0.5rem;
         }
 
+
         .post-item p {
             margin: 0;
             color: #666;
+        }
+
+        .post-item:hover {
+            background: #ebe5e5;
+            border-radius: 5px;
+
+            border-bottom: 2px solid #f7722f;
         }
 
         .footer {
@@ -142,8 +150,10 @@
         <div class="posts">
             <h2>开发者的文章</h2>
             {% for i in datas %}
-            <div class="post-item">
-                <h3><a href="#">{{ i['title'] }}</a></h3>
+            <div class="post-item" onclick="information(`{{i['id']}}`)">
+                <h3>
+                    <p>{{ i['title'] }}</p>
+                </h3>
                 {% if i['modify_date'] == None %}
                 <p>发布于 {{ i['date'] }}</p>
                 {% else %}
@@ -197,6 +207,15 @@
 
         <!-- Bootstrap JS -->
         <script src="../static/js/bootstrap.bundle.min.js"></script>
+        <script>
+            function information(id) {
+                // 获取所有 list-group-item 元素
+                console.log(id);
+                var basePath = `/detalied`; // 编辑页面的 URL
+                var full_path = `${basePath}/${id}`;
+                window.location.href = full_path;
+            }
+        </script>
 </body>
 
 </html>

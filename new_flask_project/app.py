@@ -2,7 +2,6 @@
 
 from functools import wraps
 
-
 from sql_flask.settings import MyFlask
 from flask import render_template, request, session, redirect, url_for, jsonify
 from flask_mail import Mail, Message
@@ -56,7 +55,7 @@ def set_session(username):
     if username is None:
         session['username'] = 'd'
     else:
-        information['data'] = selectAll(username,sqldb=msqk)
+        information['data'] = selectAll(username, sqldb=msqk)
         print(information.get('data'))
 
 
@@ -85,6 +84,7 @@ def index():
 def detalied(title_id: int):
     data = full_context(title_id, msqk)
     comments = by_id(title_id, msqk)
+    avatar_path = information.get('data', {}).get('avatar')
     print(title_id, data)
     print(comments)
     username = session.get('username', 'd')
@@ -139,7 +139,7 @@ def comment_submit(title_id: int, name: str, zhuti: str):
 @my_login_required
 def write():
     username = session.get('username', 'd')
-    avatar_path = information.get('data',{}).get('avatar')
+    avatar_path = information.get('data', {}).get('avatar')
     return render_template('write.html', **locals())
 
 
@@ -214,7 +214,7 @@ def submit_register():
     imgfile = data.get('croppedImage')
     print(f'imgFile_name==>{imgfile},username==>{username}')
     # 保存图片到本地，返回图片路径
-    imgPath = save_img(imgfile, username)
+    imgPath = save_img(imgfile, int(information.get('data', {}).get('id')))
     # 获取当前时间
     register_date = get_time()
     # 获取随机昵称
@@ -343,7 +343,7 @@ def send_email():
     data = request.form
     content = data.get('msg')
     name = session.get('username', '游客1')
-    email = data.get('email',{})
+    email = data.get('email', {})
     if email == '':
         email = 'youke@youke@163.com'
     print(f'email => {type(email)}')
@@ -392,7 +392,7 @@ def update_info():
     data = request.form
     imgfile = data.get('croppedImage')
     print(f'类型：{type(imgfile)} 数据：=> {imgfile}')
-    path = update_system_avatar(imgfile=imgfile, username=session.get('username', 'd'))
+    path = update_system_avatar(imgfile=imgfile, username=session.get('username', 'd'), uid=information.get('data',{}).get('id'))
     newnick = data.get('newnick')
     newemail = data.get('newemail')
     introduce = data.get('introduce')

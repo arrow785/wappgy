@@ -49,7 +49,7 @@
                             <img src="{{ avatar_path }}" onclick="people()" alt="用户头像">
                         </div>
                     </li>
-                    
+
                     <li class="nav-item">
                         <a class="nav-link" href="/write">撰写</a>
                     </li>
@@ -81,7 +81,7 @@
                 <br>
                 <ul class="list-group" id="article-list" style="margin-bottom: 10px;">
                     {% for i in datas %}
-                    <li class="list-group-item fr" data-id="{{ i['id'] }}">
+                    <li class="list-group-item fr" onclick="information({{i['id']}})">
                         <h3>{{ i['title'] }}</h3>
                         {% if i['modify_date'] == None %}
                         <p class="text-muted"><strong><i>{{ i['username'] }}</i></strong> - 发布于: {{ i['date'] }}</p>
@@ -91,7 +91,7 @@
                             i['modify_date'] }}</p>
                         {% endif %}
                         <!-- 使用自定义样式限制显示四行 -->
-                        <p onclick="information(`{{i['id']}}`)" class="text-muted text-clamp-4">
+                        <p class="text-muted text-clamp-4">
                             {{ i['contents'] }}
                         </p>
                     </li>
@@ -145,25 +145,13 @@
         // 初始化加载第一页
         loadPage(currentPage);
 
-        function information() {
-            // 获取所有 list-group-item 元素
-            var list = document.getElementsByClassName("list-group-item");
-            for (var i = 0; i < list.length; i++) {
-                var id = list[i].getAttribute('data-id');
-                list[i].onclick = (function (id) {
-                    return function () {
-                        this.style.backgroundColor = "#f9f9f9";
-                        var basePath = `/detalied`; // 编辑页面的 URL
-                        var full_path = `${basePath}/${id}`;
-                        console.log(full_path);
-                        window.location.href = full_path;
-                    };
-                })(id);
-            }
+        function information(id) {
+            var basePath = `/detalied`; // 编辑页面的 URL
+            var full_path = `${basePath}/${id}`;
+            console.log(full_path);
+            window.location.href = full_path;
         }
 
-        // 确保在页面加载时调用 information 函数
-        window.onload = information;
     </script>
 
 </body>

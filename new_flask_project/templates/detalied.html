@@ -76,7 +76,7 @@
                     {% else %}
                     <li class="nav-item">
                         <div class="navbar-avatar">
-                            <img src="{{ avatar_path }}" onclick="people()" alt="用户头像">
+                            <img src="{{ request.url_root }}{{ avatar_path }}" onclick="people()" alt="用户头像">
                         </div>
                     </li>
                     
@@ -173,7 +173,9 @@
     <!-- Bootstrap JS -->
     <script src="../static/js/bootstrap.bundle.min.js"></script>
     <script>
-        console.log(`{{ request.url_root }}`)
+        function people() {
+            window.location.href = '/people';
+        }
     </script>
 </body>
 

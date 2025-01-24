@@ -98,21 +98,22 @@ def delete_avatar(username):
         cur.close()
         con.close()
 
+
 import os
 
+
 # 更新系统中的头像
-def update_system_avatar(imgfile: str, username):
+def update_system_avatar(imgfile: str, username, uid):
     delete_avatar(username)
-    img_path = save_img(imgfile, username)
+    img_path = save_img(imgfile, uid)
     return img_path
 
 
-
 # 保存图片到系统
-def save_img(file: str, login_username):
+def save_img(file: str, login_username_id):
     # 解码Base64转为图片
     img: bytes = base64.b64decode(file.split(',')[1])
-    file_name = f'{login_username}_avatar.jpg'
+    file_name = f'{login_username_id}_avatar.jpg'
     input_path = os.path.join(img_curr_path, file_name)
     with open(input_path, 'wb+') as f:
         f.write(img)
