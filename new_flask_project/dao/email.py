@@ -13,7 +13,7 @@ def insert_emial(username,email,content,sqldb):
         connect.commit()
         return cursor.lastrowid
     except Exception as e:
-        print('写入错误！！！',e)
+        print(f'insert_emial() 邮箱写入错误！！！ =>{e}')
 
 def update_emial(username,sqldb):
     c,cour = sqldb.mSQL()
@@ -23,7 +23,7 @@ def update_emial(username,sqldb):
         c.commit()
         return cour.rowcount
     except Exception as e:
-        print('更新错误！！！',e)
+        print(f'更新错误！！！ update_emial() => {e}')
 
 def select_emial(username,sqldb):
     c,cour = sqldb.mSQL()
@@ -32,6 +32,6 @@ def select_emial(username,sqldb):
         cour.execute(sql,(username,))
         return cour.fetchall()
     except Exception as e:
-        print('查询错误！！！',e)
+        print(f'查询错误！！！ select_emial() => {e}')
     
     

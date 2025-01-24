@@ -1,15 +1,17 @@
 # 主程序
+
+from functools import wraps
+
+
 from sql_flask.settings import MyFlask
-from flask import render_template, request, session, redirect, url_for, jsonify,send_from_directory
-from flask_mail import Mail,Message
+from flask import render_template, request, session, redirect, url_for, jsonify
+from flask_mail import Mail, Message
 from dao.index import *
-from dao.login import *
-from dao.manager import *   
-from dao.register import *
+from dao.user import *
+from dao.manager import *
 from dao.write import *
 from dao.detailed import *
 from dao.email import *
-import os
 
 from sql_flask.mymysql import ConMySQL
 from tools.mytools import *
@@ -17,26 +19,51 @@ from tools.mytools import *
 flask = MyFlask(__name__)
 app = flask.app
 
-# 设置密钥
-app.config['SECRET_KEY'] = 'lisi_55assdasw'
+information: dict = {}
+loginUser: dict = {}
 
-loginUser:dict = {}
+
+# 登录装饰器
+def my_login_required(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print("Checking session:", session)  # 添加调试信息
+        if session.get('username', 'd') == 'd':
+            print("User not logged in, redirecting to main")
+            return redirect(url_for('tologin'))
+        else:
+            print("User logged in, proceeding")
+            return func(*args, **kwargs)
+
+    return wrapper
+
+
+# 设置密钥
+def get_salt():
+    import string, random
+    salt: str = ''.join(random.sample(string.ascii_letters + string.digits, 8))
+    return salt
+
+
+app.config['SECRET_KEY'] = get_salt()
+# string随机盐生成
 
 msqk = ConMySQL()
 
 
-def set_session(username, password):
-    if username is None or password is None:
-        session['username'] = 'd'
+def set_session(username):
     session['username'] = username
+    if username is None:
+        session['username'] = 'd'
+    else:
+        information['data'] = selectAll(username,sqldb=msqk)
+        print(information.get('data'))
 
 
 @app.route('/', methods=['GET'])
 def main():
     news = getNews()
-    weather = getWearther().get('data')
-    city = getWearther().get('city')
-    return render_template('zy.html', username=session.get('username', 'd'), news=news, weather=weather, city=city)
+    return render_template('zy.html', username=session.get('username', 'd'), news=news)
 
 
 @app.route('/index', methods=['GET', 'POST'])
@@ -49,6 +76,8 @@ def index():
     print(f'总页数：{total_articles}，所有数据：{datas}')
     total_pages = (total_articles + per_page - 1) // per_page  # 计算总页数
     username = session.get('username', 'd')
+    # 获取用户头像
+    avatar_path = get_avatar(username=username)
     return render_template('index.html', **locals())
 
 
@@ -57,19 +86,20 @@ def detalied(title_id: int):
     data = full_context(title_id, msqk)
     comments = by_id(title_id, msqk)
     print(title_id, data)
+    print(comments)
     username = session.get('username', 'd')
     return render_template('detalied.html', **locals())
 
 
 @app.route('/login', methods=['GET'])
-def login():
+def tologin():
     username = session.get('username', 'd')
     return render_template('login.html', **locals())
 
 
 # 登录功能
-@app.route('/submit', methods=['POST'])
-def submit():
+@app.route('/login_sub', methods=['POST'])
+def login():
     data = request.form
     username = data.get('username')
     password = data.get('password')
@@ -83,7 +113,7 @@ def submit():
                   </script>
                   """
     elif rows == 1:
-        set_session(username, md5pasword)
+        set_session(username)
         return """
                     <script>
                         location.assign('/index')
@@ -106,8 +136,10 @@ def comment_submit(title_id: int, name: str, zhuti: str):
 
 
 @app.route('/write', methods=['GET'])
+@my_login_required
 def write():
     username = session.get('username', 'd')
+    avatar_path = information.get('data',{}).get('avatar')
     return render_template('write.html', **locals())
 
 
@@ -121,13 +153,16 @@ def submit_write():
 
 
 @app.route('/manager', methods=['GET'])
+@my_login_required
 def manager():
     username = session.get('username')
     datas = select_all_context(username, sqldb=msqk)
+    avatar_path = information.get('data', {}).get('avatar')
     return render_template('manager.html', **locals())
 
 
 @app.route('/edit/<int:title_id>', methods=['GET'])
+@my_login_required
 def edit(title_id: int):
     datas = find_context(title_id)
     return render_template('edit.html', **locals())
@@ -176,11 +211,20 @@ def register():
 def submit_register():
     data = request.form
     username = data.get('username')
+    imgfile = data.get('croppedImage')
+    print(f'imgFile_name==>{imgfile},username==>{username}')
+    # 保存图片到本地，返回图片路径
+    imgPath = save_img(imgfile, username)
+    # 获取当前时间
+    register_date = get_time()
+    # 获取随机昵称
+    nickName = data.get('nickname', randName())
     password = data.get('password')
     email = data.get('email')
     print(type(email))
     md5pasword = md5(password)
-    rows = insert_user(username, email, md5pasword)
+    rows = insertUser(username=username, email=email, password=md5pasword, avatar=imgPath,
+                      register_date=register_date, nickName=nickName)
     if rows is not None:
         return """
                 <script>
@@ -202,40 +246,43 @@ def next1():
     imgUrl = getImage()
     url = imgUrl.get('data').get('url')
     title = imgUrl.get('data').get('title')
-    return jsonify(url=url,title=title)
+    return jsonify(url=url, title=title)
 
 
-@app.route('/curr_weather',methods=['GET'])
+@app.route('/curr_weather', methods=['GET'])
 def curr_weather():
     weather = getWearther()
     print(weather)
     return jsonify(weather)
 
 
-@app.route('/reset_pwd',methods=['GET'])
+@app.route('/reset_pwd', methods=['GET'])
 def reset_pwd():
     return render_template('resetpwd.html')
 
 
-@app.route('/check_username/<string:username>',methods=['GET'])
-def check_username(username:str):
+# 注册时，判断用户名是否已经存在
+@app.route('/check_username/<string:username>', methods=['GET'])
+def check_username(username: str):
     rows = check_(username=username)
+    print(f'check_username=>{username}')
     if rows != 0:
         return jsonify(exists=False)
     else:
         return jsonify(exists=True)
-    
-@app.route('/reset_pwd1',methods=['POST'])
+
+
+@app.route('/reset_pwd1', methods=['POST'])
 def reset_pwd1():
     data = request.form
     username = data.get('username')
     password = data.get('password')
-    row = resetPwd(new_pwd=password,username=username)
+    row = resetPwd(new_pwd=password, username=username)
     if row is not None:
         return """
                 <script>
-                    alert('修改成功！')
-                    location.assign('/login')
+                    alert('重置成功！')
+                    location.assign('/login_sub')
                 </script>
                """
     else:
@@ -245,62 +292,63 @@ def reset_pwd1():
                     location.assign('/reset_pwd')
                 </script>
                """
-               
-@app.route('/pep_dev',methods=['GET'])
+
+
+@app.route('/pep_dev', methods=['GET'])
 def pep():
-    username = session.get('username','d')
-    datas = select_all_context(username=username,sqldb=msqk)
+    datas = select_all_context(username='喜欢劈瓜的刘华强', sqldb=msqk)
     print(datas)
     if datas is not None:
-        return render_template('dev_people.html',**locals())
+        return render_template('dev_people.html', **locals())
 
 
-@app.route('/people',methods=['GET'])
+@app.route('/people', methods=['GET'])
+@my_login_required
 def people():
-
-    username = session.get('username','d')
-    datas = select_all_context(username=username,sqldb=msqk)
-    contents = select_emial(username=username,sqldb=msqk)
+    username = session.get('username', 'd')
+    ifm = information.get('data', {})
+    print(f'==> {ifm}')
+    contexts = select_all_context(username=username, sqldb=msqk)
+    contents = select_emial(username=username, sqldb=msqk)
     # 图片地址要求是相对地址
     avatar = get_avatar(username=username)
-    avatar_url = ''
-    if avatar != 'xxx':
-        avatar_url = os.path.relpath(avatar,os.path.dirname(__file__))
-    else:
-        avatar_url = 'static/upload_img/mr.png'
-    return render_template('people.html',**locals())
+    print(avatar)
+    if avatar == 'xxx':
+        avatar = 'static/upload_img/mr.png'
+    return render_template('people.html', **locals())
+
 
 # 留言板
-@app.route('/boards',methods=['GET'])
+@app.route('/boards', methods=['GET'])
 def boards():
-    return render_template('guestbook.html')
+    username = session.get('username', 'd')
+    return render_template('guestbook.html', **locals())
 
 
 # 联系我
-@app.route('/callme',methods=['GET'])
+
+@app.route('/callme', methods=['GET'])
 def callme():
+    # 获取用户信息
     username = session.get('username', 'd')
+    # print(username)
     loginUser['username'] = username
-    data = selectAll(username)
-    if data is not None:
-        loginUser['username'] = data['username']
-        loginUser['email'] = data['email']
-    else:
-        loginUser['username'] = 'd'
-        loginUser['email'] = '未知邮箱'
-    return render_template('callme.html',username=loginUser.get('username','d'),mail=loginUser.get('email'))
+    return render_template('callme.html',
+                           username=username)
 
 
 # 发送邮件
-@app.route('/send_email',methods=['POST'])
+@app.route('/send_email', methods=['POST'])
 def send_email():
-
     data = request.form
-    name = data.get('username','未知用户')
-    email:str = data.get('email')
     content = data.get('msg')
-
-    print('===@@>',name,email,content)
+    name = session.get('username', '游客1')
+    email = data.get('email',{})
+    if email == '':
+        email = 'youke@youke@163.com'
+    print(f'email => {type(email)}')
+    print(f'email = > {email} , information = > {information}')
+    print('===@@>', name, email, content)
     # 配置 Flask-Mail
     app.config['MAIL_SERVER'] = 'smtp.163.com'
     app.config['MAIL_PORT'] = 465
@@ -308,16 +356,16 @@ def send_email():
     app.config['MAIL_USERNAME'] = 'xttdfix@163.com'
     app.config['MAIL_PASSWORD'] = 'LVgPZrqcMmmWFUdq'
     mail = Mail(app)
-    msg = Message(subject=f"来自{name}的留言",sender='xttdfix@163.com',recipients=['luoruiGeng@163.com'])
+    msg = Message(subject=f"来自{name}的留言", sender='xttdfix@163.com', recipients=['luoruiGeng@163.com'])
     msg.body = f"来自{name}({email})的留言：{content}"
-    if insert_emial(username=name,email=email,content=content,sqldb=msqk) is not None:
-            print('插入成功！')
+    if insert_emial(username=name, email=email, content=content, sqldb=msqk) is not None:
+        print('插入成功！')
     else:
         print('插入失败！')
-    
+
     try:
         mail.send(msg)
-        if update_emial(username=name,sqldb=msqk) is not None:
+        if update_emial(username=name, sqldb=msqk) is not None:
             print('更新成功！')
         else:
             print('更新失败！')
@@ -329,7 +377,7 @@ def send_email():
 
     """
     except Exception as e:
-        print(e)
+        print(f'send_email() error=> {e}')
         return """
             <script>
                 alert('发送失败！')
@@ -338,17 +386,75 @@ def send_email():
         """
 
 
-@app.route('/update_info',methods=['POST'])
+# 修改个人信息
+@app.route('/update_info', methods=['POST'])
 def update_info():
     data = request.form
-    imgfile = request.files.get('imgf')
-    save_image(imgfile=imgfile,curr_path=__file__,username=session.get('username','d'))
-    print(type(imgfile))
+    imgfile = data.get('croppedImage')
+    print(f'类型：{type(imgfile)} 数据：=> {imgfile}')
+    path = update_system_avatar(imgfile=imgfile, username=session.get('username', 'd'))
     newnick = data.get('newnick')
     newemail = data.get('newemail')
     introduce = data.get('introduce')
-    print(newnick,newemail,introduce)
-    return jsonify(send=True)
+    print(newnick, newemail, introduce)
+    rows = update_user(username=session.get('username', 'd'), email=newemail, nickName=newnick, introduce=introduce,
+                       avatar=path)
+    if rows is not None:
+        return """
+                <script>
+                    alert('修改成功！')
+                    location.assign('/people')
+                </script>
+               """
+    else:
+        return """
+                <script>
+                    alert('修改失败！未知错误，请联系开发者')
+                    location.assign('/people')
+                </script>
+               """
+
+
+@app.route('/update_pwd', methods=['post'])
+def update_pwd():
+    pwd = request.form.get('pwd')
+    username = session.get('username', 'd')
+
+    # 判断和旧密码是否一致
+    oldPwd = getOldPwd(username)
+    rows = updatePwd(username=username, pwd=md5(pwd))
+    print(oldPwd)
+    if oldPwd == md5(pwd):
+        return """
+                <script>
+                    alert('修改失败！新密码与旧密码一致，重新修改密码')
+                    location.assign('/people')
+                </script>
+               """
+    if rows is not None:
+        return """
+                <script>
+                    alert('修改成功！请重新登陆！')
+                    location.assign('/login')
+                </script>
+               """
+    else:
+        return """
+                <script>
+                    alert('修改失败！未知错误，请联系开发者')
+                    location.assign('/people')
+                </script>
+               """
+
+
+@app.route('/checkoldpwd', methods=['POST'])
+def checkoldpwd():
+    oldPwd = getOldPwd(session.get('username', 'd'))
+    newpwd = md5(request.json.get('pwd1'))
+    print(oldPwd, newpwd)
+    if oldPwd == newpwd:
+        return jsonify(exists=True)
+    return jsonify(exists=False)
 
 
 if __name__ == '__main__':

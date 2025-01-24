@@ -63,7 +63,7 @@
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">联系我</a>
+            <a class="navbar-brand" href="/callme">联系我</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -90,29 +90,14 @@
         <div class="contact-form">
             <h2>发送消息</h2>
             <form action="/send_email" method="post">
-                {% if username != 'd'%}
+                {% if username == 'd'%}
+                <p style="color: red;">游客请注意，由于你未登录，如果不填邮箱则系统默认将以昵称为“游客1”、“youke@youke.com”发送📩。我会认真阅读，如果有必要请留下你的邮箱，谢谢你的留言。</p>
                 <div class="mb-3">
-                    <label for="name" class="form-label">昵称</label>
-                    <input placeholder="如果是游客，则填游客即可" disabled value="{{ username }}" name="username"
-                        type="text" class="form-control" id="name" required>
+                    <label for="message" class="form-label">留言内容</label>
+                    <input type="email" class="form-control" name="email" id="email">
                 </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">邮箱</label>
-                    <input type="email" name="email" disabled value="{{ mail }}" class="form-control"
-                        id="email" required>
-                </div>
-
                 {% else %}
-                <div class="mb-3">
-                    <label for="name" class="form-label">昵称</label>
-                    <input placeholder="如果是游客，则填游客即可"  name="username"
-                        type="text" class="form-control" id="name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">邮箱</label>
-                    <input type="email" name="email"  class="form-control"
-                        id="email" required>
-                </div>
+                <p style="color: red;">用户<i>{{username}}</i>，系统默认将以你设置的邮箱发送📩。谢谢你的留言。
                 {% endif %}
                 <div class="mb-3">
                     <label for="message" class="form-label">留言内容</label>
@@ -124,11 +109,7 @@
     </div>
 
     <!-- 页脚 -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 联系我. All rights reserved.</p>
-        </div>
-    </footer>
+    {% include 'footer.html' %}
 
     <!-- Bootstrap JS -->
     <script src="../static/js/bootstrap.bundle.min.js"></script>

@@ -18,6 +18,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
     .fr:hover {
         background-color: #dee4e8;
     }
@@ -25,11 +26,47 @@
 
 <body>
     <!-- 导航栏 -->
-    {% if username == 'd' or username == None %}
-    {% include './notlogin_head.html' %}
-    {%else%}
-    {% include './head.html' %}
-    {%endif%}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{url_for('index')}}">个人论坛</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto head-ul">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">首页</a>
+                    </li>
+                    {% if username == 'd' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">登录</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <div class="navbar-avatar">
+                            <img src="{{ avatar_path }}" onclick="people()" alt="用户头像">
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="/write">撰写</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manager">管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">退出</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/boards">留言板</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
     <!-- 主页内容 -->
     <div class="container mt-4">
         {% if username == 'd' %}
@@ -37,7 +74,7 @@
         {% else %}
         <h1 class="mb-4">{{ username }}，欢迎回来！😄</h1>
         {% endif %}
-        <p>在这里，你可以分享你的想法、阅读他人的文章，并进行交流👍。我是<i><strong>摸鱼怪</strong></i>，很高兴你能来。</p>
+        <p>在这里，你可以分享你的想法、阅读他人的文章，并进行交流👍。我是<i><strong>喜欢劈瓜的刘华强</strong></i>，很高兴你能来。</p>
         <div class="row">
             <div class="col-md-8">
                 <h2>最新文章</h2>
@@ -49,7 +86,8 @@
                         {% if i['modify_date'] == None %}
                         <p class="text-muted"><strong><i>{{ i['username'] }}</i></strong> - 发布于: {{ i['date'] }}</p>
                         {% else %}
-                        <p class="text-muted"><strong><i>{{ i['username'] }}</i></strong> - 发布于: {{ i['date'] }} - 修改于: {{
+                        <p class="text-muted"><strong><i>{{ i['username'] }}</i></strong> - 发布于: {{ i['date'] }} - 修改于:
+                            {{
                             i['modify_date'] }}</p>
                         {% endif %}
                         <!-- 使用自定义样式限制显示四行 -->
@@ -77,6 +115,10 @@
     <!-- Bootstrap JS -->
     <script src="../static/js/bootstrap.bundle.min.js"></script>
     <script>
+        function people() {
+            window.location.href = "/people";
+        }
+
         // 当前页码
         let currentPage = `{{ current_page }}`;
         // 总页数
@@ -104,24 +146,24 @@
         loadPage(currentPage);
 
         function information() {
-        // 获取所有 list-group-item 元素
-        var list = document.getElementsByClassName("list-group-item");
-        for (var i = 0; i < list.length; i++) {
-            var id = list[i].getAttribute('data-id');
-            list[i].onclick = (function (id) {
-                return function () {
-                    this.style.backgroundColor = "#f9f9f9";
-                    var basePath = `/detalied`; // 编辑页面的 URL
-                    var full_path = `${basePath}/${id}`;
-                    console.log(full_path);
-                    window.location.href = full_path;
-                };
-            })(id);
+            // 获取所有 list-group-item 元素
+            var list = document.getElementsByClassName("list-group-item");
+            for (var i = 0; i < list.length; i++) {
+                var id = list[i].getAttribute('data-id');
+                list[i].onclick = (function (id) {
+                    return function () {
+                        this.style.backgroundColor = "#f9f9f9";
+                        var basePath = `/detalied`; // 编辑页面的 URL
+                        var full_path = `${basePath}/${id}`;
+                        console.log(full_path);
+                        window.location.href = full_path;
+                    };
+                })(id);
+            }
         }
-    }
 
-    // 确保在页面加载时调用 information 函数
-    window.onload = information;
+        // 确保在页面加载时调用 information 函数
+        window.onload = information;
     </script>
 
 </body>

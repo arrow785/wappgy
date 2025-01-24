@@ -141,7 +141,7 @@
         <!-- 文章列表 -->
         <div class="posts">
             <h2>开发者的文章</h2>
-            {% for i in datas%}
+            {% for i in datas %}
             <div class="post-item">
                 <h3><a href="#">{{ i['title'] }}</a></h3>
                 {% if i['modify_date'] == None %}
@@ -193,11 +193,7 @@
         </div>
 
         <!-- 页脚 -->
-        <footer class="footer">
-            <div class="container">
-                <p>&copy; 2025 用户主页. All rights reserved.</p>
-            </div>
-        </footer>
+        {% include 'footer.html' %}
 
         <!-- Bootstrap JS -->
         <script src="../static/js/bootstrap.bundle.min.js"></script>
