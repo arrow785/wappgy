@@ -204,7 +204,7 @@
             <h2>你的文章</h2>
             {% for i in contexts %}
             <div class="post-item">
-                <h3><a href="{{ url_for('edit',title_id=i['id']) }}">{{ i['title'] }}</a></h3>
+                <h3><a href="{{ url_for('detalied',title_id=i['id']) }}">{{ i['title'] }}</a></h3>
                 {% if i['modify_date'] == None %}
                 <p>发布于 {{ i['date'] }}</p>
                 {% else %}
@@ -240,6 +240,11 @@
                             <div class="mb-3">
                                 <label for="profilePicture" class="form-label">头像</label>
                                 <input accept=".png,.jpg"  type="file" class="form-control" id="profilePicture">
+                                <small id="imgHelp" class="form-text text-muted">
+                                    <ul>
+                                        <li>必须是.png或者.jpg，且大小不能超过2MB</li>
+                                    </ul>
+                                </small>
                             </div>
                             <div class="mb-3">
                                 <label for="newnick" class="form-label">新的昵称</label>
@@ -334,6 +339,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script src="../static/js/bootstrap.bundle.min.js"></script>
     <script>
+
+        console.log(`{{contexts}}`)
+
+
+
         document.addEventListener('DOMContentLoaded', function () {
             const profilePictureInput = document.getElementById('profilePicture');
             const imageToCrop = document.getElementById('imageToCrop');

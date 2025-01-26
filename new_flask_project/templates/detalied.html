@@ -115,7 +115,7 @@
         <div class="comment-list">
             {% for i in comments %}
             <div class="comment-item">
-                <div class="navbar-avatar-content">
+                <div class="navbar-avatar-content" onclick="show_info(`{{i['username']}}`)">
                     <img src="{{request.url_root}}{{i['avatar']}}" alt="用户头像">
                     <strong>{{ i['username'] }}</strong>
                 </div>
@@ -175,6 +175,9 @@
     <script>
         function people() {
             window.location.href = '/people';
+        }
+        function show_info(username){
+            location.assign(`/show_information/${username}`)
         }
     </script>
 </body>

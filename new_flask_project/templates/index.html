@@ -72,7 +72,7 @@
         {% if username == 'd' %}
         <h1 class="mb-4">Hi Guys😃欢迎来到个人论坛，期待你的使用！</h1>
         {% else %}
-        <h1 class="mb-4">{{ username }}，欢迎回来！😄</h1>
+        <h1 class="mb-4">{{ username }}，欢迎回来，新年快乐！！😄🥳</h1>
         {% endif %}
         <p>在这里，你可以分享你的想法、阅读他人的文章，并进行交流👍。我是<i><strong>喜欢劈瓜的刘华强</strong></i>，很高兴你能来。</p>
         <div class="row">
@@ -81,7 +81,7 @@
                 <br>
                 <ul class="list-group" id="article-list" style="margin-bottom: 10px;">
                     {% for i in datas %}
-                    <li class="list-group-item fr" onclick="information({{i['id']}})">
+                    <li class="list-group-item fr" onclick="information(`{{i['id']}}`)">
                         <h3>{{ i['title'] }}</h3>
                         {% if i['modify_date'] == None %}
                         <p class="text-muted"><strong><i>{{ i['username'] }}</i></strong> - 发布于: {{ i['date'] }}</p>

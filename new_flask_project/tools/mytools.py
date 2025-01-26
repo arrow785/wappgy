@@ -1,6 +1,8 @@
 import hashlib, os
 import requests as reqs
 import base64
+
+from deprecated.classic import deprecated
 from werkzeug.utils import secure_filename
 import getCurrPath as myp
 from getCurrPath import getCurrPath, img_curr_path
@@ -72,31 +74,32 @@ def getWearther():
         print(f'getWearther() => 请求失败！=> {e}')
 
 
-# 删除历史头像
-def delete_avatar(username):
-    from sql_flask.mymysql import ConMySQL
-    con, cur = ConMySQL().mSQL()
-    print(f'当前用户为：{username}')
-
-    try:
-        with cur as c:
-            sql = 'select avatar as path from admin where username = %s'
-            c.execute(sql, (username,))
-            paths = c.fetchone()
-            print(f'delete_avatar() => 数据库查询到的地址：{paths}')
-            path = paths.get('path')
-            if os.path.exists(path):
-                print(f'delete_avatar() => 头像为默认头像，无需删除！')
-                return False
-            else:
-                os.remove(path)
-                print(f'delete_avatar() => 删除头像成功！')
-                return True
-    except Exception as e:
-        print(f'delete_avatar() => 删除头像错误！=> {e}')
-    finally:
-        cur.close()
-        con.close()
+# 弃用
+# @deprecated
+# # 删除历史头像
+# def delete_avatar(username):
+#     from sql_flask.mymysql import ConMySQL
+#     print(f'当前用户为：{username}')
+#
+#     try:
+#         with cur as c:
+#             sql = 'select avatar as path from admin where username = %s'
+#             c.execute(sql, (username,))
+#             paths = c.fetchone()
+#             print(f'delete_avatar() => 数据库查询到的地址：{paths}')
+#             path = str(paths.get('path')).replace(r'\\','\\')
+#             print(f'delete_avatar() 转化后的路径： => 头像地址：{path}')
+#             if os.path.exists(path):
+#                 print(f'delete_avatar() => 头像为默认头像，无需删除！')
+#                 return False
+#             else:
+#                 os.remove(path)
+#                 print(f'delete_avatar() => 删除头像成功！')
+#                 return True
+#     except Exception as e:
+#         print(f'delete_avatar() => 删除头像错误！=> {e}')
+#     finally:
+#         print(f'delete_avatar() => 删除头像完成！')
 
 
 import os
@@ -104,7 +107,6 @@ import os
 
 # 更新系统中的头像
 def update_system_avatar(imgfile: str, username, uid):
-    delete_avatar(username)
     img_path = save_img(imgfile, uid)
     return img_path
 

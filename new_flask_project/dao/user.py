@@ -5,12 +5,13 @@ connect, cursor = ConMySQL().mSQL()
 
 
 # 用户注册
-def insertUser(username, email, password, avatar, nickName, register_date):
+def insertUser(username, email, password, nickName, register_date):
+    default_avatar = r"static\upload_img\mr.png"
     sql = f"""
                     insert into admin (username,nick_name,email,pwd,introduce,avatar,register_date) values (%s,%s,%s,%s,%s,%s,%s)
                 """
     try:
-        cursor.execute(sql, (username, nickName, email, password, '什么都没有！', avatar, register_date))
+        cursor.execute(sql, (username, nickName, email, password, '什么都没有！', default_avatar, register_date))
         connect.commit()
         return cursor.lastrowid
     except Exception as e:
@@ -61,8 +62,8 @@ def resetPwd(new_pwd, username):
     return cursor.rowcount
 
 
-def selectAll(username,sqldb):
-    con,cur = sqldb.mSQL()
+def selectAll(username, sqldb):
+    con, cur = sqldb.mSQL()
     if username == 'd':
         return None
     sql = """
@@ -71,7 +72,7 @@ def selectAll(username,sqldb):
     try:
         cur.execute(sql, (username,))
         result = cur.fetchone()
-        print(result)
+        print(f'selectAll() => {result}')
         return result
     except Exception as e:
         print(f'根据id查询文章内容 full_context() 错误！=> {e}')
@@ -108,13 +109,30 @@ def getOldPwd(username):
 
 
 # 更新资料
-def update_user(username, email, nickName, introduce, avatar):
+def update_user(username, email, nickName, introduce, avatar, sqldb):
+    con, cur = sqldb.mSQL()
     sql = """
             UPDATE admin SET email = %s, nick_name = %s, introduce = %s, avatar = %s WHERE username = %s;
         """
     try:
-        cursor.execute(sql, (email, nickName, introduce, avatar, username))
-        connect.commit()
-        return cursor.lastrowid
+        cur.execute(sql, (email, nickName, introduce, avatar, username))
+        con.commit()
+        print('update_user() => 更新成功！')
+        return cur.lastrowid
     except Exception as e:
         print(f'update_user() 更新资料错误！！！ =>{e}')
+
+
+def show_info(username: str):
+    sql = """
+            SELECT * FROM admin WHERE username = %s;
+        """
+    try:
+        cursor.execute(sql, (username,))
+        result = cursor.fetchone()
+        print(f'show_info() => {result}')
+        return result
+    except Exception as e:
+        print(f'show_info() 错误！=> {e}')
+    finally:
+        print('show_info() finally')

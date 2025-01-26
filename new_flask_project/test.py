@@ -2,9 +2,12 @@ import hashlib
 import itertools
 import os.path
 import string
+
+import dbutils.pooled_db
 import requests
 from werkzeug.utils import secure_filename
 from getCurrPath import getUploadPath, getCurrPath, img_curr_path
+from sql_flask.mymysql import ConMySQL
 from tools.mytools import get_time, randName
 
 
@@ -26,6 +29,7 @@ def brute_force_md5(md5_hash, charset, max_length):
 
 if __name__ == '__main__':
     fl = secure_filename(fr'static\upload_img\16.jpg')
-    print(os.path.join(img_curr_path, fl))
+    con = ConMySQL().mSQL()
+    print(con)
 
 # 59957072ba0b6fd04b7fe17f464f4cbd

@@ -50,12 +50,18 @@ app.config['SECRET_KEY'] = get_salt()
 msqk = ConMySQL()
 
 
+# 更新字典information的数据
+def update_information(username):
+    information['data'] = selectAll(username, msqk)
+    print(f"update_information() 更新的内容为 => {information.get('data', {})}")
+
+
 def set_session(username):
     session['username'] = username
     if username is None:
         session['username'] = 'd'
     else:
-        information['data'] = selectAll(username, sqldb=msqk)
+        update_information(username)
         print(information.get('data'))
 
 
@@ -156,7 +162,7 @@ def submit_write():
 @my_login_required
 def manager():
     username = session.get('username')
-    datas = select_all_context(username, sqldb=msqk)
+    datas = select_all_context(username, msqk)
     avatar_path = information.get('data', {}).get('avatar')
     return render_template('manager.html', **locals())
 
@@ -209,21 +215,21 @@ def register():
 
 @app.route('/submit_register', methods=['POST'])
 def submit_register():
+    if request.method == 'GET':
+        return redirect(url_for('register'))
     data = request.form
     username = data.get('username')
-    imgfile = data.get('croppedImage')
-    print(f'imgFile_name==>{imgfile},username==>{username}')
-    # 保存图片到本地，返回图片路径
-    imgPath = save_img(imgfile, int(information.get('data', {}).get('id')))
     # 获取当前时间
     register_date = get_time()
     # 获取随机昵称
-    nickName = data.get('nickname', randName())
+    nickName = data.get('nickname')
+    if nickName is '':
+        nickName = randName()
     password = data.get('password')
     email = data.get('email')
     print(type(email))
     md5pasword = md5(password)
-    rows = insertUser(username=username, email=email, password=md5pasword, avatar=imgPath,
+    rows = insertUser(username=username, email=email, password=md5pasword,
                       register_date=register_date, nickName=nickName)
     if rows is not None:
         return """
@@ -302,22 +308,6 @@ def pep():
         return render_template('dev_people.html', **locals())
 
 
-@app.route('/people', methods=['GET'])
-@my_login_required
-def people():
-    username = session.get('username', 'd')
-    ifm = information.get('data', {})
-    print(f'==> {ifm}')
-    contexts = select_all_context(username=username, sqldb=msqk)
-    contents = select_emial(username=username, sqldb=msqk)
-    # 图片地址要求是相对地址
-    avatar = get_avatar(username=username)
-    print(avatar)
-    if avatar == 'xxx':
-        avatar = 'static/upload_img/mr.png'
-    return render_template('people.html', **locals())
-
-
 # 留言板
 @app.route('/boards', methods=['GET'])
 def boards():
@@ -386,26 +376,43 @@ def send_email():
         """
 
 
+@app.route('/people', methods=['GET'])
+@my_login_required
+def people():
+    print(f'people() == >被调用')
+    username = session.get('username', 'd')
+    ifm = information.get('data', {})
+    print(f'ifm ==> {ifm}')
+    contexts = select_all_context(username=username, sqldb=msqk)
+    contents = select_emial(username=username)
+    # 图片地址要求是相对地址
+    avatar = get_avatar(username=username)
+    print(avatar)
+    if avatar == 'xxx':
+        avatar = 'static/upload_img/mr.png'
+    return render_template('people.html', **locals())
+
+
 # 修改个人信息
 @app.route('/update_info', methods=['POST'])
 def update_info():
     data = request.form
     imgfile = data.get('croppedImage')
+    name = session.get('username', 'd')
+
     print(f'类型：{type(imgfile)} 数据：=> {imgfile}')
-    path = update_system_avatar(imgfile=imgfile, username=session.get('username', 'd'), uid=information.get('data',{}).get('id'))
+    path = update_system_avatar(imgfile=imgfile, username=name,
+                                uid=information.get('data', {}).get('id'))
     newnick = data.get('newnick')
     newemail = data.get('newemail')
     introduce = data.get('introduce')
+
     print(newnick, newemail, introduce)
     rows = update_user(username=session.get('username', 'd'), email=newemail, nickName=newnick, introduce=introduce,
-                       avatar=path)
+                       avatar=path, sqldb=msqk)
+    update_information(name)
     if rows is not None:
-        return """
-                <script>
-                    alert('修改成功！')
-                    location.assign('/people')
-                </script>
-               """
+        return redirect(url_for('people'))
     else:
         return """
                 <script>
@@ -456,6 +463,13 @@ def checkoldpwd():
         return jsonify(exists=True)
     return jsonify(exists=False)
 
+
+@app.route('/show_information/<string:username>', methods=['GET'])
+def show_information(username: str):
+    data = show_info(username)
+    contexts = select_all_context(username=username, sqldb=msqk)
+    print(f'show_information() => {contexts}')
+    return render_template('user_people.html', **locals())
 
 if __name__ == '__main__':
     flask.run()

@@ -14,8 +14,10 @@ def select_all(page, sqldb, per_page=5, ):
         return result
     except Exception as e:
         print(f'select_all() 错误=>{e}')
-    
-def select_all_context(username: str,sqldb):
+
+
+def select_all_context(username: str, sqldb):
+    con, cur = ConMySQL().mSQL()()
     if username == 'd':
         print('未知用户！')
         return None
@@ -25,11 +27,12 @@ def select_all_context(username: str,sqldb):
         ORDER BY c.date DESC
         """
     try:
-        c,cur = sqldb.mSQL()
         cur.execute(sql, (username,))
+        print(f'select_all_context() => {cur.fetchall()}')
         return cur.fetchall()[0]
     except Exception as e:
         print(f'select_all_context() 错误=>{e}')
+
 
 # 获取总文章数
 def get_total_articles(sqldb):

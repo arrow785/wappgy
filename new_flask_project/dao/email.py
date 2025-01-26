@@ -25,12 +25,12 @@ def update_emial(username,sqldb):
     except Exception as e:
         print(f'更新错误！！！ update_emial() => {e}')
 
-def select_emial(username,sqldb):
-    c,cour = sqldb.mSQL()
+def select_emial(username):
+    con, cur = ConMySQL().mSQL()
     sql = f"""select * from email where send_username = %s"""
     try:
-        cour.execute(sql,(username,))
-        return cour.fetchall()
+        cur.execute(sql,(username,))
+        return cur.fetchall()
     except Exception as e:
         print(f'查询错误！！！ select_emial() => {e}')
     
