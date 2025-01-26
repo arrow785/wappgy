@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>留言板</title>
     <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/my.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,6 +83,19 @@
             text-align: center;
             margin-top: auto;
         }
+
+        .navbar-avatar-content img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            padding: 1px;
+            border: 1px solid #d9d7d6;
+            margin-right: 5px;
+        }
+
+        .navbar-avatar-content {
+            align-items: center;
+        }
     </style>
 </head>
 
@@ -117,56 +131,48 @@
             </p>
         </div>
 
-        <!-- 留言列表 -->
-        <div class="guestbook-list">
-            <h2>留言列表</h2>
-            <div class="guestbook-item">
-                <h3>John Doe</h3>
-                <p>2025-01-20</p>
-                <p>这是一条测试留言，欢迎来到我的留言板！</p>
-            </div>
-            <div class="guestbook-item">
-                <h3>Jane Smith</h3>
-                <p>2025-01-19</p>
-                <p>非常有趣的留言板，期待更多留言！</p>
-            </div>
-        </div>
+
 
         <!-- 留言表单 -->
-        {% if username == 'd' %}
         <div class="guestbook-form hidden">
-            <h2>游客留下你的留言</h2>
-            <form>
+            {% if username == 'd' %}
+            <h2>游客，留下你的留言</h2>
+            {% else %}
+            <h2>{{ username }}，留下你的留言</h2>
+            {% endif %}
+            <form action="/guestbook" method="post">
                 <div class="mb-3">
-                    <label for="message" class="form-label">留言内容</label>
-                    <textarea class="form-control" id="message" rows="3" required></textarea>
+                    <textarea class="form-control" name="context" id="message" rows="3" required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary" disabled>提交留言</button>
+                <button type="submit" class="btn btn-primary">提交留言</button>
             </form>
-        </div>
-        {% else %}
-        <div class="guestbook-form">
-            <h2>留下你的留言</h2>
-            <form>
-                <div class="mb-3">
-                    <label for="username" class="form-label">用户名</label>
-                    <input type="text" class="form-control" id="username" value="{{username}}" required>
-                </div>
-                <div class="mb-3">
-                    <label for="message" class="form-label">留言内容</label>
-                    <textarea class="form-control" id="message" rows="3" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary" disabled>提交留言</button>
-            </form>
-        </div>
-        {% endif %}
-    </div>
 
-    <!-- 页脚 -->
-    {% include 'footer.html' %}
+            <h2 class="text-center mb-4">评论区</h2>
+        <hr style="height: 2px; background-color: #000000;">
+        <div class="comment-list">
+            {% for i in datas %}
+            <div class="comment-item">
+                <div class="navbar-avatar-content" onclick="show_info(`{{i['username']}}`)">
+                    <img src="{{request.url_root}}{{i['avatar']}}" alt="用户头像">
+                    <strong>{{ i['username'] }}</strong>
+                </div>
+                <p class="text-muted">{{ i['date'] }}</p>
+                <p>{{ i['context'] }}</p>
+            </div>
+            <hr>
+            {% else %}
+            <p class="text-center">这没有任何留言，期待你的留言😉</p>
+            {% endfor %}
+        </div>
+        </div>
+        <!-- 留言列表 -->
+        
 
-    <!-- Bootstrap JS -->
-    <script src="../static/js/bootstrap.bundle.min.js"></script>
+        <!-- 页脚 -->
+        {% include 'footer.html' %}
+
+        <!-- Bootstrap JS -->
+        <script src="../static/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

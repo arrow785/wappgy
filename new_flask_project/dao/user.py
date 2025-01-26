@@ -1,5 +1,5 @@
 from sql_flask.mymysql import ConMySQL
-from tools.mytools import md5
+from tools.mytools import md5,get_time
 
 connect, cursor = ConMySQL().mSQL()
 
@@ -62,7 +62,7 @@ def resetPwd(new_pwd, username):
     return cursor.rowcount
 
 
-def selectAll(username, sqldb):
+def selectAll(username, sqldb=ConMySQL()):
     con, cur = sqldb.mSQL()
     if username == 'd':
         return None
@@ -136,3 +136,39 @@ def show_info(username: str):
         print(f'show_info() 错误！=> {e}')
     finally:
         print('show_info() finally')
+
+
+
+def selectGuestContext(sqldb=ConMySQL().mSQL()):
+    sql = """
+        SELECT * FROM guestbook AS gb ORDER BY gb.id DESC;
+        """
+    try:
+        con, cur = sqldb.mSQL()
+        cur.execute(sql)
+        datas = cur.fetchall()
+        print(f'selectGuestContext() => {datas}')
+        return datas
+    except Exception as e:
+        print(f'selectGuestContext() 错误！=> {e}')
+    finally:
+        print('selectGuestContext() finally')
+        
+def insertGuestContext(username,context,avatar):
+    date = get_time()
+    avatar_path = ""
+    if username == '游客':
+        avatar_path =  r"static\upload_img\yk.png"
+    else:
+        avatar_path = avatar
+    sql = """
+        INSERT INTO guestbook (username,context,date,avatar) VALUES (%s,%s,%s,%s);
+        """
+    try:
+        cursor.execute(sql,(username,context,date,avatar_path))
+        connect.commit()
+        return cursor.lastrowid
+    except Exception as e:
+        print(f'insertGuestContext() 错误！=> {e}')
+    finally:
+        print('insertGuestContext() finally')

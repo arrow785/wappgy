@@ -311,6 +311,7 @@ def pep():
 # 留言板
 @app.route('/boards', methods=['GET'])
 def boards():
+    datas = selectGuestContext(sqldb=msqk)
     username = session.get('username', 'd')
     return render_template('guestbook.html', **locals())
 
@@ -470,6 +471,24 @@ def show_information(username: str):
     contexts = select_all_context(username=username, sqldb=msqk)
     print(f'show_information() => {contexts}')
     return render_template('user_people.html', **locals())
+
+
+@app.route('/guestbook', methods=['post'])
+def guestbook():
+    username = session.get('username', '游客')
+    print(f'guestbook() => {username}')
+    avatar_path = get_avatar(username=username)
+    row = insertGuestContext(username=username, context=request.form.get('context'),avatar=avatar_path)
+    if row is not None:
+        return redirect(url_for('boards'))
+    else:
+        return """
+                <script>
+                    alert('留言失败！未知错误，请联系开发者')
+                    location.assign('/boards')
+                </script>
+               """
+    
 
 if __name__ == '__main__':
     flask.run()

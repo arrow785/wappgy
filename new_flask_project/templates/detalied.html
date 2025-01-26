@@ -79,7 +79,7 @@
                             <img src="{{ request.url_root }}{{ avatar_path }}" onclick="people()" alt="用户头像">
                         </div>
                     </li>
-                    
+
                     <li class="nav-item">
                         <a class="nav-link" href="/write">撰写</a>
                     </li>
@@ -126,8 +126,6 @@
             {% else %}
             <p class="text-center">这篇文章没有任何评论，期待你的评论😉</p>
             {% endfor %}
-
-
         </div>
 
     </div>
@@ -176,7 +174,7 @@
         function people() {
             window.location.href = '/people';
         }
-        function show_info(username){
+        function show_info(username) {
             location.assign(`/show_information/${username}`)
         }
     </script>
