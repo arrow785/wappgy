@@ -22,6 +22,18 @@ information: dict = {}
 loginUser: dict = {}
 
 
+@app.route('/totest', methods=['GET'])
+def test1():
+    return render_template('test.html')
+
+
+@app.route('/test', methods=['POST'])
+def test():
+    pwd = request.form.get('password')
+    print(f'test() => {pwd}')
+    return 'dev'
+
+
 # 登录装饰器
 def my_login_required(func):
     @wraps(func)
@@ -109,7 +121,7 @@ def login():
     data = request.form
     username = data.get('username')
     password = data.get('password')
-    md5pasword = md5(password)
+    md5pasword = password
     rows = check_user(username, md5pasword)
     if rows == 0:
         return """
@@ -227,8 +239,8 @@ def submit_register():
         nickName = randName()
     password = data.get('password')
     email = data.get('email')
-    print(type(email))
-    md5pasword = md5(password)
+    print(f'submit_register() => : username==>{username},password==>{password},email==>{email},nickName==>{nickName}')
+    md5pasword = password
     rows = insertUser(username=username, email=email, password=md5pasword,
                       register_date=register_date, nickName=nickName)
     if rows is not None:
@@ -283,12 +295,13 @@ def reset_pwd1():
     data = request.form
     username = data.get('username')
     password = data.get('password')
+    print(f'reset_pwd1() => : username==>{username},password==>{password}')
     row = resetPwd(new_pwd=password, username=username)
     if row is not None:
         return """
                 <script>
                     alert('重置成功！')
-                    location.assign('/login_sub')
+                    location.assign('/login')
                 </script>
                """
     else:
@@ -402,7 +415,7 @@ def update_info():
     name = session.get('username', 'd')
 
     print(f'类型：{type(imgfile)} 数据：=> {imgfile}')
-    path = update_system_avatar(imgfile=imgfile, username=name,
+    path = update_system_avatar(imgfile=imgfile,
                                 uid=information.get('data', {}).get('id'))
     newnick = data.get('newnick')
     newemail = data.get('newemail')
@@ -430,9 +443,9 @@ def update_pwd():
 
     # 判断和旧密码是否一致
     oldPwd = getOldPwd(username)
-    rows = updatePwd(username=username, pwd=md5(pwd))
+    rows = updatePwd(username=username, pwd=pwd)
     print(oldPwd)
-    if oldPwd == md5(pwd):
+    if oldPwd == pwd:
         return """
                 <script>
                     alert('修改失败！新密码与旧密码一致，重新修改密码')
@@ -458,7 +471,7 @@ def update_pwd():
 @app.route('/checkoldpwd', methods=['POST'])
 def checkoldpwd():
     oldPwd = getOldPwd(session.get('username', 'd'))
-    newpwd = md5(request.json.get('pwd1'))
+    newpwd = request.json.get('pwd1')
     print(oldPwd, newpwd)
     if oldPwd == newpwd:
         return jsonify(exists=True)
@@ -478,7 +491,7 @@ def guestbook():
     username = session.get('username', '游客')
     print(f'guestbook() => {username}')
     avatar_path = get_avatar(username=username)
-    row = insertGuestContext(username=username, context=request.form.get('context'),avatar=avatar_path)
+    row = insertGuestContext(username=username, context=request.form.get('context'), avatar=avatar_path)
     if row is not None:
         return redirect(url_for('boards'))
     else:
@@ -488,7 +501,9 @@ def guestbook():
                     location.assign('/boards')
                 </script>
                """
-    
+@app.route('/show_version', methods=['GET'])
+def show_version():
+    return render_template('version.html')
 
 if __name__ == '__main__':
     flask.run()

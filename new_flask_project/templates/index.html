@@ -83,13 +83,7 @@
                     {% for i in datas %}
                     <li class="list-group-item fr" onclick="information(`{{i['id']}}`)">
                         <h3>{{ i['title'] }}</h3>
-                        {% if i['modify_date'] == None %}
                         <p class="text-muted"><strong><i>{{ i['username'] }}</i></strong> - 发布于: {{ i['date'] }}</p>
-                        {% else %}
-                        <p class="text-muted"><strong><i>{{ i['username'] }}</i></strong> - 发布于: {{ i['date'] }} - 修改于:
-                            {{
-                            i['modify_date'] }}</p>
-                        {% endif %}
                         <!-- 使用自定义样式限制显示四行 -->
                         <p class="text-muted text-clamp-4">
                             {{ i['contents'] }}
@@ -149,7 +143,7 @@
             var basePath = `/detalied`; // 编辑页面的 URL
             var full_path = `${basePath}/${id}`;
             console.log(full_path);
-            window.location.href = full_path;
+            location.assign(full_path);
         }
 
     </script>

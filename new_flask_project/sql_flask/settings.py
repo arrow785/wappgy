@@ -3,7 +3,7 @@ from flask import Flask
 
 
 class SqlConfig:
-    def __init__(self, db_name, host='127.0.0.1', port=3306, password='red9', user='root'):
+    def __init__(self, db_name, host='127.0.0.1', port=3302, password='geng', user='root'):
         self.host = host
         self.port = port
         self.password = password

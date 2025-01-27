@@ -1,5 +1,5 @@
 from sql_flask.mymysql import ConMySQL
-from tools.mytools import md5,get_time
+from tools.mytools import get_time
 
 connect, cursor = ConMySQL().mSQL()
 
@@ -46,7 +46,7 @@ def d_login_check(username, password):
     sql = """
             SELECT COUNT(*) AS c FROM admin AS a WHERE a.username = %s AND a.pwd = %s;
         """
-    cursor.execute(sql, (username, md5(password)))
+    cursor.execute(sql, (username, password))
     result = cursor.fetchone()['c']
     print(result)
     return result
@@ -57,7 +57,7 @@ def resetPwd(new_pwd, username):
     sql = """
             UPDATE admin SET pwd = %s WHERE username = %s;
         """
-    cursor.execute(sql, (md5(new_pwd), username))
+    cursor.execute(sql, (new_pwd, username))
     connect.commit()
     return cursor.rowcount
 
@@ -138,7 +138,6 @@ def show_info(username: str):
         print('show_info() finally')
 
 
-
 def selectGuestContext(sqldb=ConMySQL().mSQL()):
     sql = """
         SELECT * FROM guestbook AS gb ORDER BY gb.id DESC;
@@ -153,19 +152,20 @@ def selectGuestContext(sqldb=ConMySQL().mSQL()):
         print(f'selectGuestContext() 错误！=> {e}')
     finally:
         print('selectGuestContext() finally')
-        
-def insertGuestContext(username,context,avatar):
+
+
+def insertGuestContext(username, context, avatar):
     date = get_time()
     avatar_path = ""
     if username == '游客':
-        avatar_path =  r"static\upload_img\yk.png"
+        avatar_path = r"static\upload_img\yk.png"
     else:
         avatar_path = avatar
     sql = """
         INSERT INTO guestbook (username,context,date,avatar) VALUES (%s,%s,%s,%s);
         """
     try:
-        cursor.execute(sql,(username,context,date,avatar_path))
+        cursor.execute(sql, (username, context, date, avatar_path))
         connect.commit()
         return cursor.lastrowid
     except Exception as e:

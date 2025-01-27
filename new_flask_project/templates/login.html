@@ -31,6 +31,7 @@
     <!-- 登录页面内容 -->
     <div class="container login-container">
         <h2 class="text-center mb-4">登录</h2>
+        <p style="color: red;">尊敬的用户，您好！如果您之前注册过，因为作者更新了密码的加密方式，所以你现在需要重置密码以后才能登录。给您带来不便，请见谅。</p>
         <form id="login-form" action="/login_sub" method="post">
             <div class="mb-3">
                 <label for="username" class="form-label">用户名</label>
@@ -41,7 +42,7 @@
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
             <div class="text-center">
-                <button type="submit" class="btn btn-primary" >登录</button>
+                <button type="button" onclick="login()" class="btn btn-primary" >登录</button>
             </div>
         </form>
         <div class="text-center mt-3">
@@ -57,6 +58,23 @@
 
     <!-- Bootstrap JS -->
     <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/js/cdnjs/crypto-js.min.js"></script>
+    <script>
+        function login() {
+            var from = document.getElementById('login-form');
+            var pwd = document.getElementById('password');
+            pwd.value = SHA256(pwd.value);
+            from.submit();
+            clear();
+        }
+        function SHA256(password) {
+            return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+        }
+        function clear() {
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+    </script>
 </body>
 
 </html>

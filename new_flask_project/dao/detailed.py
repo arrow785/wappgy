@@ -1,14 +1,17 @@
-from sql_flask.mymysql import ConMySQL
 from tools.mytools import get_time
 
 
 # 根据id查询文章内容
 def full_context(title_id: int, sqldb):
+    c, cur = sqldb.mSQL()
     sql = f"""
-            select c.id,c.username,c.title,c.date,c.modify_date,c.contents from context as c where id = %s
+            select a.avatar,c.id,c.username,c.title,c.date,c.modify_date,c.contents from context as c 
+                join admin as a
+            on a.username = c.username
+            where c.id = %s;
         """
     try:
-        c, cur = sqldb.mSQL()
+
         cur.execute(sql, (title_id,))
         result = cur.fetchone()
         print(f'==> {result},,id = {title_id}')
@@ -25,7 +28,7 @@ def by_id(title_id: int, sqldb):
                 join admin as a
             on a.username = c.username
             where c.context_id = %s
-						ORDER BY c.comment_time DESC
+			ORDER BY c.comment_time DESC
         """
     try:
         c, cur = sqldb.mSQL()

@@ -47,6 +47,12 @@
             right: 50px;
             z-index: 1000;
         }
+        .a_img {
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            margin-right: 2px;
+        }
     </style>
 </head>
 
@@ -100,13 +106,21 @@
         <div class="article">
             <h2><strong>{{ data['title'] }}</strong></h2>
             {% if data['modify_date'] == None %}
-            <p class="text-muted"><i>{{ data['username'] }}</i> | 发布时间：{{ data['date'] }}</p>
-            {% else %}
-            <p class="text-muted"><i>{{ data['username'] }}</i> | 发布时间：{{ data['date'] }} | 修改时间：{{
-                data['modify_date'] }}</p>
-            {% endif %}
+            <p class="text-muted" onclick="show_athur(`{{data['username']}}`)"><img class="a_img" src="{{request.url_root}}{{ data['avatar'] }}" alt=""><i>{{ data['username'] }}</i> | 发布时间：{{ data['date'] }}</p>
             <textarea class="form-control" id="contents" name="contents" rows="8"
                 disabled>{{ data['contents'] }}</textarea>
+            {% else %}
+            <p class="text-muted" onclick="show_athur(`{{data['username']}}`)"><img class="a_img" src="{{request.url_root}}{{ data['avatar'] }}" alt=""><i>{{ data['username'] }}</i> | 发布时间：{{ data['date'] }}</p>
+            <textarea class="form-control" id="contents" name="contents" rows="8"
+                disabled>{{ data['contents'] }}</textarea>
+
+            <small>
+                <p class="text-muted">最后修改于{{
+                    data['modify_date'] }}</p>
+            </small>
+
+            {% endif %}
+
         </div>
 
         <!-- 评论列表 -->
@@ -126,6 +140,7 @@
             {% else %}
             <p class="text-center">这篇文章没有任何评论，期待你的评论😉</p>
             {% endfor %}
+
         </div>
 
     </div>
@@ -175,6 +190,10 @@
             window.location.href = '/people';
         }
         function show_info(username) {
+            location.assign(`/show_information/${username}`)
+        }
+
+        function show_athur(username) {
             location.assign(`/show_information/${username}`)
         }
     </script>

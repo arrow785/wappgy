@@ -1,5 +1,5 @@
 from sql_flask.mymysql import ConMySQL
-
+from tools.mytools import get_time
 connect, cursor = ConMySQL().mSQL()
 
 
@@ -17,11 +17,12 @@ def select_all_context(username: str,sqldb):
 def update_content(title_id: int, content: str, title: str):
     sql = """
         UPDATE context
-        SET contents = %s, title = %s
+        SET contents = %s, title = %s, modify_date = %s
+        FROM context
         WHERE id = %s
         """
     try:
-        cursor.execute(sql, (content, title, title_id))
+        cursor.execute(sql, (content, title, get_time(), title_id))
         connect.commit()
     except Exception as e:
         print(e)

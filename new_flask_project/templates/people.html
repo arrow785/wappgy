@@ -220,7 +220,11 @@
             <h2>邮件发送记录</h2>
             {% for i in contents %}
             <p>发送内容：{{ i['send_content'] }}</p>
+            {% if i['is_send'] == '成功' %}
             <small>发送时间：{{ i['send_date'] }} <i style="color: green;">发送{{ i['is_send'] }}</i></small>
+            {% elif i['is_send'] == '失败' %}
+            <small>发送时间：{{ i['send_date'] }} <i style="color: red;">发送{{ i['is_send'] }}</i></small>
+            {% endif %}
             {% else %}
             <p>没有发送任何内容。</p>
             {% endfor %}
@@ -301,35 +305,37 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="/update_pwd" method="post" enctype="multipart/form-data">
+                        <form id="form1-r" action="/update_pwd" method="post">
                             <p class="text-muted" style="color:red;">⚠由于时间关系，现在修改密码，只需要填两次密码即可。以后为了密码能够正常修改，请务必设置正确的邮箱。
                             </p>
                             <div class="row">
-                                <div class="mb-3 col-5">
+                                <div class="mb-3 col">
                                     <input type="text" name="verificationCode" class="form-control"
                                         placeholder="邮箱验证码" id="verificationCode">
                                 </div>
-                                <div class="mb-3 col-5">
+                                <div class="mb-3 col">
                                     <button type="button" class="btn btn-primary" id="veryf"
                                         onclick="getVeryf()">获取邮箱验证码
                                     </button>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="mb-3 col-5">
+                                <div class="mb-3 col">
                                     <label for="pwd" class="form-label">新密码</label>
                                     <input type="password" name="pwd" onblur="checkpassword()" class="form-control"
                                         id="pwd">
                                 </div>
-                                <div class="mb-3 col-5">
+                                <div class="mb-3 col">
                                     <label for="pwd1" class="form-label">确认密码</label>
                                     <input type="password" name="pwd1" onblur="checkpassword()" class="form-control"
                                         id="pwd1">
                                 </div>
                             </div>
-                            <button type="submit" id="change" onmouseover="checkoldpwd()"
-                                class="btn btn-primary">修改</button>
+                            
                         </form>
+                        <div class="text-center">
+                            <button type="button" onclick="submit()" id="change" class="btn btn-primary">提交</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -338,11 +344,23 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/js/cdnjs/crypto-js.min.js"></script>
     <script>
 
-        console.log(`{{contexts}}`)
-
-
+        function submit(){
+            var from = document.getElementById("form1-r");
+            var pwd = document.getElementById("pwd");
+            pwd.value = SHA256(pwd.value)
+            from.submit();
+            clear();
+        }
+        function SHA256() {
+            return CryptoJS.SHA256(pwd).toString(CryptoJS.enc.Hex);
+        }
+        function clear(){
+            document.getElementById("pwd").value = '';
+            document.getElementById("pwd1").value = '';
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
             const profilePictureInput = document.getElementById('profilePicture');

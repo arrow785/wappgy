@@ -1,19 +1,15 @@
-import hashlib, os
 import requests as reqs
 import base64
 
-from deprecated.classic import deprecated
-from werkzeug.utils import secure_filename
-import getCurrPath as myp
-from getCurrPath import getCurrPath, img_curr_path
-from PIL import Image
+from getCurrPath import img_curr_path
 
 
+# 取消使用MD5加密，前端使用SHA256加密
 # md5
-def md5(text: str):
-    mmd5 = hashlib.md5()
-    mmd5.update(text.encode('utf-8'))
-    return mmd5.hexdigest()
+# def md5(text: str):
+#     mmd5 = hashlib.md5()
+#     mmd5.update(text.encode('utf-8'))
+#     return mmd5.hexdigest()
 
 
 # 获取当前时间
@@ -48,10 +44,7 @@ def getNews():
             Update: str = news.get('update_time')
             print(From, Update)
             datas: list = list(news.get('data'))[0:10]
-            new_dict: dict = {}
-            new_dict['from'] = From
-            new_dict['update'] = Update
-            new_dict['data'] = datas
+            new_dict: dict = {'from': From, 'update': Update, 'data': datas}
             return new_dict
         else:
             return f'未获取到数据，状态码:{resp.status_code}'
@@ -106,7 +99,7 @@ import os
 
 
 # 更新系统中的头像
-def update_system_avatar(imgfile: str, username, uid):
+def update_system_avatar(imgfile: str, uid):
     img_path = save_img(imgfile, uid)
     return img_path
 

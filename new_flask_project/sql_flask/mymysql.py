@@ -5,8 +5,8 @@ from sql_flask.settings import SqlConfig
 
 
 class ConMySQL:
-    def __init__(self):
-        conf = SqlConfig(db_name='blog')
+    def __init__(self,username ='root',password='red9',port=3306,db_name='blog'):
+        conf = SqlConfig(password=password,user=username,port=port,db_name=db_name)
         self.__conf = conf.config()
 
     def mSQL(self):

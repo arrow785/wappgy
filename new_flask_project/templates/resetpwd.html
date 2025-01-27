@@ -60,11 +60,11 @@
                 <label for="password" class="form-label">确认密码</label>
                 <input type="password" onblur="checkPwd()" id="pwd1" class="form-control" name="password-test" required>
             </div>
-            <div class="text-center">
-                <button type="submit" id="sub" class="btn btn-primary">提交</button>
-            </div>
-        </form>
 
+        </form>
+        <div class="text-center">
+            <button type="button" onclick="submit()" id="sub" class="btn btn-primary">提交</button>
+        </div>
     </div>
 
     <!-- 页脚 -->
@@ -72,8 +72,22 @@
 
     <!-- Bootstrap JS -->
     <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/js/cdnjs/crypto-js.min.js"></script>
     <script>
-
+        function submit() {
+            var from = document.getElementById('register-form');
+            var pwd = document.getElementById('pwd');
+            pwd.value = SHA256(pwd.value);
+            from.submit();
+            clear();
+        }
+        function clear() {
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+        function SHA256(password) {
+            return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+        }
         function check_name() {
             var username = document.getElementById('username').value;
             var tips = document.getElementById('tips');
@@ -82,7 +96,7 @@
             var sub = document.getElementById('sub');
             var url = `check_username/${username}`
             console.log(url);
-            
+
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
@@ -94,7 +108,7 @@
                         pwd1.disabled = true;
                         pwd.disabled = true;
                         sub.disabled = 'disabled';
-                    }  else{
+                    } else {
                         tips.style.color = 'black';
                         tips.innerHTML = '用户名';
                         pwd1.disabled = false;
@@ -102,7 +116,7 @@
                         sub.disabled = false;
                     }
                 })
-                .catch(error => {})
+                .catch(error => { })
         }
 
         function checkPwd() {

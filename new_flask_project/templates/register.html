@@ -69,7 +69,7 @@
     <!-- 注册页面内容 -->
     <div class="container register-container">
         <h2 class="text-center mb-4">注册新账号</h2>
-        <form id="register-form" action="/submit_register" method="post" style="padding: 15px;"
+        <form id="form1" action="/submit_register" method="post" style="padding: 15px;"
             enctype="multipart/form-data">
             <div class="row mb-1">
                 <div class="col">
@@ -83,14 +83,6 @@
                 </div>
             </div>
 
-            <div class="row mb-1" hidden>
-                <div class="col">
-                    <label for="imgfile" id="imgtips" class="form-label">头像</label>
-                    <input type="file" accept="image/png, image/jpeg" onchange="checkFileType()" class="form-control"
-                        id="imgfile" name="imgf">
-
-                </div>
-            </div>
             <div class="mb-1 col">
                 <label for="nickname" class="form-label">昵称</label>
                 <input type="text" class="form-control" id="nickname" name="nickname">
@@ -129,33 +121,13 @@
                     </button>
                 </div>
             </div>
-            <div class="text-center">
-                <button type="submit" id="sub" class="btn btn-primary">注册</button>
-            </div>
+            
         </form>
+        <div class="text-center">
+            <button type="button" id="sub" onclick="register()" class="btn btn-primary">注册</button>
+        </div>
         <div class="text-center mt-3">
             <p>已有账号？<a class="text-muted" href="/login">登录</a></p>
-        </div>
-    </div>
-
-    <!-- 裁剪模态框 -->
-    <div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="cropModalLabel">裁剪图片</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="cropper-container">
-                        <img id="imageToCrop" src="" alt="Image to Crop" style="max-width: 100%;">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="cropButton">裁剪并保存</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -165,8 +137,30 @@
     <!-- Bootstrap JS and Icons -->
     <script src="../static/js/bootstrap.bundle.min.js"></script>
     <script src="../static/js/cropper.js"></script>
+    <script src="../static/js/cdnjs/crypto-js.min.js"></script>
 
     <script>
+
+
+        function register(){
+            alert('----')
+            var form = document.getElementById('form1');
+            var pwd = document.getElementById('pwd');
+            pwd.value = SHA256(pwd.value);
+            form.submit();
+            clear();
+        }
+
+
+        function SHA256(password){
+            return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+        }
+        function clear(){
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('password-test').value = '';
+        }
+
         const allowedExtensions = ['jpg', 'png'];
         const allowedMime = ['image/jpeg', 'image/png'];
         const fileInput = document.getElementById('imgfile');
@@ -190,36 +184,6 @@
             return file.size <= max_size;
         }
 
-        // 判断上传的文件格式是否是png和jpg
-        fileInput.addEventListener("change", (event) => {
-            clear();
-            const file = event.target.files[0];
-            if (file) {
-                if (checkFile(file) && checkFileSize(file)) {
-                    imgtips.innerHTML = `格式正确`;
-                    // 显示裁剪模态框
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        const imageToCrop = document.getElementById('imageToCrop');
-                        imageToCrop.src = e.target.result;
-                        const cropModal = new bootstrap.Modal(document.getElementById('cropModal'));
-                        cropModal.show();
-                        if (cropper) {
-                            cropper.destroy();
-                        }
-                        cropper = new Cropper(imageToCrop, {
-                            aspectRatio: 1 / 1,
-                            viewMode: 1,
-                        });
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    imgtips.style.color = "red";
-                    imgtips.innerHTML = `格式错误或者文件过大`;
-                    fileInput.value = ""; // 清空文件选择
-                }
-            }
-        });
 
         function offtrue(flg) {
             const pwd1 = document.getElementById('pwd1');
@@ -227,21 +191,18 @@
             const sub = document.getElementById('sub');
             const email = document.getElementById('email');
             const nickname = document.getElementById('nickname');
-            const imgfile = document.getElementById('imgfile');
             if (flg == true) {
                 pwd1.disabled = true;
                 pwd.disabled = true;
                 sub.disabled = true;
                 email.disabled = true;
                 nickname.disabled = true;
-                imgfile.disabled = true;
             } else {
                 pwd1.disabled = false;
                 pwd.disabled = false;
                 sub.disabled = false;
                 email.disabled = false;
                 nickname.disabled = false;
-                imgfile.disabled = false;
             }
         }
 
@@ -318,21 +279,6 @@
             }
         }
 
-        let cropper;
-
-        document.getElementById('cropButton').addEventListener('click', function () {
-            const canvas = cropper.getCroppedCanvas({
-                width: 100,
-                height: 100,
-            });
-            const croppedImageDataUrl = canvas.toDataURL('image/png');
-            const croppedImageInput = document.createElement('input');
-            croppedImageInput.type = 'hidden';
-            croppedImageInput.name = 'croppedImage';
-            croppedImageInput.value = croppedImageDataUrl;
-            document.getElementById('register-form').appendChild(croppedImageInput);
-            document.getElementById('cropModal').querySelector('.btn-close').click(); // 关闭模态框
-        });
     </script>
 </body>
 
