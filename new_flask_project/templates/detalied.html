@@ -106,7 +106,7 @@
         <div class="article">
             <h2><strong>{{ data['title'] }}</strong></h2>
             {% if data['modify_date'] == None %}
-            <p class="text-muted" onclick="show_athur(`{{data['username']}}`)"><img class="a_img" src="{{request.url_root}}{{ data['avatar'] }}" alt=""><i>{{ data['username'] }}</i> | 发布时间：{{ data['date'] }}</p>
+            <p class="text-muted" onclick="show_athur(`{{data['username']}}`)"><img class="a_img" style="margin-right: 5px;" src="{{request.url_root}}{{ data['avatar'] }}" alt=""><i>{{ data['username'] }}</i> | 发布时间：{{ data['date'] }}</p>
             <textarea class="form-control" id="contents" name="contents" rows="8"
                 disabled>{{ data['contents'] }}</textarea>
             {% else %}
@@ -130,7 +130,7 @@
             {% for i in comments %}
             <div class="comment-item">
                 <div class="navbar-avatar-content" onclick="show_info(`{{i['username']}}`)">
-                    <img src="{{request.url_root}}{{i['avatar']}}" alt="用户头像">
+                    <img src="{{request.url_root}}{{i['avatar']}}"  alt="用户头像">
                     <strong>{{ i['username'] }}</strong>
                 </div>
 

@@ -1,7 +1,7 @@
 import requests as reqs
 import base64
 
-from getCurrPath import img_curr_path
+from getCurrPath import img_curr_path,getUploadPath
 
 
 # 取消使用MD5加密，前端使用SHA256加密
@@ -109,16 +109,18 @@ def save_img(file: str, login_username_id):
     # 解码Base64转为图片
     img: bytes = base64.b64decode(file.split(',')[1])
     file_name = f'{login_username_id}_avatar.jpg'
-    input_path = os.path.join(img_curr_path, file_name)
+    input_path = os.path.join(f'new_flask_project\{img_curr_path}', file_name)
+    input_path1 = os.path.join(img_curr_path, file_name)
+    print(f'save_img() => {input_path}')
     with open(input_path, 'wb+') as f:
         f.write(img)
         if os.path.exists(input_path):
             print(f'保存成功！ save_img() => {input_path}')
-            return input_path
+            return input_path1
         else:
             print(f'保存失败！ save_img() => {input_path}')
-
-
+            
+            
 def get_avatar(username):
     from sql_flask.mymysql import ConMySQL
     con, cur = ConMySQL().mSQL()
@@ -150,3 +152,5 @@ def randName():
     # 组合昵称
     full_nick = first_name + fulx + salt
     return full_nick
+
+

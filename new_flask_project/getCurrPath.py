@@ -12,3 +12,7 @@ def getUploadPath():
 def getCurrPath(file_name):
     currpath = os.path.join(os.path.dirname(__file__))
     return currpath
+
+
+print(os.path.dirname(__file__))
+print(getUploadPath())

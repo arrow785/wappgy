@@ -316,19 +316,6 @@
                     console.error('Error:', error);
                 });
         }
-
-        function curr_weather() {
-            var baseUrl = "{{ url_for('curr_weather') }}"
-            fetch(baseUrl)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data)
-                    document.getElementById('curr_weather').innerHTML = data.city + '，' + data.data.type;
-                }).catch(error => {
-                    console.error('Error:', error);
-                });
-
-        }
         var time = 1 * 60 * 1000;
         setInterval(next, time);
         window.onload = function () {
