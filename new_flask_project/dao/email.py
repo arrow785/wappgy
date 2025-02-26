@@ -1,5 +1,5 @@
 from sql_flask.mymysql import ConMySQL
-from tools.mytools import get_time
+from mytools import get_time
 
 
 def insert_emial(username,email,content,sqldb):

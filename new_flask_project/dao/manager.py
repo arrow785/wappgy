@@ -1,5 +1,5 @@
 from sql_flask.mymysql import ConMySQL
-from tools.mytools import get_time
+from mytools import get_time
 connect, cursor = ConMySQL().mSQL()
 
 
@@ -10,8 +10,11 @@ def select_all_context(username: str,sqldb):
         ORDER BY c.date DESC
         """
     c,cur = sqldb.mSQL()
-    cur.execute(sql, (username,))
-    return cur.fetchall()
+    try:
+        cur.execute(sql, (username,))
+        return cur.fetchall()
+    except Exception as e:
+        print(f'select_all_context() 错误=>{e}')
 
 
 def update_content(title_id: int, content: str, title: str):

@@ -69,8 +69,7 @@
     <!-- 注册页面内容 -->
     <div class="container register-container">
         <h2 class="text-center mb-4">注册新账号</h2>
-        <form id="form1" action="/submit_register" method="post" style="padding: 15px;"
-            enctype="multipart/form-data">
+        <form id="form1" action="/submit_register" method="post" style="padding: 15px;" enctype="multipart/form-data">
             <div class="row mb-1">
                 <div class="col">
                     <label for="username" id="tips" class="form-label">用户名</label>
@@ -94,9 +93,9 @@
                 </small>
             </div>
             <div class="mb-2">
-                <label for="pwd" class="form-label">密码</label>
+                <label for="pwd" id="pwdt" class="form-label">密码</label>
                 <div class="input-group">
-                    <input type="password" id="pwd" onblur="checkPassword()" class="form-control" name="password"
+                    <input type="password" id="pwd" onblur="validatePassword()" class="form-control" name="password"
                         required>
                     <button class="btn btn-outline-secondary password-toggle" type="button"
                         onclick="togglePassword('pwd')">
@@ -113,7 +112,7 @@
             <div class="mb-2">
                 <label for="pwd1" class="form-label">确认密码</label>
                 <div class="input-group">
-                    <input type="password" id="pwd1" onblur="checkPassword()" class="form-control" name="password-test"
+                    <input type="password"  id="pwd1" onblur="validatePassword()" class="form-control" name="password-test"
                         required>
                     <button class="btn btn-outline-secondary password-toggle" type="button"
                         onclick="togglePassword('pwd1')">
@@ -121,7 +120,7 @@
                     </button>
                 </div>
             </div>
-            
+
         </form>
         <div class="text-center">
             <button type="button" id="sub" onclick="register()" class="btn btn-primary">注册</button>
@@ -141,68 +140,53 @@
 
     <script>
 
-
-        function register(){
-            alert('----')
+        // 正则表达式验证密码
+        const regex = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])(?!.*\s).{8,}$/;
+        function validatePassword() {
+            var pwdt = document.getElementById('pwdt');
+            var password = document.getElementById('pwd').value;
+            var sub = document.getElementById('sub');
+            if (regex.test(password)) {
+                pwdt.style.color = "black";
+                pwdt.innerText = "密码";
+                checkPassword()
+            } else {
+                pwdt.style.color = "red";
+                pwdt.innerText = "密码格式不正确！！";
+                sub.disabled = true;
+            }
+        }
+        function register() {
             var form = document.getElementById('form1');
             var pwd = document.getElementById('pwd');
+
+            var name = document.getElementById('username');
+            if (name.value.length < 3 || name.value.length > 20) {
+                alert('用户名长度必须在3到20个字符之间');
+                return;
+            }
+
             pwd.value = SHA256(pwd.value);
             form.submit();
             clear();
         }
 
 
-        function SHA256(password){
+        function SHA256(password) {
             return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
         }
-        function clear(){
+        function clear() {
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             document.getElementById('password-test').value = '';
         }
 
-        const allowedExtensions = ['jpg', 'png'];
-        const allowedMime = ['image/jpeg', 'image/png'];
-        const fileInput = document.getElementById('imgfile');
-        const imgtips = document.getElementById('imgtips');
-        const max_size = 2 * 1024 * 1024;
-
-        function clear() {
-            imgtips.innerHTML = '头像';
-            imgtips.style.color = 'black'; // 重置颜色
-        }
-
-        // 检查文件格式
-        function checkFile(file) {
-            const fileName = file.name.toLowerCase();
-            const fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
-            const fileType = file.type.toLowerCase();
-            return allowedExtensions.includes(fileExtension) && allowedMime.includes(fileType);
-        }
-
-        function checkFileSize(file) {
-            return file.size <= max_size;
-        }
-
-
         function offtrue(flg) {
-            const pwd1 = document.getElementById('pwd1');
-            const pwd = document.getElementById('pwd');
             const sub = document.getElementById('sub');
-            const email = document.getElementById('email');
-            const nickname = document.getElementById('nickname');
             if (flg == true) {
-                pwd1.disabled = true;
-                pwd.disabled = true;
                 sub.disabled = true;
-                email.disabled = true;
-                nickname.disabled = true;
             } else {
-                pwd1.disabled = false;
-                pwd.disabled = false;
                 sub.disabled = false;
-                email.disabled = false;
-                nickname.disabled = false;
             }
         }
 
@@ -254,13 +238,12 @@
             const confirmPassword = document.getElementById('pwd1').value;
             console.log(password, confirmPassword);
             if (password !== confirmPassword) {
-                const sub = document.getElementById('sub');
-                sub.disabled = true;
+                offtrue(true);
                 sub.className = 'btn btn-danger';
                 sub.innerText = '两次密码不一致';
             } else {
                 const sub = document.getElementById('sub');
-                sub.disabled = false;
+                offtrue(false);
                 sub.className = 'btn btn-primary';
                 sub.innerText = '注册';
             }

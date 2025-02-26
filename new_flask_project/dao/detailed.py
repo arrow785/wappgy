@@ -1,4 +1,4 @@
-from tools.mytools import get_time
+from mytools import get_time
 
 
 # 根据id查询文章内容

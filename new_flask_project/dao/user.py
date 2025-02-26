@@ -1,5 +1,5 @@
 from sql_flask.mymysql import ConMySQL
-from tools.mytools import get_time
+from mytools import get_time
 
 connect, cursor = ConMySQL().mSQL()
 
@@ -123,13 +123,14 @@ def update_user(username, email, nickName, introduce, avatar, sqldb):
         print(f'update_user() 更新资料错误！！！ =>{e}')
 
 
-def show_info(username: str):
+def show_info(username: str,sqldb):
+    con, cur = sqldb.mSQL()
     sql = """
             SELECT * FROM admin WHERE username = %s;
         """
     try:
-        cursor.execute(sql, (username,))
-        result = cursor.fetchone()
+        cur.execute(sql, (username,))
+        result = cur.fetchone()
         print(f'show_info() => {result}')
         return result
     except Exception as e:

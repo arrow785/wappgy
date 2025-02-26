@@ -3,34 +3,79 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>HTML5 图片裁剪与缩放</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark/Light Mode</title>
     <style>
-        #canvas {
-            border: 1px solid black;
-            cursor: move;
+        :root {
+            --background-color: #fff;
+            --text-color: #000;
         }
 
-        #croppedImage {
-            max-width: 300px;
-            border: 1px solid black;
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #000;
+                --text-color: #fff;
+            }
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .light-mode {
+            --background-color: #fff;
+            --text-color: #000;
+        }
+
+        .dark-mode {
+            --background-color: #000;
+            --text-color: #fff;
         }
     </style>
 </head>
 
 <body>
-<form>
-    密码:<input type="password" id="pwd">
-    <button onclick="transformSHA256()">sha256</button>
-</form>
+    <h1>Hello, World!</h1>
+    <p>This is a demo of dark and light mode.</p>
+    <button id="toggle-mode">Toggle Mode</button>
+
+    <script>
+        const toggleButton = document.getElementById('toggle-mode');
+        const body = document.body;
+
+        // 检测系统主题
+        const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        // 初始化主题
+        if (isDarkMode) {
+            body.classList.add('dark-mode');
+        } else {
+            body.classList.add('light-mode');
+        }
+
+        toggleButton.addEventListener('click', () => {
+            if (body.classList.contains('dark-mode')) {
+                body.classList.replace('dark-mode', 'light-mode');
+            } else {
+                body.classList.replace('light-mode', 'dark-mode');
+            }
+        });
+        // 密码验证
+        const regex = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+        var flg = false;
+        function validatePassword(password) {
+            if (regex.test(password)) {
+                flg = true;
+                console.log("Password is valid.");
+            } else {
+                console.log("Password is invalid.");
+            }
+        }
+        validatePassword('123456789');
+        validatePassword('zhangsan8.');
+    </script>
 </body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-<script>
-    function transformSHA256(){
-        var pwd = document.getElementById('pwd').value
-        alert(sha256(pwd))
-    }
-    function sha256(message) {
-        return CryptoJS.SHA256(message).toString(CryptoJS.enc.Hex);
-    }
-</script>
+
 </html>

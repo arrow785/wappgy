@@ -204,7 +204,7 @@
             <h2>你的文章</h2>
             {% for i in contexts %}
             <div class="post-item">
-                <h3><a href="{{ url_for('detalied',title_id=i['id']) }}">{{ i['title'] }}</a></h3>
+                <h3><a class="text-muted" href="{{ url_for('detalied',title_id=i['id']) }}">{{ i['title'] }}</a></h3>
                 {% if i['modify_date'] == None %}
                 <p>发布于 {{ i['date'] }}</p>
                 {% else %}
@@ -346,7 +346,6 @@
     <script src="../static/js/bootstrap.bundle.min.js"></script>
     <script src="../static/js/cdnjs/crypto-js.min.js"></script>
     <script>
-
         function submit(){
             var from = document.getElementById("form1-r");
             var pwd = document.getElementById("pwd");

@@ -129,12 +129,8 @@
             <p>在这里留下你的足迹、想法或者遇到的问题！如果不好描述问题请跟我联系。
                 <i><strong style="color: red;">目前还在开发中--------</strong></i>
             </p>
-        </div>
-
-
-
-        <!-- 留言表单 -->
-        <div class="guestbook-form hidden">
+            <br>
+            <br>
             {% if username == 'd' %}
             <h2>游客，留下你的留言</h2>
             {% else %}
@@ -147,26 +143,34 @@
                 <button type="submit" class="btn btn-primary">提交留言</button>
             </form>
 
-            <h2 class="text-center mb-4">评论区</h2>
-        <hr style="height: 2px; background-color: #000000;">
-        <div class="comment-list">
-            {% for i in datas %}
-            <div class="comment-item">
-                <div class="navbar-avatar-content" onclick="show_info(`{{i['username']}}`)">
-                    <img src="{{request.url_root}}{{i['avatar']}}" alt="用户头像">
-                    <strong>{{ i['username'] }}</strong>
-                </div>
-                <p class="text-muted">{{ i['date'] }}</p>
-                <p>{{ i['context'] }}</p>
-            </div>
-            <hr>
-            {% else %}
-            <p class="text-center">这没有任何留言，期待你的留言😉</p>
-            {% endfor %}
         </div>
+
+
+
+        <!-- 留言表单 -->
+        <div class="guestbook-form hidden">
+            <h2 class="text-center mb-4">评论区</h2>
+            <hr style="height: 2px; background-color: #000000;">
+            <div class="comment-list">
+                {% for i in datas %}
+                <!-- <hr> -->
+                <div class="comment-item">
+                    <div class="navbar-avatar-content" onclick="show_info(`{{i['username']}}`)">
+                        <img src="{{request.url_root}}{{i['avatar']}}" alt="用户头像">
+                        <strong>{{ i['username'] }}</strong>
+                    </div>
+                    <p class="text-muted">{{ i['date'] }}</p>
+                    <p>{{ i['context'] }}</p>
+                </div>
+
+                {% else %}
+                <p class="text-center">这没有任何留言，期待你的留言😉</p>
+                {% endfor %}
+            </div>
+            <hr style="height: 2px; background-color: #000000;">
         </div>
         <!-- 留言列表 -->
-        
+
 
         <!-- 页脚 -->
         {% include 'footer.html' %}

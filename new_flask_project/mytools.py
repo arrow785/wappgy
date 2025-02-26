@@ -109,7 +109,7 @@ def save_img(file: str, login_username_id):
     # 解码Base64转为图片
     img: bytes = base64.b64decode(file.split(',')[1])
     file_name = f'{login_username_id}_avatar.jpg'
-    input_path = os.path.join(f'new_flask_project\{img_curr_path}', file_name)
+    input_path = os.path.join(getUploadPath(), file_name)
     input_path1 = os.path.join(img_curr_path, file_name)
     print(f'save_img() => {input_path}')
     with open(input_path, 'wb+') as f:

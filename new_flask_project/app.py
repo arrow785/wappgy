@@ -13,7 +13,7 @@ from dao.detailed import *
 from dao.email import *
 
 from sql_flask.mymysql import ConMySQL
-from tools.mytools import *
+from mytools import *
 
 flask = MyFlask(__name__)
 app = flask.app
@@ -480,13 +480,14 @@ def checkoldpwd():
 
 @app.route('/show_information/<string:username>', methods=['GET'])
 def show_information(username: str):
-    data = show_info(username)
+    data = show_info(username,sqldb=msqk)
     contexts = select_all_context(username=username, sqldb=msqk)
+    username1 = session.get('username', 'd')
     print(f'show_information() => {contexts}')
     return render_template('user_people.html', **locals())
 
 
-@app.route('/guestbook', methods=['post'])
+@app.route('/guestbook', methods=['POST'])
 def guestbook():
     username = session.get('username', '游客')
     print(f'guestbook() => {username}')

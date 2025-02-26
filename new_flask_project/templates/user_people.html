@@ -29,7 +29,7 @@
 
         .profile-header {
             background-color: #fff;
-            padding: 1rem;
+            padding: 1.5rem;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 1rem;
@@ -61,16 +61,16 @@
         }
 
         .profile-header .bio {
-            margin-top: 1.5rem;
+            margin-top: 0.5rem;
         }
 
         .profile-header .edit-profile {
-            margin-top: 1rem;
+            margin-top: 0.5rem;
         }
 
         .posts {
             background-color: #fff;
-            padding: 1rem;
+            padding: 1.5rem;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 1rem;
@@ -158,7 +158,7 @@
 <!-- 导航栏 -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <p class="navbar-brand">{{username}}的主页</p>
+        <p class="navbar-brand">{{data['username']}}的主页</p>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -171,6 +171,11 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="/index">文章</a>
                 </li>
+                {% if username1 != 'd' or username1 != None  %}
+                <li class="nav-item active">
+                    <a class="nav-link" href="/logout">注销</a>
+                </li>
+                {%endif%}
             </ul>
         </div>
     </div>

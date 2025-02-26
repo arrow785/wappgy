@@ -8,7 +8,7 @@ import requests
 from werkzeug.utils import secure_filename
 from getCurrPath import getUploadPath, getCurrPath, img_curr_path
 from sql_flask.mymysql import ConMySQL
-from tools.mytools import get_time, randName
+from new_flask_project.mytools import get_time, randName
 
 
 def generate_passwords(charset, max_length):

@@ -1,7 +1,7 @@
 import os, os.path
 
 
-img_curr_path = fr'static\upload_img'
+img_curr_path = r'static\upload_img'
 def getUploadPath():
     fupath = os.path.join(os.path.dirname(__file__), r'static\upload_img')
     print(fupath)

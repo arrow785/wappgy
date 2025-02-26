@@ -17,7 +17,7 @@ def select_all(page, sqldb, per_page=5, ):
 
 
 def select_all_context(username: str, sqldb):
-    con, cur = ConMySQL().mSQL()()
+    con, cur = sqldb.mSQL()
     if username == 'd':
         print('未知用户！')
         return None
