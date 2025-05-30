@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>重置密码 - 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+     <link rel="stylesheet" href="../static/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            --border-radius: 12px;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* 导航栏样式 */
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 1rem;
+            background-color: white !important;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+        
+        /* 主容器 */
+        .reset-container {
+            max-width: 500px;
+            margin: 3rem auto;
+            padding: 2.5rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+        }
+        
+        /* 标题样式 */
+        .reset-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .reset-title i {
+            margin-right: 0.75rem;
+            color: var(--primary-color);
+        }
+        
+        /* 表单样式 */
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-label i {
+            margin-right: 0.5rem;
+            width: 20px;
+        }
+        
+        .form-control {
+            border-radius: var(--border-radius);
+            border: 1px solid #e0e0e0;
+            padding: 0.9rem 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(74, 107, 255, 0.1);
+        }
+        
+        /* 按钮样式 */
+        .btn-reset {
+            padding: 0.9rem 1.5rem;
+            font-weight: 500;
+            border-radius: var(--border-radius);
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .btn-reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(74, 107, 255, 0.2);
+        }
+        
+        /* 验证状态 */
+        .is-valid {
+            border-color: var(--success-color);
+        }
+        
+        .is-invalid {
+            border-color: var(--danger-color);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .reset-container {
+                padding: 2rem;
+                margin: 2rem auto;
+            }
+            
+            .reset-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-comments me-2"></i>个人论坛
+            </a>
+        </div>
+    </nav>
+
+    <!-- 重置密码内容 -->
+    <div class="reset-container">
+        <h2 class="reset-title">
+            <i class="fas fa-key"></i>重置密码
+        </h2>
+        
+        <form id="reset-form">
+            <div class="mb-4">
+                <label for="username" class="form-label">
+                    <i class="fas fa-user"></i>用户名
+                </label>
+                <input type="text" class="form-control" id="username" name="username" 
+                       placeholder="请输入您的用户名" required>
+                <div id="username-feedback" class="invalid-feedback"></div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="pwd" class="form-label">
+                    <i class="fas fa-lock"></i>新密码
+                </label>
+                <div class="input-group">
+                    <input type="password" id="pwd" class="form-control" name="password"
+                        placeholder="8位以上，包含数字、字母和符号" required>
+                    <button class="btn btn-outline-secondary" type="button"
+                        onclick="togglePassword('pwd')">
+                        <i class="bi bi-eye-fill"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="pwd1" class="form-label">
+                    <i class="fas fa-lock"></i>确认密码
+                </label>
+                <div class="input-group">
+                    <input type="password" id="pwd1" class="form-control" name="password-test" 
+                        placeholder="再次输入新密码" required>
+                    <button class="btn btn-outline-secondary" type="button"
+                        onclick="togglePassword('pwd1')">
+                        <i class="bi bi-eye-fill"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="button" id="sub" onclick="submitForm()" class="btn btn-primary btn-reset">
+                <i class="fas fa-sync-alt me-2"></i>重置密码
+            </button>
+        </form>
+    </div>
+
+    <!-- 页脚 -->
+    {% include 'footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/js/cdnjs/crypto-js.min.js"></script>
+    <script>
+        const regex = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])(?!.*\s).{8,}$/;
+
+        // 实时验证用户名
+        document.getElementById('username').addEventListener('blur', checkUsername);
+        
+        // 实时验证密码
+        document.getElementById('pwd').addEventListener('input', validatePassword);
+        document.getElementById('pwd1').addEventListener('input', validatePassword);
+
+        async function checkUsername() {
+            const username = document.getElementById('username');
+            const feedback = document.getElementById('username-feedback');
+            
+            if (!username.value) {
+                username.classList.add('is-invalid');
+                feedback.textContent = '用户名不能为空';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/check_username/${username.value}`);
+                const data = await response.json();
+                
+                if (data.exists) {
+                    username.classList.add('is-invalid');
+                    feedback.textContent = '用户名不存在';
+                } else {
+                    username.classList.remove('is-invalid');
+                    username.classList.add('is-valid');
+                    feedback.textContent = '';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                username.classList.add('is-invalid');
+                feedback.textContent = '验证失败，请重试';
+            }
+        }
+
+        function validatePassword() {
+            const pwd = document.getElementById('pwd');
+            const pwd1 = document.getElementById('pwd1');
+            const sub = document.getElementById('sub');
+
+            // 验证密码格式
+            if (!regex.test(pwd.value)) {
+                pwd.classList.add('is-invalid');
+                sub.disabled = true;
+                return;
+            } else {
+                pwd.classList.remove('is-invalid');
+                pwd.classList.add('is-valid');
+            }
+
+            // 验证密码一致性
+            if (pwd.value !== pwd1.value) {
+                pwd1.classList.add('is-invalid');
+                sub.disabled = true;
+            } else {
+                pwd1.classList.remove('is-invalid');
+                pwd1.classList.add('is-valid');
+                sub.disabled = false;
+            }
+        }
+
+        async function submitForm() {
+            const username = document.getElementById('username');
+            const pwd = document.getElementById('pwd');
+            const sub = document.getElementById('sub');
+
+            // 禁用按钮防止重复提交
+            sub.disabled = true;
+            sub.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>处理中...';
+
+            try {
+                const response = await fetch('/reset_pwd', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username.value,
+                        password: SHA256(pwd.value)
+                    })
+                });
+                
+                const data = await response.json();
+                alert(data.msg);
+                if (data.code === 1) {
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('重置失败，请重试');
+            } finally {
+                sub.disabled = false;
+                sub.innerHTML = '<i class="fas fa-sync-alt me-2"></i>重置密码';
+                clearForm();
+            }
+        }
+
+        function SHA256(password) {
+            return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+        }
+
+        function clearForm() {
+            document.getElementById('username').value = '';
+            document.getElementById('pwd').value = '';
+            document.getElementById('pwd1').value = '';
+        }
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.querySelector(`button[onclick="togglePassword('${inputId}')"] i`);
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.className = input.type === 'password' ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill';
+        }
+    </script>
+</body>
+</html>

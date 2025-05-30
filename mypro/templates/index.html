@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="/static/css/all.min.css?v=1.0.0"> -->
+    <link rel="stylesheet" href="../static/css/all.min.css">
+</head>
+<style>
+    :root {
+        --primary-color: #4a6bff;
+        --secondary-color: #6c757d;
+        --light-bg: #f8f9fa;
+        --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 0.8rem 1rem;
+    }
+
+    .navbar-brand {
+        font-weight: 600;
+        color: var(--primary-color);
+        font-size: 1.3rem;
+    }
+
+    .nav-link {
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s;
+    }
+
+    .navbar-avatar img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--primary-color);
+    }
+
+    /* 欢迎标题 */
+    .welcome-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 2rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .welcome-title::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: var(--primary-color);
+        border-radius: 3px;
+    }
+
+    /* 类别区域标题 */
+    .category-section-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    /* 卡片样式 */
+    .category-card {
+        border-radius: 12px;
+        background: #fff;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .category-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .category-title i {
+        margin-right: 0.6rem;
+    }
+
+    .article-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid #eee;
+        transition: all 0.2s;
+    }
+
+    .article-item:last-child {
+        border-bottom: none;
+    }
+
+    .article-item:hover {
+        background-color: rgba(74, 107, 255, 0.03);
+    }
+
+    .article-item-title {
+        font-size: 1.05rem;
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .article-item-title:hover {
+        color: var(--primary-color);
+    }
+
+    /* 元数据样式 */
+    .article-meta {
+        color: var(--secondary-color);
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+    }
+
+    .article-meta span {
+        display: flex;
+        align-items: center;
+    }
+
+    .article-meta i {
+        margin-right: 0.3rem;
+        font-size: 0.7rem;
+    }
+
+    .article-type {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        background-color: rgba(74, 107, 255, 0.1);
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+
+    /* 文章内容预览 */
+    .article-content {
+        color: #5a5a5a;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    /* 分类筛选 */
+    .category-filter {
+        margin: 2rem 0 1.5rem;
+    }
+
+    .category-filter h2 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-right: 1rem;
+        color: #2c3e50;
+    }
+
+    .category-tag {
+        font-size: 0.85rem;
+        padding: 0.5rem 1.2rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        border-radius: 20px;
+        background-color: #f1f3f5;
+        color: #495057;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .category-tag:hover {
+        background-color: var(--primary-color);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .category-tag.active {
+        background-color: var(--primary-color);
+        color: #fff;
+        box-shadow: 0 2px 5px rgba(74, 107, 255, 0.3);
+    }
+
+    /* 文章列表 */
+    .article-list {
+        margin-top: 2rem;
+    }
+
+    .article-card {
+        border-radius: 12px;
+        background: #fff;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        height: 100%;
+        border-top: 3px solid var(--primary-color);
+    }
+
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .article-card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.8rem;
+    }
+
+    /* 分页导航 */
+    .pagination-container {
+        margin: 3rem 0;
+    }
+
+    .page-item .page-link {
+        color: var(--secondary-color);
+        border: none;
+        padding: 0.5rem 0.9rem;
+        margin: 0 0.2rem;
+        border-radius: 8px;
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--primary-color);
+        color: #fff;
+    }
+
+    .page-item:hover .page-link {
+        background-color: rgba(74, 107, 255, 0.1);
+        color: var(--primary-color);
+    }
+
+    /* 响应式适配 */
+    @media (max-width: 992px) {
+        .category-card {
+            margin-bottom: 1rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .category-card {
+            padding: 1rem;
+        }
+
+        .category-title {
+            font-size: 1.1rem;
+        }
+
+        .article-card {
+            padding: 1.2rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .welcome-title {
+            font-size: 1.5rem;
+        }
+
+        .category-section-title {
+            font-size: 1.1rem;
+        }
+
+        .category-tag {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* 空白状态 */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 0;
+        color: var(--secondary-color);
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container">
+            <a class="navbar-brand" href="{{url_for('index')}}">
+                <i class="fas fa-comments me-2"></i>经验分享
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/index">
+                            <i class="fas fa-home me-1"></i>首页
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/search" target="_blank">
+                            <i class="fas fa-search me-1"></i>搜索
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/todeepseek">
+                            <i class="fas fa-robot me-1"></i>问AI
+                        </a>
+                    </li>
+                    {% if username == 'd' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login" target="_blank">
+                            <i class="fas fa-sign-in-alt me-1"></i>登录
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <div class="navbar-avatar">
+                            <a href="/people" target="_blank">
+                                <img src="{{ avatar_path }}" alt="用户头像">
+                            </a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/write" target="_blank">
+                            <i class="fas fa-edit me-1"></i>撰写
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manager" target="_blank">
+                            <i class="fas fa-cog me-1"></i>管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">
+                            <i class="fas fa-sign-out-alt me-1"></i>注销
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/boards" target="_blank">
+                            <i class="fas fa-comment-dots me-1"></i>留言板
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主页内容 -->
+    <div class="container py-4">
+        <!-- 欢迎标题 -->
+        <h1 class="welcome-title">
+            {% if username == 'd' %}
+            <i class="fas fa-globe-americas me-2"></i>Hi! 欢迎来到个人论坛
+            {% else %}
+            <i class="fas fa-smile-beam me-2"></i>{{ nickname }}，欢迎回来！
+            {% endif %}
+        </h1>
+
+        <!-- 各类别最新文章 -->
+        <h3 class="category-section-title">
+            <i class="fas fa-list-ul me-2"></i>各类别最新文章
+        </h3>
+        <div class="row">
+            <!-- 第一列 -->
+            {% if all_data.all_data %}
+            {% for data in all_data.all_data %}
+            <div class="col-lg-3 col-md-6 mb-4">
+
+                <div class="category-card">
+                    <h3 class="category-title">
+                        <i style="display: none;">{{data.typeid}}</i>
+                        <i class="fas fa-heart"></i>
+                       
+                        <a style="text-decoration: none;" href="/tag?type_id={{data.typeid}}" target="_blank"> {{data.type_name}}</a>
+                    </h3>
+                    {% for article in data.infos %}
+                    <div class="article-item" onclick="information(`{{article.id}}`)">
+                        <h4 class="article-item-title">{{ article.title }}</h4>
+                        <div class="article-meta">
+                            <span><i class="fas fa-user"></i>{{ article.nick_name }}</span>
+                            <span><i class="far fa-clock"></i>{{article.date}}</span>
+                        </div>
+                        <div class="article-content">{{article.contents}}</div>
+                        <span class="article-type"
+                         {% if data.typeid|int == 1 %} style="color: rgb(255, 123, 145);"
+                         {% elif data.typeid|int == 2 %} style="color: rgb(255, 0, 0);"
+                         {% elif data.typeid|int == 3 %} style="color: rgb(10, 0, 201);"
+                         {% else %} style="color: rgb(0, 194, 0);"
+                         {% endif %}
+                         
+                         
+                         >{{article.type_name}}</span>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="far fa-file-alt"></i>
+                        <p>暂无这个类型的文章</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <h2>没有任何文章哦！</h2>
+            {% endif %}
+
+
+        </div>
+
+   
+    <!-- 页脚 -->
+    {% include './footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script>
+        console.log('{{all_}}');
+
+        function people() {
+            window.location.href = "/people";
+        }
+
+        // 当前页码
+        let currentPage = `{{ current_page }}`;
+        // 总页数
+        const totalPages = `{{ total_pages }}`;
+
+        function information(id) {
+            const basePath = `/detalied`;
+            const full_path = `${basePath}/${id}`;
+            location.assign(full_path);
+        }
+        function loadLimit3Datas() {
+            const basePath = `/index?typeid=0`;
+            fetch(basePath, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            }).then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                })
+
+        }
+    </script>
+</body>
+
+</html>

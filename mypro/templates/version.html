@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>版本信息</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/my.css">
+     <link rel="stylesheet" href="../static/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .profile-header {
+            background-color: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            margin-left: -20px;
+            margin-right: -20px;
+        }
+
+        .profile-header img {
+            width: 100px;
+            height: 100px;
+            border: 1px solid black;
+            padding: 1px;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+
+        .profile-header .info {
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-header .info h2 {
+            margin: 0;
+        }
+
+        .profile-header .info p {
+            margin: 0;
+            color: #666;
+        }
+
+        .profile-header .bio {
+            margin-top: 1.5rem;
+        }
+
+        .profile-header .edit-profile {
+            margin-top: 1rem;
+        }
+
+        .posts {
+            background-color: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            margin-left: -20px;
+            margin-right: -20px;
+        }
+
+        .post-item {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+        }
+
+        .post-item:last-child {
+            border-bottom: none;
+        }
+
+        .post-item h3 {
+            margin: 0 0 0.5rem;
+        }
+
+        .post-item p {
+            margin: 0;
+            color: #666;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .navbar-avatar-p img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .navbar-avatar-p {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .edit-profile button {
+            margin-right: 10px;
+        }
+
+        .modal-body .row {
+            margin-bottom: 1rem;
+        }
+
+        .modal-body .row .col-6,
+        .modal-body .row .col-4 {
+            padding-right: 0.5rem;
+            padding-left: 0.5rem;
+        }
+
+        .modal-body .row .col-4 {
+            padding-right: 0;
+        }
+
+        .modal-body .row .col-6 {
+            padding-left: 0;
+        }
+
+        .modal-body .row .col-6 input,
+        .modal-body .row .col-4 input {
+            width: 100%;
+        }
+
+        .modal-body .row .col-4 .btn {
+            width: 100%;
+        }
+
+        .cropper-container {
+            max-width: 100%;
+            height: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <p class="navbar-brand">版本信息</p>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">主页</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/index">文章</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/boards">留言板</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 容器 -->
+    <div class="container">
+        <div class="profile-header text-wrap">
+            <div class="info">
+                <div>
+                    <h2 style="color: pink;">NEXT VERSION</h2>
+                    <p class="text-break">0.0.2 V</p>
+                    <p>预计发布日期：2025/~/~</p>
+                    <p style="color: hotpink;">主要的更新内容：</p>
+                    <ul style="color: hotpink;">
+                        <li>修复一些已知的bug</li>
+                        <li>优化用户界面</li>
+                        <li>优化导航栏的显示逻辑</li>
+                        <li>添加草稿箱功能</li>
+                        <li>采用正则表达式匹配密码、用户名和昵称是否符合要求</li>
+                        <li>重置密码需要邮箱验证</li>
+                        <li>添加对用户的搜索</li>
+                        <li>修复“昵称”与“用户名”的问题，在正确的页面正确显示“昵称”与“用户名”</li>
+                        <li>用户回复用户功能</li>
+                        <li style="text-decoration: line-through;">文章内容检查是否违规</li>
+                        <li>个人主页添加“收藏”模块</li>
+                        <li>添加评论区、留言区的分页功能</li>
+                    </ul>
+                    <p style="color: blue;">尝试更新的内容：</p>
+                    <ul style="color: blue;">
+                        <li>尝试修复天气BUG</li>
+                        <li>尝试添加富文本编辑框</li>
+                        <li>尝试优化“文章内容”显示的排版</li>
+                        <!-- <li>尝试添加音乐播放器（如果可行，将使用作者的会员）</li> -->
+                    </ul>
+                </div>
+            </div>
+            <p class="text-break bio" style="width: auto;">
+
+            </p>
+        </div>
+
+        <!-- 版本更新日志 -->
+        <div class="posts">
+            <h1>更新日志</h1>
+            <div class="post-item">
+                <h2>以下是历史版本详细的版本信息和更新日志</h2>
+                <h3>当前版本 0.0.1</h3>
+                <p>发布日期：2025/1/21</p>
+                <p>以下是主要的更新内容：</p>
+                <ul>
+                    <li>初始版本发布</li>
+                    <li>添加用户注册和登录功能</li>
+                    <li>添加文章发布和管理功能</li>
+                    <li>添加邮件发送功能</li>
+                    <li>添加“点击头像”查看用户信息功能</li>
+                    <li>添加文章的回复功能</li>
+                    <li>添加“修改资料”功能</li>
+                    <li>添加留言功能</li>
+                    <li>使用一些公共API添加页面的丰富性</li>
+                    <li>...</li>
+                    
+                </ul>
+            </div>
+            <!-- 可以继续添加更多版本信息 -->
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    {% include 'footer.html' %}
+
+    <!-- Bootstrap JS and Icons -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/js/cropper.js"></script>
+    <script src="../static/js/cdnjs/crypto-js.min.js"></script>
+</body>
+
+</html>

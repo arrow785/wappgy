@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑文章 | 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #6c757d;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            --border-radius: 12px;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2c3e50;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            background-color: #ffffff !important;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.4rem;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1.2rem;
+            color: #495057;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .navbar-avatar img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .navbar-avatar img:hover {
+            transform: scale(1.1);
+        }
+
+        /* 编辑容器 */
+        .edit-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            width: 100%;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+        }
+
+        .edit-header {
+            font-weight: 600;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+            color: #2c3e50;
+        }
+
+        /* 表单元素 */
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: var(--border-radius);
+            padding: 0.7rem 1rem;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(74, 107, 255, 0.15);
+        }
+
+        /* 按钮样式 */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.7rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #3a5bef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(74, 107, 255, 0.2);
+        }
+
+        .btn-danger {
+            border-radius: var(--border-radius);
+            padding: 0.7rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+        }
+
+        /* 内容区域 */
+        #content {
+            min-height: 300px;
+            resize: vertical;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .edit-container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .navbar {
+                padding: 0.8rem 1rem;
+            }
+        }
+
+        /* 操作按钮组 */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="{{url_for('index')}}">
+                <i class="fas fa-comments me-2"></i>个人论坛
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-1"></i>首页
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/boards">
+                            <i class="fas fa-comment-dots me-1"></i>留言板
+                        </a>
+                    </li>
+                    {% if username == 'd' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">
+                            <i class="fas fa-sign-in-alt me-1"></i>登录
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <div class="navbar-avatar">
+                            <img src="{{ request.url_root }}{{avatar_path}}" onclick="people()" alt="用户头像">
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">
+                            <i class="fas fa-sign-out-alt me-1"></i>退出
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/write">
+                            <i class="fas fa-edit me-1"></i>撰写
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manager">
+                            <i class="fas fa-cog me-1"></i>管理
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 编辑页面内容 -->
+    <div class="edit-container">
+        <h1 class="edit-header">
+            <i class="fas fa-edit me-2"></i>编辑文章
+        </h1>
+        <form id="write-form" action="/edit" method="post">
+            <div class="mb-3" hidden>
+                <input type="text" class="form-control" id="title_id" name="title_id" value="{{ title_id }}" required>
+            </div>
+            
+            <div class="mb-4">
+                <label for="title1" class="form-label">文章标题</label>
+                <input type="text" class="form-control" id="title1" name="title" value="{{ datas['title'] }}" required
+                    placeholder="请输入文章标题">
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label">文章类型</label>
+                <select class="form-select" name="content_type" id="content_type">
+                    {% for type in allTypes %}
+                    <option value="{{type.typeid}}" {% if type.typeid|int==datas.typeid|int %} selected {% endif %}>
+                        {{type.explain}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label for="content" class="form-label">文章内容</label>
+                <textarea class="form-control" id="content" name="content" rows="12" required
+                    placeholder="请输入文章内容...">{{ datas['contents'] }}</textarea>
+            </div>
+            
+            <div class="action-buttons">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>保存修改
+                </button>
+                <a href="#" onclick="delete1()" class="btn btn-danger">
+                    <i class="fas fa-trash-alt me-2"></i>删除文章
+                </a>
+            </div>
+        </form>
+    </div>
+
+    {% include 'footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function delete1() {
+            if (confirm("确定删除这篇文章吗？删除后无法恢复！")) {
+                location.assign(`{{ url_for('delete',t_id=title_id) }}`)
+            }
+        }
+        
+        function people() {
+            location.assign('/people')
+        }
+    </script>
+</body>
+</html>

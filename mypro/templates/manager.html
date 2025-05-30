@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章管理 | 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <link  rel="stylesheet" href="../static/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #6c757d;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2c3e50;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            background-color: #ffffff !important;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.4rem;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1.2rem;
+            color: #495057;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .navbar-avatar img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .navbar-avatar img:hover {
+            transform: scale(1.1);
+        }
+
+        /* 主内容区域 */
+        .management-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* 卡片样式 */
+        .management-card {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .management-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            margin-right: 0.8rem;
+            color: var(--primary-color);
+        }
+
+        /* 表格样式 */
+        .article-table {
+            margin: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .article-table thead th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .article-table tbody tr {
+            transition: var(--transition);
+        }
+
+        .article-table tbody tr:hover {
+            background-color: rgba(74, 107, 255, 0.03) !important;
+        }
+
+        .article-table tbody td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        /* 标题列样式 */
+        .article-title {
+            font-weight: 500;
+            color: #2c3e50;
+            max-width: 400px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 日期列样式 */
+        .article-date {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        /* 操作按钮 */
+        .action-buttons {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            border-radius: 20px;
+            padding: 0.5rem 1.2rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-edit {
+            background-color: rgba(74, 107, 255, 0.1);
+            border: 1px solid rgba(74, 107, 255, 0.2);
+            color: var(--primary-color);
+        }
+
+        .btn-edit:hover {
+            background-color: rgba(74, 107, 255, 0.2);
+            color: var(--primary-color);
+        }
+
+        .btn-delete {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .btn-delete:hover {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        /* 空状态样式 */
+        .empty-state {
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 1rem;
+        }
+
+        .empty-title {
+            color: var(--secondary-color);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-subtitle {
+            color: #adb5bd;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .management-container {
+                padding: 0 1rem;
+            }
+            
+            .article-table thead {
+                display: none;
+            }
+            
+            .article-table tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+                border-radius: var(--border-radius);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+            
+            .article-table tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.8rem 1rem;
+                border-bottom: none;
+            }
+            
+            .article-table tbody td::before {
+                content: attr(data-label);
+                font-weight: 500;
+                color: var(--secondary-color);
+                margin-right: 1rem;
+            }
+            
+            .action-buttons {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="{{url_for('index')}}">
+                <i class="fas fa-comments me-2"></i>个人论坛
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-1"></i>首页
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index">
+                            <i class="fas fa-newspaper me-1"></i>文章
+                        </a>
+                    </li>
+                    {% if username == 'd' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">
+                            <i class="fas fa-sign-in-alt me-1"></i>登录
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <div class="navbar-avatar">
+                            <img src="{{ avatar_path }}" onclick="people()" alt="用户头像">
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/write">
+                            <i class="fas fa-edit me-1"></i>撰写
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">
+                            <i class="fas fa-sign-out-alt me-1"></i>退出
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/boards">
+                            <i class="fas fa-comment-dots me-1"></i>留言板
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 管理页面内容 -->
+    <div class="management-container">
+        <div class="management-card">
+            <div class="card-header">
+                <h1 class="card-title">
+                    <i class="fas fa-tasks me-2"></i>我的文章管理
+                </h1>
+            </div>
+            
+            <div class="card-body p-0">
+                {% if datas %}
+                <div class="table-responsive">
+                    <table class="article-table w-100">
+                        <thead>
+                            <tr>
+                                <th class="text-start">文章标题</th>
+                                <th>发布时间</th>
+                                <th class="text-end">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for article in datas %}
+                            <tr>
+                                <td class="article-title" data-label="标题">
+                                    {{ article['title'] }}
+                                </td>
+                                <td class="article-date" data-label="发布时间">
+                                    {{ article['date'] }}
+                                </td>
+                                <td data-label="操作">
+                                    <div class="action-buttons">
+                                        <button class="btn-action btn-edit"
+                                            onclick="window.location.assign('/edit?title_id={{article.id}}')">
+                                            <i class="fas fa-pencil-alt me-2"></i>编辑
+                                        </button>
+                                        <button class="btn-action btn-delete"
+                                            onclick="delete1(`{{article['id']}}`)">
+                                            <i class="fas fa-trash-alt me-2"></i>删除
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="far fa-file-alt"></i>
+                    </div>
+                    <h4 class="empty-title">您还没有发布任何文章</h4>
+                    <p class="empty-subtitle">点击顶部导航栏的"撰写"按钮开始创作您的第一篇文章</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    {% include './footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function delete1(id) {
+            if (confirm("确定要删除这篇文章吗？删除后将无法恢复！")) {
+                fetch(`delete/${parseInt(id)}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('删除失败');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.flg) {
+                            showToast('删除成功', 'success');
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            throw new Error('删除失败');
+                        }
+                    })
+                    .catch(error => {
+                        showToast('删除失败，请重试', 'danger');
+                        console.error('删除错误:', error);
+                    });
+            }
+        }
+
+        function people() {
+            location.assign('/people');
+        }
+
+        function showToast(message, type) {
+            // 这里可以添加Toast通知功能
+            alert(message);
+        }
+    </script>
+</body>
+</html>

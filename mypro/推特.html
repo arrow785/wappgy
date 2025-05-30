@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter-like Homepage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #000;
+            color: #e7e9ea;
+        }
+        
+        /* 左侧导航栏 */
+        .sidebar {
+            width: 250px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #2f3336;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+        
+        .logo {
+            font-size: 28px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 4px 0;
+            border-radius: 9999px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-item:hover {
+            background-color: #181818;
+        }
+        
+        .nav-item i {
+            margin-right: 20px;
+        }
+        
+        .tweet-btn {
+            background-color: #1d9bf0;
+            color: white;
+            border: none;
+            border-radius: 9999px;
+            padding: 15px 0;
+            font-size: 17px;
+            font-weight: 700;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .tweet-btn:hover {
+            background-color: #1a8cd8;
+        }
+        
+        /* 主要内容区 */
+        .main-content {
+            flex: 1;
+            max-width: 600px;
+            border-right: 1px solid #2f3336;
+        }
+        
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(12px);
+            padding: 15px 20px;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 1px solid #2f3336;
+            z-index: 10;
+        }
+        
+        .tweet-box {
+            padding: 15px;
+            border-bottom: 1px solid #2f3336;
+            display: flex;
+        }
+        
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin-right: 15px;
+            background-color: #333;
+        }
+        
+        .tweet-input {
+            flex: 1;
+        }
+        
+        .tweet-input textarea {
+            width: 100%;
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            resize: none;
+            outline: none;
+            padding: 10px 0;
+            min-height: 60px;
+        }
+        
+        .tweet-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .action-icons {
+            display: flex;
+        }
+        
+        .action-icons i {
+            margin-right: 15px;
+            color: #1d9bf0;
+            cursor: pointer;
+        }
+        
+        .tweet-submit {
+            background-color: #1d9bf0;
+            color: white;
+            border: none;
+            border-radius: 9999px;
+            padding: 8px 16px;
+            font-weight: 700;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+        
+        /* 推文列表 */
+        .tweets {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tweet {
+            padding: 15px;
+            border-bottom: 1px solid #2f3336;
+            display: flex;
+        }
+        
+        .tweet-content {
+            flex: 1;
+        }
+        
+        .tweet-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .tweet-name {
+            font-weight: 700;
+            margin-right: 5px;
+        }
+        
+        .tweet-username, .tweet-time {
+            color: #71767b;
+            margin-right: 5px;
+        }
+        
+        .tweet-text {
+            margin-bottom: 10px;
+            font-size: 15px;
+            line-height: 20px;
+        }
+        
+        .tweet-actions {
+            display: flex;
+            justify-content: space-between;
+            max-width: 425px;
+            color: #71767b;
+        }
+        
+        .tweet-action {
+            display: flex;
+            align-items: center;
+        }
+        
+        .tweet-action i {
+            margin-right: 5px;
+        }
+        
+        /* 右侧边栏 */
+        .right-sidebar {
+            width: 350px;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .search-bar {
+            background-color: #202327;
+            border-radius: 9999px;
+            padding: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-bar i {
+            margin-right: 10px;
+            color: #71767b;
+        }
+        
+        .search-bar input {
+            background-color: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 100%;
+        }
+        
+        .trends, .who-to-follow {
+            background-color: #16181c;
+            border-radius: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .section-header {
+            padding: 15px;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 1px solid #2f3336;
+        }
+        
+        .trend-item, .follow-item {
+            padding: 15px;
+            border-bottom: 1px solid #2f3336;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .trend-item:hover, .follow-item:hover {
+            background-color: #1e1f23;
+        }
+        
+        .trend-category {
+            font-size: 13px;
+            color: #71767b;
+        }
+        
+        .trend-name {
+            font-weight: 700;
+            margin: 2px 0;
+        }
+        
+        .trend-count {
+            font-size: 13px;
+            color: #71767b;
+        }
+        
+        .follow-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .follow-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background-color: #333;
+        }
+        
+        .follow-info {
+            flex: 1;
+        }
+        
+        .follow-name {
+            font-weight: 700;
+        }
+        
+        .follow-username {
+            color: #71767b;
+        }
+        
+        .follow-btn {
+            background-color: white;
+            color: black;
+            border: none;
+            border-radius: 9999px;
+            padding: 8px 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        
+        .show-more {
+            padding: 15px;
+            color: #1d9bf0;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 1000px) {
+            .right-sidebar {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 700px) {
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左侧导航栏 -->
+    <div class="sidebar">
+        <div class="logo">𝕏</div>
+        <div class="nav-item">
+            <i>🏠</i>
+            <span>Home</span>
+        </div>
+        <div class="nav-item">
+            <i>🔍</i>
+            <span>Explore</span>
+        </div>
+        <div class="nav-item">
+            <i>🔔</i>
+            <span>Notifications</span>
+        </div>
+        <div class="nav-item">
+            <i>✉️</i>
+            <span>Messages</span>
+        </div>
+        <div class="nav-item">
+            <i>📋</i>
+            <span>Lists</span>
+        </div>
+        <div class="nav-item">
+            <i>📌</i>
+            <span>Bookmarks</span>
+        </div>
+        <div class="nav-item">
+            <i>✔️</i>
+            <span>Verified</span>
+        </div>
+        <div class="nav-item">
+            <i>👤</i>
+            <span>Profile</span>
+        </div>
+        <div class="nav-item">
+            <i>⋯</i>
+            <span>More</span>
+        </div>
+        <button class="tweet-btn">Post</button>
+    </div>
+    
+    <!-- 主要内容区 -->
+    <div class="main-content">
+        <div class="header">Home</div>
+        
+        <div class="tweet-box">
+            <div class="avatar"></div>
+            <div class="tweet-input">
+                <textarea placeholder="What's happening?"></textarea>
+                <div class="tweet-actions">
+                    <div class="action-icons">
+                        <i>📷</i>
+                        <i>🎥</i>
+                        <i>📊</i>
+                        <i>😊</i>
+                        <i>📍</i>
+                    </div>
+                    <button class="tweet-submit">Post</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tweets">
+            <!-- 推文1 -->
+            <div class="tweet">
+                <div class="avatar"></div>
+                <div class="tweet-content">
+                    <div class="tweet-header">
+                        <span class="tweet-name">Elon Musk</span>
+                        <span class="tweet-username">@elonmusk</span>
+                        <span class="tweet-time">· 2h</span>
+                    </div>
+                    <div class="tweet-text">
+                        Exciting news about our new AI project! We're pushing the boundaries of what's possible with machine learning.
+                    </div>
+                    <div class="tweet-actions">
+                        <div class="tweet-action">
+                            <i>💬</i>
+                            <span>24</span>
+                        </div>
+                        <div class="tweet-action">
+                            <i>🔄</i>
+                            <span>156</span>
+                        </div>
+                        <div class="tweet-action">
+                            <i>❤️</i>
+                            <span>1.2K</span>
+                        </div>
+                        <div class="tweet-action">
+                            <i>📤</i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 推文2 -->
+            <div class="tweet">
+                <div class="avatar"></div>
+                <div class="tweet-content">
+                    <div class="tweet-header">
+                        <span class="tweet-name">NASA</span>
+                        <span class="tweet-username">@NASA</span>
+                        <span class="tweet-time">· 5h</span>
+                    </div>
+                    <div class="tweet-text">
+                        Our Mars rover has discovered evidence of ancient microbial life! This groundbreaking discovery could change our understanding of life in the universe.
+                    </div>
+                    <div class="tweet-actions">
+                        <div class="tweet-action">
+                            <i>💬</i>
+                            <span>342</span>
+                        </div>
+                        <div class="tweet-action">
+                            <i>🔄</i>
+                            <span>1.5K</span>
+                        </div>
+                        <div class="tweet-action">
+                            <i>❤️</i>
+                            <span>8.7K</span>
+                        </div>
+                        <div class="tweet-action">
+                            <i>📤</i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 推文3 -->
+            <div class="tweet">
+                <div class="avatar"></div>
+                <div class="tweet-content">
+                    <div class="tweet-header">
+                        <span class="tweet-name">Bill Gates</span>
+                        <span class="tweet-username">@BillGates</span>
+                        <span class="tweet-time">· 8h</span>
+                    </div>
+                    <div class="tweet-text">
+                        Climate change is the defining challenge of our time. At the Gates Foundation, we're investing in innovative solutions to reduce carbon emissions and help vulnerable communities adapt.
+                    </div>
+                    <div class="tweet-actions">
+                        <div class="tweet-action">
+                            <i>💬</i>
+                            <span>189</span>
+                        </div>
+                        <div class="tweet-action">
+                            <i>🔄</i>
+                            <span>876</span>
+                        </div>
+                        <div class="tweet-action">
+                            <i>❤️</i>
+                            <span>5.3K</span>
+                        </div>
+                        <div class="tweet-action">
+                            <i>📤</i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右侧边栏 -->
+    <div class="right-sidebar">
+        <div class="search-bar">
+            <i>🔍</i>
+            <input type="text" placeholder="Search">
+        </div>
+        
+        <div class="trends">
+            <div class="section-header">Trends for you</div>
+            <div class="trend-item">
+                <div class="trend-category">Technology · Trending</div>
+                <div class="trend-name">#AIRevolution</div>
+                <div class="trend-count">125K posts</div>
+            </div>
+            <div class="trend-item">
+                <div class="trend-category">Sports · Trending</div>
+                <div class="trend-name">#WorldCup2026</div>
+                <div class="trend-count">89K posts</div>
+            </div>
+            <div class="trend-item">
+                <div class="trend-category">Politics · Trending</div>
+                <div class="trend-name">#ClimateSummit</div>
+                <div class="trend-count">76K posts</div>
+            </div>
+            <div class="trend-item">
+                <div class="trend-category">Entertainment · Trending</div>
+                <div class="trend-name">#NewMovieRelease</div>
+                <div class="trend-count">54K posts</div>
+            </div>
+            <div class="show-more">Show more</div>
+        </div>
+        
+        <div class="who-to-follow">
+            <div class="section-header">Who to follow</div>
+            <div class="follow-item">
+                <div class="follow-avatar"></div>
+                <div class="follow-info">
+                    <div class="follow-name">Tim Cook</div>
+                    <div class="follow-username">@tim_cook</div>
+                </div>
+                <button class="follow-btn">Follow</button>
+            </div>
+            <div class="follow-item">
+                <div class="follow-avatar"></div>
+                <div class="follow-info">
+                    <div class="follow-name">Satya Nadella</div>
+                    <div class="follow-username">@satyanadella</div>
+                </div>
+                <button class="follow-btn">Follow</button>
+            </div>
+            <div class="follow-item">
+                <div class="follow-avatar"></div>
+                <div class="follow-info">
+                    <div class="follow-name">Jeff Bezos</div>
+                    <div class="follow-username">@jeffbezos</div>
+                </div>
+                <button class="follow-btn">Follow</button>
+            </div>
+            <div class="show-more">Show more</div>
+        </div>
+    </div>
+</body>
+</html>

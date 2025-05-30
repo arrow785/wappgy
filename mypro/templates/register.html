@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+     <link rel="stylesheet" href="../static/css/all.min.css">
+    <link href="../static/css/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            --border-radius: 12px;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* 导航栏样式 */
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 1rem;
+            background-color: white !important;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+        
+        /* 注册容器 */
+        .register-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+        }
+        
+        /* 注册标题 */
+        .register-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .register-title i {
+            margin-right: 0.75rem;
+            color: var(--primary-color);
+        }
+        
+        /* 表单样式 */
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-label i {
+            margin-right: 0.5rem;
+            width: 20px;
+        }
+        
+        .form-control {
+            border-radius: var(--border-radius);
+            border: 1px solid #e0e0e0;
+            padding: 0.9rem 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(74, 107, 255, 0.1);
+        }
+        
+        /* 输入组样式 */
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        .input-group-text {
+            background-color: white;
+            border-right: none;
+        }
+        
+        .form-control.is-invalid {
+            border-color: var(--danger-color);
+        }
+        
+        .form-control.is-valid {
+            border-color: var(--success-color);
+        }
+        
+        /* 按钮样式 */
+        .btn-register {
+            padding: 0.9rem 1.5rem;
+            font-weight: 500;
+            border-radius: var(--border-radius);
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+        
+        .btn-register i {
+            margin-right: 0.5rem;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(74, 107, 255, 0.2);
+        }
+        
+        /* 提示信息 */
+        .form-text {
+            font-size: 0.85rem;
+            color: var(--secondary-color);
+        }
+        
+        .form-text ul {
+            padding-left: 1.5rem;
+            margin-bottom: 0;
+        }
+        
+        .form-text li {
+            margin-bottom: 0.25rem;
+        }
+        
+        /* 链接区域 */
+        .link-section {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--secondary-color);
+        }
+        
+        .link-section a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .link-section a:hover {
+            text-decoration: underline;
+        }
+        
+        /* 密码切换按钮 */
+        .password-toggle {
+            background-color: white;
+            border-left: none;
+            cursor: pointer;
+        }
+        
+        .password-toggle:hover {
+            background-color: var(--light-bg);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .register-container {
+                padding: 2rem 1.5rem;
+                margin: 1.5rem auto;
+            }
+            
+            .register-title {
+                font-size: 1.5rem;
+            }
+            
+            .form-control {
+                padding: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .register-container {
+                padding: 1.75rem 1.25rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-comments me-2"></i>个人论坛
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-1"></i>首页
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 注册页面内容 -->
+    <div class="register-container">
+        <h2 class="register-title">
+            <i class="fas fa-user-plus"></i>注册新账号
+        </h2>
+        
+        <form id="form1">
+            <div class="row mb-3">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label for="username" class="form-label">
+                        <i class="fas fa-user"></i>用户名
+                    </label>
+                    <input type="text" onblur="checkUsername()" class="form-control" id="username" name="username"
+                        placeholder="3-20个字符" required>
+                    <div id="username-feedback" class="invalid-feedback"></div>
+                </div>
+                <div class="col-md-6">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope"></i>电子邮箱
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" 
+                           placeholder="用于密码找回" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="nickname" class="form-label">
+                    <i class="fas fa-signature"></i>昵称
+                </label>
+                <input type="text" class="form-control" id="nickname" name="nickname" 
+                       placeholder="可选，4-15个字符">
+                <small class="form-text">
+                    <ul>
+                        <li>不能包含空格和敏感字符</li>
+                        <li>不填写将使用随机昵称</li>
+                    </ul>
+                </small>
+            </div>
+            
+            <div class="mb-3">
+                <label for="pwd" class="form-label">
+                    <i class="fas fa-lock"></i>密码
+                </label>
+                <div class="input-group">
+                    <input type="password" id="pwd" onblur="validatePassword()" class="form-control" name="password"
+                        placeholder="8位以上，包含数字、字母和符号" required>
+                    <button class="btn btn-outline-secondary password-toggle" type="button"
+                        onclick="togglePassword('pwd')">
+                        <i class="bi bi-eye-fill"></i>
+                    </button>
+                </div>
+                <small class="form-text">
+                    <ul>
+                        <li>长度大于8，包含数字、英文和特殊字符</li>
+                        <li>不能包含空格</li>
+                    </ul>
+                </small>
+            </div>
+            
+            <div class="mb-3">
+                <label for="pwd1" class="form-label">
+                    <i class="fas fa-lock"></i>确认密码
+                </label>
+                <div class="input-group">
+                    <input type="password" id="pwd1" onblur="validatePassword()" class="form-control"
+                        name="password-test" placeholder="再次输入密码" required>
+                    <button class="btn btn-outline-secondary password-toggle" type="button"
+                        onclick="togglePassword('pwd1')">
+                        <i class="bi bi-eye-fill"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="button" id="sub" onclick="register(event)" class="btn btn-primary btn-register">
+                <i class="fas fa-user-plus"></i>立即注册
+            </button>
+        </form>
+        
+        <div class="link-section">
+            <p>已有账号？<a href="/login">立即登录</a></p>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    {% include 'footer.html' %}
+
+    <!-- Bootstrap JS and Icons -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/js/cropper.js"></script>
+    <script src="../static/js/cdnjs/crypto-js.min.js"></script>
+
+    <script>
+        document.querySelector('#nickname').addEventListener('blur', function () {
+            const regex = /^[^\s]{4,15}$/
+            const nicknameTip = this.nextElementSibling;
+            if (this.value && !regex.test(this.value)) {
+                this.classList.add('is-invalid');
+                nicknameTip.innerHTML = '<li style="color: var(--danger-color);">昵称格式不正确</li>';
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+
+        // 正则表达式验证密码
+        const regex = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])(?!.*\s).{8,}$/;
+        
+        function validatePassword() {
+            const password = document.getElementById('pwd');
+            const confirmPassword = document.getElementById('pwd1');
+            const sub = document.getElementById('sub');
+            
+            // 验证密码格式
+            if (password.value && !regex.test(password.value)) {
+                password.classList.add('is-invalid');
+                sub.disabled = true;
+                return;
+            } else {
+                password.classList.remove('is-invalid');
+                password.classList.add('is-valid');
+            }
+            
+            // 验证两次密码是否一致
+            checkPassword();
+        }
+
+        // 注册按钮
+        function register(e) {
+            let form = document.getElementById('form1');
+            let name = document.getElementById('username');
+            
+            if (name.value.length < 3 || name.value.length > 20) {
+                alert('用户名长度必须在3到20个字符之间');
+                return;
+            }
+
+            let pwd = SHA256(document.getElementById('pwd').value);
+            let pwd1 = SHA256(document.getElementById('pwd1').value);
+
+            fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'username': name.value,
+                    'nickname': document.querySelector('#nickname').value,
+                    'password': pwd,
+                    'password-test': pwd1,
+                    'email': document.querySelector('#email').value
+                })
+            }).then(response => response.json())
+              .then(data => {
+                if (data.code == 1) {
+                    alert(data.msg);
+                    window.location.assign('/login');
+                } else {
+                    alert(data.msg || '注册失败，请重试');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('注册失败，请重试');
+            });
+        }
+
+        // SHA-256加密
+        function SHA256(password) {
+            return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+        }
+
+        // 用户名检查
+        function checkUsername() {
+            const username = document.getElementById('username');
+            const feedback = document.getElementById('username-feedback');
+            const sub = document.getElementById('sub');
+
+            if (username.value == '') {
+                username.classList.add('is-invalid');
+                feedback.textContent = '用户名不能为空';
+                sub.disabled = true;
+                return;
+            }
+
+            if (username.value.length < 3 || username.value.length > 20) {
+                username.classList.add('is-invalid');
+                feedback.textContent = '用户名长度必须在3-20个字符之间';
+                sub.disabled = true;
+                return;
+            }
+
+            const url = `/check_username/${username.value}`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists == false) {
+                        username.classList.add('is-invalid');
+                        feedback.textContent = '用户名已存在';
+                        sub.disabled = true;
+                    } else {
+                        username.classList.remove('is-invalid');
+                        username.classList.add('is-valid');
+                        feedback.textContent = '';
+                        sub.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    username.classList.add('is-invalid');
+                    feedback.textContent = '检查用户名失败，请重试';
+                    sub.disabled = true;
+                });
+        }
+
+        // 检查两次密码是否一致
+        function checkPassword() {
+            const password = document.getElementById('pwd');
+            const confirmPassword = document.getElementById('pwd1');
+            const sub = document.getElementById('sub');
+            
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.classList.add('is-invalid');
+                sub.disabled = true;
+            } else {
+                confirmPassword.classList.remove('is-invalid');
+                confirmPassword.classList.add('is-valid');
+                sub.disabled = false;
+            }
+        }
+
+        // 切换密码显示状态
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.querySelector(`button[onclick="togglePassword('${inputId}')"] i`);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye-slash-fill';
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye-fill';
+            }
+        }
+    </script>
+</body>
+</html>

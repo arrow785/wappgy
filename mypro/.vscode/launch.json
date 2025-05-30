@@ -1,0 +1,68 @@
+// .vscode/launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Flask Backend",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "flask",
+      "env": {
+        "FLASK_APP": "app.py",
+        "FLASK_ENV": "development"
+        
+      },
+      "args": [
+        "run",
+        "--no-debugger",
+        "--host=127.0.0.1",
+        "--port=5002"
+      ],
+      "cwd": "${workspaceFolder}",
+      "justMyCode": true
+    },
+    {
+      "name": "Chrome: Frontend",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5002",
+      "webRoot": "${workspaceFolder}/templates",
+      "skipFiles": [
+        "**/node_modules/**/*.js",
+        "**/static/js/bootstrap.bundle.min.js",
+        "**/static/js/cropper.js",
+        "**/static/js/ds-script.js"
+      ]
+    },
+    {
+      "name": "Flask Full Stack",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "flask",
+      "env": {
+        "FLASK_APP": "app.py",
+        "FLASK_ENV": "development"
+      },
+      "args": [
+        "run",
+        "--no-debugger",
+        "--host=0.0.0.0",
+        "--port=5002"
+      ],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "npm: start",
+      "serverReadyAction": {
+        "pattern": "Running on (http://\\S+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      },
+      "justMyCode": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack Debug",
+      "configurations": ["Python: Flask Backend", "Chrome: Frontend"]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+ <div class="news-section">
+        <h2>新闻摘要</h2>
+        <p>以下是最近的热门新闻，来源于{{ news['from'] }}，最后更新于<i style="color: green;">{{ news['update'] }}</i></p>
+        <ol>
+            {% for i in news['data'] %}
+            <li><a class="text-muted" href="{{i['url']}}" target="_blank">{{ i['title']
+                    }}&nbsp;&nbsp;&nbsp;<i>（{{ i['hot']}}）</i></a></li>
+            {% endfor %}
+        </ol>
+    </div>

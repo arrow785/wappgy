@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>撰写新文章 - 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+     <link rel="stylesheet" href="../static/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #6c757d;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            --border-radius: 12px;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* 导航栏样式 */
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 1rem;
+            background-color: white !important;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+        
+        .navbar-avatar img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
+        
+        /* 主内容区域 */
+        .main-content {
+            padding: 2rem 0;
+        }
+        
+        .write-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2.5rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 1rem;
+        }
+        
+        .page-title i {
+            margin-right: 0.75rem;
+            color: var(--primary-color);
+        }
+        
+        /* 表单样式 */
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            padding: 1rem;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(74, 107, 255, 0.1);
+        }
+        
+        #content {
+            min-height: 400px;
+        }
+        
+        /* 作者输入框特殊样式 */
+        .author-input {
+            background-color: var(--light-bg);
+            cursor: not-allowed;
+            font-weight: 500;
+        }
+        
+        /* 提交按钮 */
+        .submit-btn {
+            padding: 1rem 2.5rem;
+            font-weight: 600;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+        
+        .submit-btn i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(74, 107, 255, 0.25);
+        }
+        
+        /* 表单组间距 */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .write-container {
+                max-width: 900px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .write-container {
+                max-width: 800px;
+                padding: 2rem;
+            }
+            
+            .page-title {
+                font-size: 1.75rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .write-container {
+                padding: 1.75rem;
+                margin: 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .form-control, .form-select {
+                padding: 0.85rem;
+            }
+            
+            #content {
+                min-height: 350px;
+            }
+            
+            .submit-btn {
+                padding: 0.85rem 2rem;
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .write-container {
+                padding: 1.5rem;
+            }
+            
+            .page-title {
+                font-size: 1.35rem;
+            }
+            
+            .form-label {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="{{url_for('index')}}">
+                <i class="fas fa-comments me-2"></i>经验分享
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-1"></i>首页
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index">
+                            <i class="fas fa-newspaper me-1"></i>文章
+                        </a>
+                    </li>
+                    {% if username == 'd' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">
+                            <i class="fas fa-sign-in-alt me-1"></i>登录
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <div class="navbar-avatar">
+                            <img src="{{ avatar_path }}" onclick="people()" alt="用户头像">
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manager">
+                            <i class="fas fa-cog me-1"></i>管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">
+                            <i class="fas fa-sign-out-alt me-1"></i>注销
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/boards">
+                            <i class="fas fa-comment-dots me-1"></i>留言板
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <div class="write-container">
+            <h1 class="page-title">
+                <i class="fas fa-edit"></i>撰写新文章
+            </h1>
+            
+            <form id="write-form" action="/write" method="post">
+                <div class="form-group">
+                    <label for="username" class="form-label">作者</label>
+                    <input type="text" class="form-control author-input" id="username" 
+                           name="username" value="{{ username }}" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="title" class="form-label">文章标题</label>
+                    <input type="text" class="form-control" id="title" name="title" 
+                           placeholder="请输入文章标题..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">文章类型</label>
+                    <select class="form-select" name="content_type" id="content_type">
+                        {% for type in allTypes %}
+                        <option value="{{type.typeid}}">{{type.explain}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="content" class="form-label">文章内容</label>
+                    <textarea class="form-control" id="content" name="content" 
+                              placeholder="请输入文章内容..." rows="12" required></textarea>
+                </div>
+                
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary submit-btn">
+                        <i class="fas fa-paper-plane"></i>发布文章
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    {% include 'footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function people() {
+            window.location.href = "/people";
+        }
+    </script>
+</body>
+</html>

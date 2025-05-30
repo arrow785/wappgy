@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{username}}的主页</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/my.css">
+    <link rel="stylesheet" href="../static/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        body {
+            background-color: #f1f5f9;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #334155;
+            position: relative;
+            line-height: 1.6;
+        }
+        
+        /* 导航栏样式 */
+        .navbar {
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            padding: 0.8rem 1.5rem;
+            background-color: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+            transition: var(--transition);
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            color: #1e293b !important;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            color: #475569 !important;
+            transition: var(--transition);
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        /* 背景图片 */
+        .background-image {
+            width: 100%;
+            height: 360px;
+            background-image: url("{{request.url_root}}{{ bgc_img|replace('\\', '/') }}");
+            background-size: cover;
+            background-position: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            transition: var(--transition);
+        }
+        
+        .background-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(248, 250, 252, 0.98));
+            z-index: 1;
+        }
+        
+        /* 主容器 */
+        .main-container {
+            max-width: 1280px;
+            width: 85%;
+            margin: 0 auto;
+            padding: 2.5rem;
+            margin-top: 240px;
+            transition: var(--transition);
+        }
+        
+        /* 用户简介卡片 */
+        .profile-card {
+            background-color: rgba(255, 255, 255, 0.92);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: var(--transition);
+        }
+        
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-right: 2rem;
+            transition: var(--transition);
+        }
+        
+        .profile-info h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #1e293b;
+        }
+        
+        .profile-info p {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .profile-bio {
+            margin-top: 2rem;
+            color: #475569;
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+        
+        /* 内容卡片 */
+        .content-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+        
+        .content-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        .content-card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+        }
+        
+        .content-card h2 i {
+            margin-right: 0.75rem;
+            color: var(--primary-color);
+        }
+        
+        /* 文章项 */
+        .article-item {
+            padding: 1.25rem 0;
+            border-bottom: 1px solid #eee;
+            transition: var(--transition);
+        }
+        
+        .article-item:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .article-item:last-child {
+            border-bottom: none;
+        }
+        
+        .article-item h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .article-item h3 a {
+            color: #1e293b;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .article-item h3 a:hover {
+            color: var(--primary-color);
+        }
+        
+        .article-meta {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            padding: 2rem;
+            text-align: center;
+            color: var(--secondary-color);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .profile-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .profile-avatar {
+                margin-bottom: 1.5rem;
+                margin-right: 0;
+                width: 120px;
+                height: 120px;
+            }
+            
+            .main-container {
+                width: 90%;
+                padding: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1.5rem;
+                margin-top: 200px;
+                width: 95%;
+            }
+            
+            .background-image {
+                height: 280px;
+            }
+            
+            .profile-card {
+                padding: 2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .background-image {
+                height: 220px;
+            }
+            
+            .main-container {
+                padding: 1.25rem;
+                margin-top: 180px;
+            }
+            
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 背景图片 -->
+    <div class="background-image"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-comments me-2"></i>{{data['nick_name']}}的主页
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-1"></i>首页
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index">
+                            <i class="fas fa-newspaper me-1"></i>文章
+                        </a>
+                    </li>
+                    {% if username1 != 'd' or username1 != None %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">
+                            <i class="fas fa-sign-out-alt me-1"></i>注销
+                        </a>
+                    </li>
+                    {%endif%}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="main-container">
+        <!-- 用户简介 -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <img src="{{request.url_root}}{{data['avatar']}}" alt="用户头像" class="profile-avatar">
+                <div class="profile-info">
+                    <h2>{{ data['nick_name'] }}</h2>
+                    <p><i class="fas fa-user me-2"></i>{{ data['username'] }}</p>
+                    <p><i class="fas fa-envelope me-2"></i>{{ data['email'] }}</p>
+                </div>
+            </div>
+            <div class="profile-bio">
+                {{ data['introduce'] }}
+            </div>
+        </div>
+
+        <!-- 用户文章 -->
+        <div class="content-card">
+            <h2><i class="fas fa-pen-alt"></i>{{data['username']}}的文章</h2>
+            
+            {% for i in contexts %}
+            <div class="article-item">
+                <h3><a href="{{ url_for('detalied',title_id=i['id']) }}">{{ i['title'] }}</a></h3>
+                <div class="article-meta">
+                    {% if i['modify_date'] == None %}
+                    <span><i class="fas fa-calendar-alt me-1"></i>{{ i['date'] }}</span>
+                    {% else %}
+                    <span><i class="fas fa-calendar-alt me-1"></i>{{ i['date'] }} | <i class="fas fa-edit me-1"></i>{{ i['modify_date'] }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p><i class="fas fa-pen-alt fa-2x mb-3"></i></p>
+                <p>{{data['username']}}没有发布任何文章</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 页脚 -->
+    {% include 'footer.html' %}
+</body>
+</html>

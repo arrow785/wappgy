@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修改用户 - 管理员控制台</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+     <link rel="stylesheet" href="../static/css/all.min.css">
+    <style>
+        .user-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0 auto;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .border-bottom {
+            border-bottom: 3px solid var(--primary-color) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 - 与admin.html保持一致 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/admin">
+                <i class="fas fa-shield-alt me-2"></i>管理员控制台
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto head-ul">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">
+                            <i class="fas fa-sign-out-alt me-1"></i>退出
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="container mt-4">
+        <div class="card-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-user-edit me-2"></i>编辑用户信息</h1>
+                <a href="/admin" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>返回管理页
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <form id="userEditForm" method="POST">
+                        <input type="hidden" name="user_id" value="{{user.id}}">
+
+                        <!-- 用户头像 -->
+                        <div class="text-center mb-4">
+                            <img src="{{user.avatar}}" alt="" width="10%" style="border-radius: 50%;">
+                            <!-- <div class="user-avatar-large mx-auto mb-3">
+                                
+                            </div> -->
+                        </div>
+
+                        <!-- 基本信息 -->
+                        <div class="mb-4">
+                            <h3 class="mb-3 border-bottom pb-2"><i class="fas fa-info-circle me-2"></i>基本信息</h3>
+
+                            <div class="mb-3">
+                                <label class="form-label">用户名</label>
+                                <input type="text" class="form-control" name="username" value="{{user.username}}"
+                                    readonly disabled>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">昵称</label>
+                                <input type="text" class="form-control" name="nick_name" value="{{user.nick_name}}"
+                                    required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">电子邮箱</label>
+                                <input type="email" class="form-control" name="email" value="{{user.email or ''}}">
+                            </div>
+                        </div>
+
+                        <!-- 权限设置 -->
+                        <div class="mb-4">
+                            <h3 class="mb-3 border-bottom pb-2"><i class="fas fa-user-shield me-2"></i>权限设置</h3>
+
+                            <div class="mb-3">
+                                <label class="form-label">用户角色</label>
+                                <select class="form-select" name="role">
+                                    <option value="0" {% if user.power|int==0 %}selected{% endif %}>普通用户</option>
+                                    <option value="1" {% if user.power|int==1 %}selected{% endif %}>管理员</option>
+                                    <option value="2" {% if user.power|int==2 %}selected{% endif %}>违规用户</option>
+
+                                </select>
+                            </div>
+
+
+                        </div>
+
+                        <!-- 操作按钮 -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-danger"
+                                onclick="confirmDelete('{{user.username}}', '{{user.id}}')">
+                                <i class="fas fa-trash-alt me-1"></i>删除用户
+                            </button>
+                            <div>
+                                <!-- <button type="reset" class="btn btn-secondary me-2">
+                                    <i class="fas fa-undo me-1"></i>重置
+                                </button> -->
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>保存更改
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    {% include './footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 自定义样式 -->
+
+
+    <script>
+        function confirmDelete(username, userId) {
+            if (confirm(`确定要永久删除用户 "${username}" 吗？此操作不可撤销！`)) {
+                fetch('/admin/delete_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: userId,
+                        username: username
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 200) {
+                            window.location.href = '/admin?message=用户删除成功';
+                        } else {
+                            alert('删除失败: ' + (data.message || '未知错误'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('删除过程中发生错误');
+                    });
+            }
+        }
+
+        // 表单提交处理
+        document.getElementById('userEditForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+
+            const nick_name = document.querySelector('input[name="nick_name"]').value;
+            const email = document.querySelector('input[name="email"]').value;
+            const role = document.querySelector('select[name="role"]').value
+            const uid = document.querySelector('input[name="user_id"]').value
+
+
+            fetch(`/admin_modify_user`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nick_name,
+                    email,
+                    role,
+                    uid: parseInt(uid),
+
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 1) {
+                        alert(data.msg);
+                        window.location.href = '/admin';
+                    } else {
+                        alert('更新失败: ' + (data.msg || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('更新过程中发生错误');
+                });
+        });
+    </script>
+</body>
+
+</html>

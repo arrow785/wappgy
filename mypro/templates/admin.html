@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员页面</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+     <link rel="stylesheet" href="../static/css/all.min.css">
+</head>
+<style>
+    :root {
+        --primary-color: #3498db;
+        --secondary-color: #2c3e50;
+        --accent-color: #e74c3c;
+        --light-bg: #f8f9fa;
+        --dark-bg: #343a40;
+        --success-color: #2ecc71;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+        color: #333;
+    }
+
+    .navbar {
+        background-color: var(--secondary-color) !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+        font-weight: 700;
+        color: white !important;
+        font-size: 1.5rem;
+    }
+
+    .nav-link {
+        color: rgba(255, 255, 255, 0.85) !important;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        color: white !important;
+        transform: translateY(-2px);
+    }
+
+    .container {
+        max-width: 1200px;
+        margin-top: 2rem;
+    }
+
+    h1 {
+        color: var(--secondary-color);
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+
+    h1:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background: var(--primary-color);
+        border-radius: 2px;
+    }
+
+    h2 {
+        color: var(--secondary-color);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+
+    .card-section {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .list-group-item {
+        border: none;
+        border-left: 4px solid var(--primary-color);
+        margin-bottom: 1rem;
+        border-radius: 5px !important;
+        transition: all 0.3s ease;
+        padding: 1.25rem;
+    }
+
+    .list-group-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        background-color: #f8f9fa !important;
+    }
+
+    .article-title {
+        color: var(--secondary-color);
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .article-title:hover {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .btn-danger {
+        background-color: var(--accent-color);
+        border: none;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        background-color: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .pagination .page-link {
+        color: var(--secondary-color);
+        border: none;
+        margin: 0 3px;
+        border-radius: 5px !important;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #e9ecef;
+        color: var(--primary-color);
+    }
+
+    .welcome-message {
+        background: linear-gradient(135deg, #3498db, #2c3e50);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .welcome-message p {
+        margin-bottom: 0;
+        opacity: 0.9;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        border-top: 3px solid var(--primary-color);
+    }
+
+    .stats-card h3 {
+        color: var(--secondary-color);
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-card p {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .card-section {
+            padding: 1rem;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+        }
+    }
+</style>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-shield-alt me-2"></i>管理员控制台
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto head-ul">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">
+                            <i class="fas fa-sign-out-alt me-1"></i>退出
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主页内容 -->
+    <div class="container mt-4">
+        <div class="welcome-message">
+            <h1><i class="fas fa-user-shield me-2"></i>管理员控制台</h1>
+            <p>欢迎回来，您可以在这里管理所有文章和用户。</p>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="stats-card">
+                    <h3>文章总数</h3>
+                    <p class="stats-number" id="total-articles">{{articleCount}}</p>
+                    <p><i class="fas fa-file-alt me-2"></i>所有发布的文章</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="stats-card">
+                    <h3>用户总数</h3>
+                    <p class="stats-number" id="total-users">{{userCount}}</p>
+                    <p><i class="fas fa-users me-2"></i>所有注册用户</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card-section">
+                    <h2><i class="fas fa-newspaper me-2"></i>文章管理</h2>
+                    <ul class="list-group" id="article-list">
+                        <!-- 文章列表将通过JS动态加载 -->
+
+                        {% for article in article_admin_fy_data %}
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-start">
+                                <div class="user-avatar">{{article.title[0]}}</div>
+                                <div class="flex-grow-1">
+                                    <h4><a class="article-title" href="#"
+                                            onclick="admin_mofidy(`{{article.id}}`)">{{article.title}}</a></h4>
+                                    <p class="text-muted mb-2"><i class="far fa-user me-1"></i>{{article.username}} •
+                                        <i class="far fa-clock me-1"></i>{{article.date}}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end mt-2">
+                                <a class="btn btn-primary me-2"
+                                
+                                    href="/admin/modify_content?id={{article.id}}">
+                                    <i class="fas fa-eye me-1"></i>修改
+                            </a>
+                                <a href="#" class="btn btn-danger"
+                                    onclick="deleteArticle('{{article.title}}',`{{article.id}}`)">
+                                    <i class="fas fa-trash-alt me-1"></i>删除
+                                </a>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <!-- 分页导航 -->
+                    <nav aria-label="Page navigation" class="mt-3">
+                        <ul class="pagination justify-content-center" id="article-pagination">
+                            {% for page_num in range(1, article_Pages + 1) %}
+                            <li class="page-item {% if page_num == article_current_page %}active{% endif %}">
+                                <a class="page-link"
+                                    href="/admin?user_current_page={{user_current_page}}&article_current_page={{page_num}}">{{
+                                    page_num }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-section">
+                    <h2><i class="fas fa-users-cog me-2"></i>用户管理</h2>
+                    <ul class="list-group" id="users-list">
+                        <!-- 用户列表将通过JS动态加载 -->
+                        {% for user in user_admin_fy_data %}
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar">{{user.nick_name[0]}}</div>
+                                <div>
+                                    <h5 class="mb-1">{{user.nick_name}}</h5>
+                                    <p class="text-muted mb-0"><i class="fas fa-id-card me-1"></i>{{user.username}}</p>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end mt-2">
+                                <!-- 添加查看详情按钮 -->
+                                <button type="button" class="btn btn-primary me-2"
+                                    onclick="window.location.assign('/admin_modify_user?id={{user.id}}')">
+                                    <i class="fas fa-eye me-1"></i>操作
+                                </button>
+                                <a href="#" class="btn btn-danger"
+                                    onclick="deleteUserById('{{user.username}}','{{user.id}}')">
+                                    <i class="fas fa-trash-alt me-1"></i>删除
+                                </a>
+                            </div>
+                        </li>
+
+
+                        {% endfor %}
+                    </ul>
+                    <!-- 分页导航 -->
+                    <nav aria-label="Page navigation" class="mt-3">
+                        <ul class="pagination justify-content-center" id="user-pagination">
+                            {% for page_num in range(1, user_Pages + 1) %}
+                            <li class="page-item {% if page_num == user_current_page %}active{% endif %}">
+                                <a class="page-link"
+                                    href="/admin?user_current_page={{page_num}}&article_current_page={{article_current_page}}">{{
+                                    page_num }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    {% include './footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        function updateActivePagination(paginationId, activePage) {
+            const pagination = document.getElementById(paginationId);
+            if (pagination) {
+                const pageItems = pagination.querySelectorAll('.page-item');
+                pageItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.querySelector('.page-link').textContent == activePage) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        function deleteArticle(title, id) {
+            if (confirm(`确定要删除文章 "${title}" 吗？⚠️ 该操作不可撤销！`)) {
+                fetch(`/admin/delete_article?id=${id}&title=${title}`, {
+                    method: 'GET',
+                }).then(response => response.json()).then(data => {
+                    if (data.status === 200) {
+                        showAlert(`文章 "${title}" 已成功删除`, 'success');
+                        window.location.assign(`/admin?user_current_page={{user_current_page-1}}&article_current_page=1`)
+                    } else {
+                        showAlert(`删除失败: ${data.message || '未知错误'}`, 'danger');
+                    }
+                }).catch(error => {
+                    showAlert('删除过程中发生错误', 'danger');
+                    console.error('删除错误:', error);
+                });
+            }
+        }
+
+        function deleteUserById(username, id) {
+            if (confirm(`确定要删除用户 "${username}" 吗？该用户的所有文章也将被删除！`)) {
+                fetch(`admin/deleteUserById`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        id: id
+                    })
+                }).then(response => response.json()).then(data => {
+                    if (data.status === 200) {
+                        showAlert(`用户 "${username}" 已成功删除`, 'success');
+                        window.location.assign(`/admin?user_current_page=1&article_current_page={{article_current_page-1}}`)
+
+                    } else {
+                        showAlert(`删除失败: ${data.message || '未知错误'}`, 'danger');
+                    }
+                }).catch(error => {
+                    showAlert('删除过程中发生错误', 'danger');
+                    console.error('删除错误:', error);
+                });
+            }
+        }
+
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '9999';
+            alert.style.minWidth = '300px';
+            alert.role = 'alert';
+
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+
+            document.body.appendChild(alert);
+
+            // 自动消失
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 150);
+            }, 3000);
+        }
+
+        function admin_mofidy(id) {
+            const fullpath = `/admin/modify_content?id=${id}`;
+            window.location.assign(fullpath);
+        }
+
+        // 初始化加载
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     loadPaperPage(curr_paper_page);
+        //     loadUersPage(curr_user_page);
+        //     loadStats();
+        // });
+    </script>
+</body>
+
+</html>

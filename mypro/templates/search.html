@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索 - 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #6c757d;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 1rem;
+            background-color: white !important;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+
+        /* 搜索容器 */
+        .search-main-container {
+            padding: 2rem 0;
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .search-input-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        #searchInput {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            font-size: 1rem;
+            transition: all 0.3s;
+            padding-left: 3rem;
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(74, 107, 255, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+        }
+
+        /* 结果区域 */
+        .search-results {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .result-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .result-header {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-header i {
+            margin-right: 0.75rem;
+            color: var(--primary-color);
+        }
+
+        /* 用户卡片 */
+        .user-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            background-color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #e9ecef;
+        }
+
+        .user-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 1rem;
+            border: 2px solid rgba(74, 107, 255, 0.2);
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-nickname {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-bio {
+            font-size: 0.875rem;
+            color: var(--secondary-color);
+            line-height: 1.4;
+        }
+
+        /* 文章卡片 */
+        .article-card {
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            background-color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #e9ecef;
+        }
+
+        .article-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .article-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.75rem;
+        }
+
+        .article-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+        }
+
+        .article-meta span {
+            display: flex;
+            align-items: center;
+        }
+
+        .article-meta i {
+            margin-right: 0.3rem;
+            font-size: 0.8rem;
+        }
+
+        .article-content {
+            color: #5a5a5a;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* 空白状态 */
+        .empty-state {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--secondary-color);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            color: #dee2e6;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* 加载动画 */
+        #globalLoading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        #globalLoading.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(74, 107, 255, 0.1);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .search-container {
+                padding: 1.5rem;
+            }
+
+            .result-section {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 全局加载层 -->
+    <div id="globalLoading" class="d-none">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="{{url_for('main')}}">
+                <i class="fas fa-comments me-2"></i>经验分享
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index">
+                            <i class="fas fa-newspaper me-1"></i>文章
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/boards">
+                            <i class="fas fa-comment-dots me-1"></i>留言板
+                        </a>
+                    </li>
+                    {% if username != 'd' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/people">
+                            <i class="fas fa-user me-1"></i>我的主页
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 搜索容器 -->
+    <div class="search-main-container">
+        <div class="container">
+            <div class="search-container">
+                <div class="search-input-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" class="form-control" placeholder="输入关键词搜索用户或文章...">
+                </div>
+
+                <div id="searchResults" class="search-results">
+                    <!-- 初始提示 -->
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h4>搜索内容</h4>
+                        <p>输入关键词开始搜索文章</p>
+                    </div>
+                </div>
+                <!-- 分页导航 -->
+                <nav aria-label="Page navigation" class="pagination-container mt-3">
+                    <ul class="pagination justify-content-center" id="pagination">
+
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    {% include 'footer.html' %}
+
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const PAGINATION_RANGE = 3;
+        let globa_keyword = ''
+        let total_page = 1;
+
+        // 加载动画控制
+        function showLoading() {
+            document.getElementById('globalLoading').classList.remove('d-none');
+            document.getElementById('globalLoading').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('globalLoading').classList.remove('show');
+            setTimeout(() => {
+                document.getElementById('globalLoading').classList.add('d-none');
+            }, 300);
+        }
+
+
+        // 渲染函数
+        function renderResults(article) {
+
+            const htmlArticle = `
+                <div class="result-section">
+                    <div class="result-header">
+                        <i class="fas fa-newspaper"></i>文章结果
+                    </div>
+                    ${article.length > 0 ?
+                    article.map(article => `
+                        <div class="article-card" onclick="window.open('/detalied/${article.id}','_blank')">
+                            <h5 class="article-title">${article.title}</h5>
+                            <div class="article-meta">
+                                <span><i class="fas fa-user"></i>${article.username}</span>
+                                <span><i class="far fa-clock"></i>${article.date}</span>
+                            </div>
+                            <p class="article-content">${article.contents}</p>
+                        </div>
+                    `).join('') :
+                    `<div class="empty-state">
+                        <i class="far fa-file-alt"></i>
+                        <p>没有找到相关文章</p>
+                    </div>`}
+                </div>
+            `;
+
+            const resultsHTML = (article.length > 0)
+                ? (htmlArticle).trim()
+                : `<div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h4>没有找到相关结果</h4>
+                        <p>尝试使用不同的关键词搜索</p>
+                   </div>`;
+
+            document.getElementById('searchResults').innerHTML = resultsHTML;
+        }
+
+        function updatePage(cur_page, tal_pages) {
+            // 获取分页容器元素
+            const pagination = document.getElementById('pagination');
+            // 创建分页元素
+            let htmlPage = ''
+            console.log(cur_page, tal_pages);
+
+
+            // 创建上一页元素
+            htmlPage += `
+                <li class="page-item ${cur_page <= 1 ? 'disabled' : ''} ${tal_pages < 1 ? 'd-none' : ''}"} ">
+                        <a class="page-link" href="#" onclick="loadPage(${cur_page - 1})">
+                            &laquo;
+                        </a>
+                    </li>
+            `
+
+            // 创建页码元素，先定义开始和结束页码，然后根据当前页调整范围
+            const startPage = Math.max(1, cur_page - PAGINATION_RANGE);
+            const endPage = Math.min(tal_pages, cur_page + PAGINATION_RANGE);
+
+            for (let i = startPage; i <= endPage; i++) {
+
+                htmlPage += `<li class="page-item ${i === cur_page ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="loadPage(${i})">
+                    ${i}
+                </a>
+            </li>`
+
+            }
+            // 创建下一页元素
+            htmlPage += `
+                <li class="page-item ${cur_page >= tal_pages ? 'disabled' : ''} ${tal_pages < 1 ? 'd-none' : ''}"}">
+                        <a class="page-link" href="#" onclick="loadPage(${cur_page + 1})">
+                            &raquo;
+                        </a>
+                    </li>
+            `
+            pagination.innerHTML = htmlPage;
+
+
+        }
+
+        function loadPage(page) {
+            if (page < 1 || page > total_pages) return false;
+            showLoading();
+            initData(page);
+            hideLoading();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return false;
+
+        }
+        function initData(page) {
+            const urlx = `/api/search?page=${page}&keyword=${globa_keyword}`
+            console.log(urlx);
+
+            fetch(urlx, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(res => res.json()).then(data => {
+                renderResults(data.data);
+                total_pages = data.total_pages;
+                updatePage(data.current_page, data.total_pages)
+                console.log(data);
+
+            }).catch(err => { })
+
+
+
+        }
+
+        // 输入监听
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const keyword = e.target.value.trim();
+
+            if (keyword === '') {
+                hideLoading();
+                document.getElementById('searchResults').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h4>搜索内容</h4>
+                        <p>输入关键词开始搜索用户和文章</p>
+                    </div>
+                `;
+                return;
+            }
+            // 保存关键词全局变量，以便在其他函数中使用
+            globa_keyword = keyword
+
+            showLoading();
+
+            fetch(`/api/search?keyword=${keyword}&page=1`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+            })
+                .then(response => response.json())
+                .then(data => {
+                    renderResults(data.data);
+                    total_pages = data.total_pages;
+                    updatePage(data.current_page, data.total_pages)
+                    hideLoading();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('searchResults').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>搜索失败</h4>
+                        <p>请稍后再试</p>
+                    </div>
+                `;
+                    hideLoading();
+                });
+        });
+    </script>
+</body>
+
+</html>
