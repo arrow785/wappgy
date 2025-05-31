@@ -4,9 +4,9 @@ from Tools import get_time
 newConMysql = ConMySQL()
 
 
-def select_all_context(username):
+def select_all_article(username):
     sql = f"""
-        SELECT * FROM context AS c
+        SELECT * FROM article AS c
         WHERE c.username = %s
         ORDER BY c.date DESC
         """
@@ -20,7 +20,7 @@ def select_all_context(username):
 
 def update_content(title_id, content, title, type_id):
     sql = """
-            UPDATE context
+            UPDATE article
             SET contents = %s, title = %s, modify_date = %s, typeid = %s
             WHERE id = %s
             """
@@ -32,9 +32,9 @@ def update_content(title_id, content, title, type_id):
         return res if res else 0
 
 
-def find_context(title_id: int):
+def find_article(title_id: int):
     sql = """
-        SELECT * FROM context
+        SELECT * FROM article
         WHERE id = %s
         """
     with newConMysql.getConnect() as db:
@@ -44,9 +44,9 @@ def find_context(title_id: int):
         return res if res else None
 
 
-def delete_context(title_id: int):
+def delete_article(title_id: int):
     sql = """
-        DELETE FROM context
+        DELETE FROM article
         WHERE id = %s
         """
     with newConMysql.getConnect() as db:

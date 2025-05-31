@@ -8,7 +8,7 @@ newConMysql = ConMySQL()
 def isStarBook(username: str, content_id):
     print(f"isStarBook() ==>  {username} content_id => {content_id}")
     sql = """
-        SELECT s.content_id,COUNT(*) FROM starbook AS s
+        SELECT  COUNT(*) AS number FROM starbook AS s
         left JOIN users AS a1 
         on a1.id = s.content_id
 				WHERE s.login_name = %s and s.content_id = %s
@@ -16,15 +16,9 @@ def isStarBook(username: str, content_id):
         """
     with newConMysql.getConnect() as db:
         cur = db.cursor()
-        cur.execute(
-            sql,
-            (
-                username,
-                content_id,
-            ),
-        )
+        cur.execute(sql, (username, content_id))
         rs = cur.fetchone()
-        return rs if rs else None
+        return rs["number"] if rs else 0
 
 
 # 收藏
@@ -32,13 +26,7 @@ def star_book(id, login_name):
     sql = "insert into starbook(content_id,login_name) values(%s,%s)"
     with newConMysql.getConnect() as db:
         cur = db.cursor()
-        cur.execute(
-            sql,
-            (
-                id,
-                login_name,
-            ),
-        )
+        cur.execute(sql, (id, login_name))
         db.commit()
         res = cur.rowcount
         return res if res else 0

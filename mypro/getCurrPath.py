@@ -15,6 +15,13 @@ def getUploadPath():
 def createBgcPath():
     fupath = os.path.join(os.path.dirname(__file__), r"static\upload_img\bgc")
 
+    # print(fupath)
+    return fupath
+
+
+def createCoverPath():
+    fupath = os.path.join(os.path.dirname(__file__), r"static\upload_img\cover_img")
+
     print(fupath)
     return fupath
 

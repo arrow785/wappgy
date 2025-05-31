@@ -411,26 +411,25 @@
                     <h3 class="category-title">
                         <i style="display: none;">{{data.typeid}}</i>
                         <i class="fas fa-heart"></i>
-                       
-                        <a style="text-decoration: none;" href="/tag?type_id={{data.typeid}}" target="_blank"> {{data.type_name}}</a>
+
+                        <a style="text-decoration: none;" href="/tag?type_id={{data.typeid}}" target="_blank">
+                            {{data.type_name}}</a>
                     </h3>
                     {% for article in data.infos %}
-                    <div class="article-item" onclick="information(`{{article.id}}`)">
+                    <div class="article-item" onclick="information(`{{article.id}}`)" >
+                        <img src="{{article.cover_url}}" alt="" class="mb-1" width="100%"
+                        
+                            style="border-radius: 5px; opacity: 1;">
                         <h4 class="article-item-title">{{ article.title }}</h4>
                         <div class="article-meta">
                             <span><i class="fas fa-user"></i>{{ article.nick_name }}</span>
                             <span><i class="far fa-clock"></i>{{article.date}}</span>
                         </div>
                         <div class="article-content">{{article.contents}}</div>
-                        <span class="article-type"
-                         {% if data.typeid|int == 1 %} style="color: rgb(255, 123, 145);"
-                         {% elif data.typeid|int == 2 %} style="color: rgb(255, 0, 0);"
-                         {% elif data.typeid|int == 3 %} style="color: rgb(10, 0, 201);"
-                         {% else %} style="color: rgb(0, 194, 0);"
-                         {% endif %}
-                         
-                         
-                         >{{article.type_name}}</span>
+                        <span class="article-type" {% if data.typeid|int==1 %} style="color: rgb(255, 123, 145);" {%
+                            elif data.typeid|int==2 %} style="color: rgb(255, 0, 0);" {% elif data.typeid|int==3 %}
+                            style="color: rgb(10, 0, 201);" {% else %} style="color: rgb(0, 194, 0);" {% endif
+                            %}>{{article.type_name}}</span>
                     </div>
                     {% else %}
                     <div class="empty-state">
@@ -448,43 +447,43 @@
 
         </div>
 
-   
-    <!-- 页脚 -->
-    {% include './footer.html' %}
 
-    <!-- Bootstrap JS -->
-    <script src="../static/js/bootstrap.bundle.min.js"></script>
-    <script>
-        console.log('{{all_}}');
+        <!-- 页脚 -->
+        {% include './footer.html' %}
 
-        function people() {
-            window.location.href = "/people";
-        }
+        <!-- Bootstrap JS -->
+        <script src="../static/js/bootstrap.bundle.min.js"></script>
+        <script>
+            console.log('{{all_}}');
 
-        // 当前页码
-        let currentPage = `{{ current_page }}`;
-        // 总页数
-        const totalPages = `{{ total_pages }}`;
+            function people() {
+                window.location.href = "/people";
+            }
 
-        function information(id) {
-            const basePath = `/detalied`;
-            const full_path = `${basePath}/${id}`;
-            location.assign(full_path);
-        }
-        function loadLimit3Datas() {
-            const basePath = `/index?typeid=0`;
-            fetch(basePath, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            }).then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                })
+            // 当前页码
+            let currentPage = `{{ current_page }}`;
+            // 总页数
+            const totalPages = `{{ total_pages }}`;
 
-        }
-    </script>
+            function information(id) {
+                const basePath = `/detalied`;
+                const full_path = `${basePath}/${id}`;
+                location.assign(full_path);
+            }
+            function loadLimit3Datas() {
+                const basePath = `/index?typeid=0`;
+                fetch(basePath, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                }).then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                    })
+
+            }
+        </script>
 </body>
 
 </html>

@@ -71,40 +71,12 @@ def getWearther():
         print(f"getWearther() => 请求失败！=> {e}")
 
 
-# 弃用
-# @deprecated
-# # 删除历史头像
-# def delete_avatar(username):
-#     from sql_flask.mymysql import ConMySQL
-#     print(f'当前用户为：{username}')
-#
-#     try:
-#         with cur as c:
-#             sql = 'select avatar as path from admin where username = %s'
-#             c.execute(sql, (username,))
-#             paths = c.fetchone()
-#             print(f'delete_avatar() => 数据库查询到的地址：{paths}')
-#             path = str(paths.get('path')).replace(r'\\','\\')
-#             print(f'delete_avatar() 转化后的路径： => 头像地址：{path}')
-#             if os.path.exists(path):
-#                 print(f'delete_avatar() => 头像为默认头像，无需删除！')
-#                 return False
-#             else:
-#                 os.remove(path)
-#                 print(f'delete_avatar() => 删除头像成功！')
-#                 return True
-#     except Exception as e:
-#         print(f'delete_avatar() => 删除头像错误！=> {e}')
-#     finally:
-#         print(f'delete_avatar() => 删除头像完成！')
-
-
 import os
 
 
 # 更新系统中的头像
 def update_system_avatar(imgfile, uid):
-    img_path = save_img(imgfile, uid)
+    img_path = save_avatar_img(imgfile, uid)
     print(f"update_system_avatar() => 保存的路径：{img_path}")
     return img_path
 
@@ -112,6 +84,23 @@ def update_system_avatar(imgfile, uid):
 def update_system_bgc(imgfile, uid):
     bgc_path = save_bgc_img(imgfile, uid)
     return bgc_path
+
+
+def update_system_cover(imgfile, uid):
+    return save_cover_img(imgfile, uid)
+
+
+def save_cover_img(imgfile, uid):
+    fileName = f"cover_{secure_filename(imgfile.filename)[:2]}_{uid}.jpg"
+    file_path = os.path.join(createCoverPath(), fileName)
+    try:
+        imgfile.save(file_path)
+        return os.path.join(r"static\upload_img\cover_img", fileName)
+    except Exception as e:
+        print(f"save_cover_img() => 保存封面图片错误！=> {e}")
+        return r"static\upload_img\cover_img\cover_mr.jpg"
+    finally:
+        print(f"save_cover_img() => 保存封面图片完成，路径：{file_path}")
 
 
 def save_bgc_img(imgfile, uid):
@@ -127,7 +116,7 @@ def save_bgc_img(imgfile, uid):
 
 
 # 保存图片到系统
-def save_img(file: str, login_username_id):
+def save_avatar_img(file: str, login_username_id):
     # 解码Base64转为图片
     img: bytes = base64.b64decode(file.split(",")[1])
     file_name = f"{login_username_id}_avatar.jpg"
@@ -144,7 +133,6 @@ def save_img(file: str, login_username_id):
 
 
 def get_avatar(username):
-
     print(f"get ==> {username}")
     try:
         with newConMysql.getConnect() as db:

@@ -17,7 +17,7 @@ def getNickName(username):
 def select_all_content(limit, current_page):
     offset = (current_page - 1) * limit
     sql = """
-    SELECT c.id,c.username, s.nick_name,c.contents,c.date FROM context AS c 
+    SELECT c.id,c.username, s.nick_name,c.contents,c.date FROM article AS c 
         LEFT JOIN users as s
         on s.username = c.username
         ORDER BY c.date DESC LIMIT %s OFFSET %s;
@@ -35,7 +35,7 @@ def select_all(
 ):
     offset = (offset - 1) * limit
     sql = f"""
-    SELECT c.id,c.username, s.nick_name,c.title,c.date FROM context AS c 
+    SELECT c.id,c.username, s.nick_name,c.title,c.date FROM article AS c 
             LEFT JOIN users as s
             on s.username = c.username
             ORDER BY c.date DESC LIMIT %s OFFSET %s
@@ -47,12 +47,12 @@ def select_all(
         return result if result else []
 
 
-def select_all_context(username):
+def select_all_article(username):
     if username == "d":
         print("未知用户！")
         return None
     sql = f"""
-        SELECT * FROM context AS c
+        SELECT * FROM article AS c
         WHERE c.username = %s
         ORDER BY c.date DESC
         """
@@ -66,9 +66,9 @@ def select_all_context(username):
 # 获取总文章数
 def get_total_articles(typeid=0):
 
-    sql = "SELECT COUNT(*) AS total FROM context"
+    sql = "SELECT COUNT(*) AS total FROM article"
     if typeid != 0:
-        sql = """SELECT COUNT(*) AS total FROM context WHERE typeid = %s"""
+        sql = """SELECT COUNT(*) AS total FROM article WHERE typeid = %s"""
     with newConMysql.getConnect() as db:
         cur = db.cursor()
         if typeid != 0:

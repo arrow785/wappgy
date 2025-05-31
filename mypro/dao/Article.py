@@ -4,22 +4,25 @@ from Tools import get_time
 newConMysql = ConMySQL()
 
 
-def insert_context(title, contents, username, type_id):
+def insert_article(title, contents, username, type_id, cover_path):
     current_time = get_time()
     sql = f"""
-            insert into context(title,username,contents,date,typeid) values (%s,%s,%s,%s,%s)
+            insert into article(title,username,contents,date,typeid,cover_url,likes_number) values (%s,%s,%s,%s,%s,%s,0)
         """
     try:
         with newConMysql.getConnect() as db:
             cursor = db.cursor()
-            cursor.execute(sql, (title, username, contents, current_time, type_id))
+            cursor.execute(
+                sql, (title, username, contents, current_time, type_id, cover_path)
+            )
             res = cursor.rowcount
             db.commit()
-            return res if res > 0 else False
+            return res if res else 0
     except Exception as e:
         print(f"未知错误！=> {e}")
+        return 0
     finally:
-        print("insert_context() finally 释放链接")
+        print("insert_article() finally 释放链接")
 
 
 # def select_all_content_type(title_id: int):
@@ -36,11 +39,11 @@ def insert_context(title, contents, username, type_id):
 #         return result
 
 
-def search_fy_contexts(keyword, page, limit):
+def search_fy_articles(keyword, page, limit):
     offset = (page - 1) * limit
     print(page, limit)
     sql = """
-        SELECT id,title,username,date,contents FROM context WHERE title LIKE %s LIMIT %s OFFSET %s;
+        SELECT id,title,username,date,contents FROM article WHERE title LIKE %s LIMIT %s OFFSET %s;
     """
     try:
         with newConMysql.getConnect() as db:
@@ -52,13 +55,13 @@ def search_fy_contexts(keyword, page, limit):
         print(f"未知错误！=> {e}")
         return []
     finally:
-        print("search_contexts() finally 释放链接")
+        print("search_articles() finally 释放链接")
 
 
 # 搜索的数量
 def select_search_count(keyword):
     sql = """
-        SELECT count(*) as number FROM context WHERE title LIKE %s;
+        SELECT count(*) as number FROM article WHERE title LIKE %s;
     """
     try:
         with newConMysql.getConnect() as db:
@@ -91,7 +94,7 @@ def getAllType():
 def art_fy_data(article_page, limit, username):
     offset = (article_page - 1) * limit
     sql = """
-        SELECT * FROM context AS c
+        SELECT * FROM article AS c
         WHERE c.username = %s
         ORDER BY c.date DESC
         limit %s offset %s;
@@ -113,7 +116,7 @@ def art_fy_data(article_page, limit, username):
 def star_fy_data(starbook_page, limit, username):
     offset = (starbook_page - 1) * limit
     sql = """
-        SELECT s.content_id,s.login_name,c.title,c.username FROM context as c 
+        SELECT s.content_id,s.login_name,c.title,c.username FROM article as c 
         JOIN starbook as s 
         on s.content_id = c.id
         WHERE s.login_name = %s
@@ -136,7 +139,7 @@ def select_all_content_by_typeid(typeid, limit, current_page):
     offset = (current_page - 1) * limit
     sql = """
             select c.*, a.nick_name, d.explain as `type_name`
-            from context as c
+            from article as c
                     RIGHT JOIN users as a
                                 on c.username = a.username
                     RIGHT JOIN article_type as d
@@ -148,7 +151,7 @@ def select_all_content_by_typeid(typeid, limit, current_page):
     if typeid != 0:
         sql = """
             select c.*, a.nick_name, d.explain as `type_name`
-            from context as c
+            from article as c
                     right join users as a
                                 on c.username = a.username
                     right join article_type as d
@@ -176,7 +179,7 @@ def select_all_content_by_typeid(typeid, limit, current_page):
 
 def select_limit3_anyTypeInfo(typeid):
     sql = """
-            	select c.*,a.nick_name,d.`explain` as `type_name` from context as c 
+            	select c.*,a.nick_name,d.`explain` as `type_name` from article as c 
         RIGHT JOIN users as a
         on c.username = a.username
 				RIGHT JOIN article_type as d
@@ -196,9 +199,121 @@ def select_limit3_anyTypeInfo(typeid):
         print("select_limit3_anyTypeInfo() finally 释放链接")
 
 
-# 获取类型文章的数量
-# def get_articles_by_type_id_count(type_id):
-#     sql ="""
-#         SELECT
-#         """
-#     pass
+# 是否点赞
+def isLikes(username, article_id):
+    sql = """
+        SELECT COUNT(*) AS number
+        FROM tb_likes AS tb
+            RIGHT JOIN users AS u ON tb.target_id = u.id
+        WHERE
+            u.username = %s
+            AND tb.article_id = %s
+    """
+    try:
+        with newConMysql.getConnect() as db:
+            cursor = db.cursor()
+            cursor.execute(sql, (username, article_id))
+            result = cursor.fetchone()
+            return result["number"] > 0 if result else False
+    except Exception as e:
+        print(f"未知错误！=> {e}")
+        return False
+    finally:
+        print("isLikes() finally 释放链接")
+
+
+# 添加点赞记录
+def add_likes(title_id, username, user_id):
+    sql = """
+        INSERT INTO tb_likes (article_id, target_id, user_id)
+        VALUES (%s, %s, %s)
+    """
+    target_id = getCurrentLoginId(username)
+    if target_id is None:
+        print("用户未登录或不存在")
+        return False
+    try:
+        with newConMysql.getConnect() as db:
+            cursor = db.cursor()
+            cursor.execute(sql, (title_id, target_id, user_id))
+            db.commit()
+            return cursor.rowcount > 0
+    except Exception as e:
+        print(f"未知错误！=> {e}")
+        return False
+    finally:
+        print("add_likes() finally 释放链接")
+
+
+# 取消点赞记录
+def cancel_likes(title_id, username, user_id):
+    sql = """
+    DELETE FROM tb_likes WHERE user_id = %s AND target_id = %s AND article_id = %s
+    """
+    target_id = getCurrentLoginId(username)
+    if target_id is None:
+        print("用户未登录或不存在")
+        return False
+    try:
+        with newConMysql.getConnect() as db:
+            cursor = db.cursor()
+            cursor.execute(sql, (user_id, target_id, title_id))
+            db.commit()
+            return cursor.rowcount > 0
+    except Exception as e:
+        print(f"未知错误！=> {e}")
+        return False
+    finally:
+        print("cancel_likes() finally 释放链接")
+
+
+def getLikesNumber(title_id):
+    sql = """
+        SELECT likes_number FROM article WHERE id = %s
+    """
+    try:
+        with newConMysql.getConnect() as db:
+            cursor = db.cursor()
+            cursor.execute(sql, (title_id,))
+            result = cursor.fetchone()
+            return result["likes_number"] if result else 0
+    except Exception as e:
+        print(f"未知错误！=> {e}")
+        return 0
+    finally:
+        print("getLikesNumber() finally 释放链接")
+
+
+def getCurrentLoginId(username):
+    sql = """
+        SELECT id FROM users WHERE username = %s
+    """
+    try:
+        with newConMysql.getConnect() as db:
+            cursor = db.cursor()
+            cursor.execute(sql, (username,))
+            result = cursor.fetchone()
+            return result["id"] if result else None
+    except Exception as e:
+        print(f"未知错误！=> {e}")
+        return None
+    finally:
+        print("getCurrentLoginId() finally 释放链接")
+
+
+# 获取文章的封面
+def getCoverByid(title_id):
+    sql = """
+        SELECT cover_url FROM article WHERE id = %s
+    """
+    try:
+        with newConMysql.getConnect() as db:
+            cursor = db.cursor()
+            cursor.execute(sql, (title_id,))
+            result = cursor.fetchone()
+            return result["cover_url"] if result else {}
+    except Exception as e:
+        print(f"未知错误！=> {e}")
+        return {}
+    finally:
+        print("getCoverByid() finally 释放链接")

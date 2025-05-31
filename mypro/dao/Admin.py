@@ -9,7 +9,7 @@ newConMysql = ConMySQL()
 def admin_select_allArt(limit, page):
     offset = (page - 1) * limit
     sql = """
-        select * from context limit %s offset %s
+        select * from article limit %s offset %s
     """
     with newConMysql.getConnect() as db:
         cur = db.cursor()
@@ -20,7 +20,7 @@ def admin_select_allArt(limit, page):
 
 def admin_select_content_by_id(id):
     sql = """
-        select * from context where id=%s
+        select * from article where id=%s
     """
     with newConMysql.getConnect() as db:
         cur = db.cursor()
@@ -61,7 +61,7 @@ def deleteUserById(username, userid):
         cur = db.cursor()
         cur.execute(sql, (username, userid))
         db.commit()
-        sql1 = """DELETE FROM context as c WHERE c.username = %s """
+        sql1 = """DELETE FROM article as c WHERE c.username = %s """
         cur.execute(sql1, (username,))
         db.commit()
         return True
@@ -91,7 +91,7 @@ def load_admin_paper_pages():
 
 def delete_article(id, title=""):
     sql = """
-        delete from context where  id=%s
+        delete from article where  id=%s
     """
     with newConMysql.getConnect() as db:
         cur = db.cursor()

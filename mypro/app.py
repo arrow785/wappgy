@@ -70,7 +70,6 @@ app.config["SECRET_KEY"] = get_salt()
 # 更新字典information的数据
 def update_information(username):
     information["data"] = selectAll(username)
-    print(f"update_information() 更新的内容为 => {information.get('data', {})}")
 
 
 def set_session(username, power):
@@ -119,6 +118,8 @@ def index():
                 "infos": _articles,
             }
         )
+    cover_url = getCoverByid(typeid)
+    print(f"cover_url==>{cover_url}")
     datas = select_all_content_by_typeid(typeid, limit, current_page)
     return render_template(
         "index.html",
@@ -137,17 +138,21 @@ def index():
 
 @app.route("/detalied/<int:title_id>", methods=["GET"])
 def detalied(title_id: int):
-    data = full_context(title_id)
+    data = full_article(title_id)
+    article_id = data.get("id")
     comments = by_id_get_comments(title_id)
     username = session.get("username", "d")
     avatar_path = information.get("data", {}).get("avatar")
-    is_star_book = isStarBook(username, data.get("id"))
+    is_star_book = isStarBook(username, article_id)
+    print(f"is_star_book() => {is_star_book}")
+    is_likes = isLikes(username, article_id)
 
     # 获取当前登录用户的最新三条数据
     latest_article = getLatestArticleByUsername(data.get("username"))
     # 获取收藏总数
     star_number = getStarNumber(title_id=title_id)
-    return render_template("detalied.html", **locals())
+    # detailed
+    return render_template("detailed.html", **locals())
 
 
 # 获取评论数
@@ -355,19 +360,49 @@ def write():
     elif request.method == "POST":
 
         data = request.form
+        cover_img = request.files.get("cover_img")
+        print(f"cover_img==>{cover_img}")
+        if not cover_img:
+            return """
+                <script>
+                    alert('请上传封面图片！')
+                window.history.back();
+                </script>
+            """
+        if cover_img and not allowed_file(cover_img.filename):
+            return """
+                <script>
+                    alert('不支持的文件类型！请上传jpg、jpeg或png格式的图片。')
+                    window.history.back();
+                </script>
+            """
+
         typeid = data.get("content_type")
         title = data.get("title")
         context = data.get("content")
-        contentid = insert_context(
-            title, context, session.get("username"), type_id=typeid
+        cover_path = update_system_cover(
+            imgfile=cover_img, uid=information.get("data", {}).get("id")
         )
+        res = insert_article(
+            title,
+            context,
+            session.get("username"),
+            type_id=typeid,
+            cover_path=cover_path,
+        )
+        if res == 0:
+            return """ <script>
+                    alert('添加文章失败！');
+                    window.history.back();
+                   
+        </script>"""
 
         return redirect(url_for("index", page=1))
     else:
         return """
             <script>
                 alert('不支持的请求方式')
-                location.assign('/write')
+               window.history.back();
             </script>
             """
 
@@ -376,7 +411,7 @@ def write():
 @my_login_required
 def manager():
     username = session.get("username")
-    datas = select_all_context(username)
+    datas = select_all_article(username)
     avatar_path = information.get("data", {}).get("avatar")
     return render_template("manager.html", **locals())
 
@@ -386,7 +421,7 @@ def manager():
 def edit():
     if request.method == "GET":
         title_id = request.args.get("title_id", 0, type=int)
-        datas = find_context(title_id=title_id)
+        datas = find_article(title_id=title_id)
         avatar_path = get_avatar(session.get("username", "d"))
         allTypes = getAllType()
         return render_template("edit.html", **locals())
@@ -426,7 +461,7 @@ def edit():
 @app.route("/delete/<int:t_id>", methods=["GET"])
 def delete(t_id: int):
     # print(f"t_id==>{t_id}")
-    rows = delete_context(t_id)
+    rows = delete_article(t_id)
     flg = False
     if rows is not None:
         flg = True
@@ -503,7 +538,7 @@ def check_username(username: str):
 
 @app.route("/pep_dev", methods=["GET"])
 def pep():
-    datas = select_all_context(username="喜欢劈瓜的刘华强")
+    datas = select_all_article(username="喜欢劈瓜的刘华强")
     print(datas)
     if datas is not None:
         return render_template("dev_people.html", **locals())
@@ -592,7 +627,7 @@ def people():
     username = session.get("username", "d")
     ifm = information.get("data", {})
     print(f"ifm ==> {ifm}")
-    contexts = select_all_context(username=username)
+    contexts = select_all_article(username=username)
     emails = select_emial(username=username)
     # 获取收藏文章
     stars = select_star_books(loginname=username)
@@ -631,13 +666,13 @@ def update_info():
     name = session.get("username", "d")
     bgc_img = request.files["bgc_img"]
 
-    print(f"类型：{type(imgfile)} 数据：=> {imgfile}")
     avatar_path = update_system_avatar(
         imgfile=imgfile, uid=information.get("data", {}).get("id")
     )
     bgc_path = update_system_bgc(
         imgfile=bgc_img, uid=information.get("data", {}).get("id")
     )
+
     newnick = data.get("newnick")
     newemail = data.get("newemail")
     introduce = data.get("introduce")
@@ -707,7 +742,7 @@ def checkoldpwd():
 @app.route("/show_information/<string:username>", methods=["GET"])
 def show_information(username: str):
     data = show_info(username)
-    contexts = select_all_context(username=username)
+    contexts = select_all_article(username=username)
     username1 = session.get("username", "d")
     bgc_img = get_bgc(username=username)
     print(f"show_information() => {bgc_img}")
@@ -742,17 +777,25 @@ def show_version():
 # 收藏
 @app.route("/starbook", methods=["GET"])
 def starbook():
-    id = request.args.get("id")
-    row = star_book(id, session.get("username", "d"))
-    return jsonify({"status": row})
+    title_id = request.args.get("id")
+    type_ = request.args.get("type")
+    username = session.get("username", "d")
+    if type_ == "star":
+        row = star_book(title_id, username)
+    elif type_ == "unstar":
+        row = cancel_star_book(title_id, username)
+    else:
+        return jsonify({"status": "error", "message": "不合法的类型"})
+    starNumber = getStarNumber(title_id=title_id)
+    return jsonify({"status": row, "starNumber": starNumber})
 
 
 # 取消收藏
-@app.route("/cancel_starbook", methods=["GET"])
-def cancel_starbook():
-    id = request.args.get("id")
-    row = cancel_star_book(id, session.get("username", "d"))
-    return jsonify({"status": row})
+# @app.route("/cancel_starbook", methods=["GET"])
+# def cancel_starbook():
+#     id = request.args.get("id")
+#     row = cancel_star_book(id, session.get("username", "d"))
+#     return jsonify({"status": row})
 
 
 # 管理员编辑文章
@@ -834,7 +877,7 @@ def search_fy_api():
     keyword = request.args.get("keyword", "", type=str)
     searchCount = select_search_count(keyword)
     search_total_pages = totalPage(total_count=searchCount, limit=limit)
-    search_fy_data = search_fy_contexts(keyword=keyword, limit=limit, page=page)
+    search_fy_data = search_fy_articles(keyword=keyword, limit=limit, page=page)
     if search_fy_data:
         return jsonify(
             {
@@ -952,6 +995,7 @@ def ask_question():
         response = requests.post(
             app.config["DEEPSEEK_API_URL"], headers=headers, json=payload
         )
+        #  检查响应状态
         response.raise_for_status()
 
         # 解析响应并保存AI回复到历史
@@ -988,6 +1032,23 @@ def admin_modify_user():
         print(f"admin_modify_user() => {userid}")
         user = select_userinfo_By_id(userid)
         return render_template("admin_modify_user.html", user=user)
+
+
+@app.route("/likes", methods=["GET"])
+def likes():
+
+    title_id = request.args.get("id")
+    type_ = request.args.get("type")
+    user_id = request.args.get("user_id", type=int)
+    username = session.get("username", "d")
+    if type_ == "like":
+        row = add_likes(title_id, username, user_id)
+    elif type_ == "unlike":
+        row = cancel_likes(title_id, username, user_id)
+    else:
+        return jsonify({"status": "error", "message": "不合法的类型"})
+    likesNumber = getLikesNumber(title_id=title_id)
+    return jsonify({"status": row, "likesNumber": likesNumber})
 
 
 if __name__ == "__main__":

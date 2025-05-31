@@ -133,7 +133,9 @@ def getOldPwd(username):
 # 更新资料
 def update_user(username, email, nickName, introduce, avatar, bgimg):
     sql = """
-            UPDATE users SET email = %s, nick_name = %s, introduce = %s, avatar = %s, bg_img = %s WHERE username = %s;
+            UPDATE users 
+            SET email = %s, nick_name = %s, introduce = %s, avatar = %s, bg_img = %s 
+            WHERE username = %s;
         """
 
     with newConMysql.getConnect() as con:
@@ -196,7 +198,7 @@ def insertGuestContext(username, context, avatar):
 
 def select_star_books(loginname):
     sql = """
-    SELECT s.content_id,s.login_name,c.title,c.username FROM context as c 
+    SELECT s.content_id,s.login_name,c.title,c.username FROM article as c 
         JOIN starbook as s 
         on s.content_id = c.id
         WHERE s.login_name = %s

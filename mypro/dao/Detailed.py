@@ -6,10 +6,14 @@ newConMysql = ConMySQL()
 
 
 # 根据id查询文章内容
-def full_context(title_id: int):
+def full_article(title_id: int):
     sql = f"""
-            	select a.avatar,c.id,c.username,c.title,c.date,c.modify_date,c.contents,a.nick_name,d.typeid,d.`explain` from context as c 
-               RIGHT  join users as a
+            select 
+             a.avatar,a.nick_name,a.id as user_id,
+             c.id,c.username,c.title,c.date,c.modify_date,c.contents,c.likes_number,c.cover_url,
+             d.typeid,d.`explain` 
+             from article as c 
+                RIGHT  join users as a
             on a.username = c.username
 						RIGHT JOIN article_type as d
 						on d.id = c.typeid
@@ -88,7 +92,7 @@ def insert_comment(name, comment_context, title_id, zhuti):
 # 获取当前作者的最新三条动态
 def getLatestArticleByUsername(username):
     sql = """
-        select c.title,c.contents,c.date,c.id from context as c 
+        select c.title,c.contents,c.date,c.id from article as c 
                 join users as a
             on a.username = c.username
 						WHERE c.username = %s
