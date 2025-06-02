@@ -47,22 +47,6 @@ def select_all(
         return result if result else []
 
 
-def select_all_article(username):
-    if username == "d":
-        print("未知用户！")
-        return None
-    sql = f"""
-        SELECT * FROM article AS c
-        WHERE c.username = %s
-        ORDER BY c.date DESC
-        """
-    with newConMysql.getConnect() as db:
-        cur = db.cursor()
-        cur.execute(sql, (username,))
-        res = cur.fetchone()
-        return res if res else None
-
-
 # 获取总文章数
 def get_total_articles(typeid=0):
 

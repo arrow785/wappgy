@@ -157,7 +157,7 @@
             </div>
             
             <div class="d-grid gap-2">
-                <button type="button" onclick="login()" class="btn btn-login">
+                <button type="button" onclick="login(event)" class="btn btn-login">
                     <i class="fas fa-sign-in-alt"></i> 管理员登录
                 </button>
             </div>
@@ -171,15 +171,18 @@
     <script src="../static/js/bootstrap.bundle.min.js"></script>
     <script src="../static/js/cdnjs/crypto-js.min.js"></script>
     <script>
-        function login() {
+        function login(e) {
+            e.preventDefault();
             var form = document.getElementById('login-form');
             const pwd = document.getElementById('password');
             const username = document.getElementById('username');
+            console.log(SHA256(pwd.value));
             
             if (pwd.value == '' || username.value == '') {
                 alert('请填写完整的信息！');
                 return;
             }
+            
             
             pwd.value = SHA256(pwd.value);
             form.submit();

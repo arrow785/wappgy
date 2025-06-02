@@ -6,6 +6,27 @@ import math
 newConMysql = ConMySQL()
 
 
+# 管理员登录
+
+
+def admin_check_user(username, password):
+    sql = """
+        SELECT username,power from users where username = %s and pwd = %s;
+    """
+    try:
+        with newConMysql.getConnect() as db:
+            cur = db.cursor()
+            cur.execute(sql, (username, password))
+            result = cur.fetchone()
+            return result if result else None
+    except Exception as e:
+        print("admin_check_user error: ", e)
+        return None
+    finally:
+        print("admin_check_user finally")
+
+
+# 管理员 LIMIT 查询
 def admin_select_allArt(limit, page):
     offset = (page - 1) * limit
     sql = """
@@ -18,13 +39,14 @@ def admin_select_allArt(limit, page):
         return result if result else None
 
 
-def admin_select_content_by_id(id):
+# 管理员根据 id查询文章的内容
+def admin_select_content_by_id(title_id):
     sql = """
         select * from article where id=%s
     """
     with newConMysql.getConnect() as db:
         cur = db.cursor()
-        cur.execute(sql, (id,))
+        cur.execute(sql, (title_id,))
         result = cur.fetchone()
         return result if result else None
 
@@ -98,7 +120,7 @@ def delete_article(id, title=""):
         cur.execute(sql, (id))
         db.commit()
         res = cur.rowcount
-        return res if res else False
+        return res if res else 0
 
 
 def search_users(keyword):

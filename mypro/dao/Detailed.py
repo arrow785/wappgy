@@ -10,7 +10,7 @@ def full_article(title_id: int):
     sql = f"""
             select 
              a.avatar,a.nick_name,a.id as user_id,
-             c.id,c.username,c.title,c.date,c.modify_date,c.contents,c.likes_number,c.cover_url,
+             c.id,c.username,c.title,c.date,c.modify_date,c.contents,c.likes_number,c.cover_url,c.file_url,
              d.typeid,d.`explain` 
              from article as c 
                 RIGHT  join users as a
@@ -86,7 +86,7 @@ def insert_comment(name, comment_context, title_id, zhuti):
         cur.execute(sql, (name, curr_time, comment_context, title_id, zhuti))
         db.commit()
         res = cur.rowcount
-        return res if res else False
+        return res if res else 0
 
 
 # 获取当前作者的最新三条动态

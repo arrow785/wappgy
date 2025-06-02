@@ -376,7 +376,7 @@
     <script>
         function delete1(id) {
             if (confirm("确定要删除这篇文章吗？删除后将无法恢复！")) {
-                fetch(`delete/${parseInt(id)}`)
+                fetch(`/delete/${parseInt(id)}`)
                     .then(response => {
                         if (!response.ok) throw new Error('删除失败');
                         return response.json();

@@ -4,7 +4,7 @@ from Tools import get_time
 newConMysql = ConMySQL()
 
 
-def select_all_article(username):
+def select_article_by_username(username):
     sql = f"""
         SELECT * FROM article AS c
         WHERE c.username = %s

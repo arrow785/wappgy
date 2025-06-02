@@ -16,4 +16,4 @@ class MyFlask:
         self.app.run(host=self.host, port=self.port, debug=self.debug)
 
     def __getApp__(self, appName):
-        return Flask(appName)
+        return Flask(appName, template_folder="templates", static_folder="static")

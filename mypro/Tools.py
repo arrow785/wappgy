@@ -4,6 +4,8 @@ from sql_flask.MySQL_DB import ConMySQL
 from getCurrPath import *
 from werkzeug.utils import secure_filename
 
+import os
+
 # 取消使用MD5加密，前端使用SHA256加密
 # md5
 # def md5(text: str):
@@ -71,67 +73,77 @@ def getWearther():
         print(f"getWearther() => 请求失败！=> {e}")
 
 
-import os
-
-
-# 更新系统中的头像
-def update_system_avatar(imgfile, uid):
-    img_path = save_avatar_img(imgfile, uid)
+# 创建头像图片存储路径
+def save_avatar_to_system(imgfile, lid):
+    img_path = save_avatar_img(imgfile, lid)
     print(f"update_system_avatar() => 保存的路径：{img_path}")
     return img_path
 
 
-def update_system_bgc(imgfile, uid):
-    bgc_path = save_bgc_img(imgfile, uid)
+# 保存头像图片到系统
+def save_bgc_to_system(imgfile, lid):
+    bgc_path = save_bgc_img(imgfile, lid)
     return bgc_path
 
 
-def update_system_cover(imgfile, uid):
-    return save_cover_img(imgfile, uid)
+# 创建封面图片存储路径，并保存封面图片
+def save_cover_to_system(imgfile, lid):
+    if not imgfile:
+        print("save_cover_to_system() => 使用默认封面图片")
+        return r"static\upload\cover_img\user_mr_cover\cover_mr.jpg"
+    return save_cover_img(imgfile, lid)
 
 
-def save_cover_img(imgfile, uid):
-    fileName = f"cover_{secure_filename(imgfile.filename)[:2]}_{uid}.jpg"
-    file_path = os.path.join(createCoverPath(), fileName)
+def save_cover_img(imgfile, lid):
+    date = "-".join(get_time().split("-")[:2])
+    fileName = f"cover_{lid}_{date}_{secure_filename(imgfile.filename)}"
+    file_path = os.path.join(createCoverPath(lid), fileName)
     try:
         imgfile.save(file_path)
-        return os.path.join(r"static\upload_img\cover_img", fileName)
+        return file_path
     except Exception as e:
         print(f"save_cover_img() => 保存封面图片错误！=> {e}")
-        return r"static\upload_img\cover_img\cover_mr.jpg"
+        return r"static\upload\cover_img\user_mr_cover\cover_mr.jpg"
     finally:
         print(f"save_cover_img() => 保存封面图片完成，路径：{file_path}")
 
 
-def save_bgc_img(imgfile, uid):
-    filename = f"bg_{secure_filename(imgfile.filename)[:2]}_{uid}.jpg"
-    file_path = os.path.join(createBgcPath(), filename)
+# 创建背景图片存储路径
+def save_bgc_img(imgfile, lid):
+    date = "-".join(get_time().split("-")[:2])
+    filename = f"bg_{lid}_{date}_{secure_filename(imgfile.filename)}"
+    file_path = os.path.join(createBgcPath(lid), filename)
     print(f"save_bgc_img() => 保存的路径：{file_path}")
     try:
         imgfile.save(file_path)
-        return os.path.join(bgc_curr_path, filename)
+        return file_path
     except Exception as e:
         print(f"save_bgc_img() => 保存背景图片错误！=> {e}")
-        return "xxx"
+        return r"static\upload\bgc\user_mr_bgc\mr_bg2.jpg"
 
 
 # 保存图片到系统
-def save_avatar_img(file: str, login_username_id):
+def save_avatar_img(file: str, lid):
     # 解码Base64转为图片
     img: bytes = base64.b64decode(file.split(",")[1])
-    file_name = f"{login_username_id}_avatar.jpg"
-    input_path = os.path.join(getUploadPath(), file_name)
-    input_path1 = os.path.join(img_curr_path, file_name)
+    file_name = f"{lid}_avatar.jpg"
+    input_path = os.path.join(createAvatarPath(lid=lid), file_name)
+    # input_path1 = os.path.join(img_curr_path, file_name)
     print(f"save_img() => {input_path}")
-    with open(input_path, "wb+") as f:
-        f.write(img)
-        if os.path.exists(input_path):
-            print(f"保存成功！ save_img() => {input_path}")
-            return input_path1
-        else:
-            print(f"保存失败！ save_img() => {input_path}")
+    try:
+        with open(input_path, "wb+") as f:
+            f.write(img)
+            if os.path.exists(input_path):
+                print(f"保存成功！ save_img() => {input_path}")
+                return input_path
+            else:
+                return r"static\upload\avatar\user_mr_avatar\avatar_mr.png"
+    except Exception as e:
+        print(f"save_img() => 保存图片错误！=> {e}")
+        return r"static\upload\avatar\user_mr_avatar\avatar_mr.png"
 
 
+#  获取头像，但是弃用
 def get_avatar(username):
     print(f"get ==> {username}")
     try:
@@ -141,7 +153,12 @@ def get_avatar(username):
             cur.execute(sql, (username,))
             result = cur.fetchone()
             # 如果查询结果不为空，则返回头像路径
-            return result["avatar"] if result else "static/upload_img/mr.png"
+            return (
+                result["avatar"]
+                if result
+                else r"upload\avatar\user_mr_avatar\mr_avatar.jpg"
+            )
+
     except Exception as e:
         print(f"get_avatar() 获取头像错误！=> {e}")
     finally:
@@ -157,7 +174,7 @@ def get_bgc(username):
             result = cur.fetchone()
             print(f"get_bgc() => 查询到的数据：{result}")
             # 如果查询结果不为空，则返回头像路径
-            return result["bg_img"] if result else r"/static/upload_img/bgc/mr_bg2.jpg"
+            return result["bg_img"] if result else r"upload\bgc\user_mr_bgc\mr_bg2.jpg"
     except Exception as e:
         print(f"get_bgc() 获取背景图片错误！=> {e}")
     finally:
@@ -168,7 +185,7 @@ def get_bgc(username):
 def randName():
     import random, string, time
 
-    first_name: str = "arr"
+    first_name: str = "USER_"
     # 获取当前时间
     fulx: str = time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))[-6:]
     # 随机生成5位字符
@@ -185,3 +202,32 @@ def totalPage(total_count, limit):
         # 否则，返回 total_count // limit + 1，保证多余的数据也能够被分到一页
     else:
         return int((total_count // limit) + 1)
+
+
+# 保存附件
+def save_attachment(files, title_id):
+    paths = []
+    date = "-".join(get_time().split("-")[:2])
+    file_path = ""
+    # 检查文件是否为空
+    if files[0].filename == "":
+        return None
+    try:
+        for file in files:
+            fileName = secure_filename(file.filename)
+            # 如果文件名中有逗号，则替换为下划线
+            newFileName = fileName.replace(",", "_").replace(" ", "_")
+
+            file_path = os.path.join(
+                createAttachmentPath(title_id),
+                f"{title_id}_{date}_{newFileName}",
+            )
+            file.save(file_path)
+            print(f"save_attachment() => 保存附件成功！路径：{file_path}")
+            paths.append(file_path)
+        return ",".join(paths)
+    except (Exception, FileNotFoundError) as e:
+        print(f"save_attachment() => 保存附件错误！=> {e}")
+        return None
+    finally:
+        print(f"save_attachment() => 保存附件完成，路径：{file_path}")

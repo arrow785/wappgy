@@ -197,6 +197,25 @@
                 font-size: 1rem;
             }
         }
+
+        #checking-mask {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .checking-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
     </style>
 </head>
 
@@ -264,15 +283,16 @@
             </h1>
 
             <form id="write-form" action="/write" method="post" enctype="multipart/form-data">
-                <div class="form-group">
+                <div class="form-group" hidden>
                     <label for="username" class="form-label">作者</label>
                     <input type="text" class="form-control author-input" id="username" name="username"
-                        value="{{ username }}" readonly>
+                        value="{{ nick_name }}" readonly>
                 </div>
 
                 <div class="form-group">
                     <label for="title" class="form-label">文章标题</label>
                     <input type="text" class="form-control" id="title" name="title" placeholder="请输入文章标题..." required>
+                    <div class="form-text" id="tips"></div>
                 </div>
 
                 <div class="form-group">
@@ -286,22 +306,48 @@
 
                 <div class="form-group">
                     <label for="content" class="form-label">文章内容</label>
-                    <textarea class="form-control" id="content" name="content" placeholder="请输入文章内容..." rows="12"
-                        required></textarea>
+                    <textarea class="form-control" id="content" name="content"
+                        placeholder="请输入文章内容，如果使用AI写作请填写描述，如果不进行字数要求，默认在800-1200字之间....." rows="12" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="title" class="form-label">文章封面</label>
+                    <label for="cover_img" class="form-label">文章封面</label>
                     <!-- 限制只能上传图片 -->
 
-                    <input type="file" class="form-control" id="title" name="cover_img"
-                        accept=".jpg,.png" required>
+                    <input type="file" class="form-control" id="cover_img" name="cover_img" accept=".jpg,.png">
+                </div>
+
+                <div class="form-group">
+                    <label for="zipfiles" class="form-label">附件📎</label>
+                    <!-- 限制只上传zip、rar、7z、tar、gz格式的文件 -->
+                    <input type="file" class="form-control" id="zipfiles" name="zipfiles"
+                        accept=".zip,.rar,.7z,.tar,.gz,.sql,.java,.ppt,.py,.txt,.ini,.doc,.pdf,.docx" multiple>
                 </div>
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary submit-btn">
+
+                    <button type="submit" id="submit_" class="btn btn-primary mb-2">
                         <i class="fas fa-paper-plane"></i>发布文章
+                    </button>
+                    <button type="submit" id="aiWrite" class="btn btn-danger mb-2">
+                        <i class="fas fa-magic"></i> AI写作
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+    <!-- 动画遮罩层 -->
+    <div id="checking-mask"
+        style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;background:rgba(255,255,255,0.7);justify-content:center;align-items:center;">
+        <div class="checking-spinner">
+            <div class="spinner-border text-primary" style="width:3rem;height:3rem;" role="status"></div>
+            <div style="margin-top:1rem;font-size:1.1rem;color:#4a6bff;">正在检查内容合法性...</div>
+        </div>
+    </div>
+
+    <div id="ai-write-mask"
+        style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;background:rgba(255,255,255,0.7);justify-content:center;align-items:center;">
+        <div class="checking-spinner">
+            <div class="spinner-border text-primary" style="width:3rem;height:3rem;" role="status"></div>
+            <div style="margin-top:1rem;font-size:1.1rem;color:#0489f5;">正在写作中，请耐心等待。创作时间可能在1~3分钟。具体和你的字数有关</div>
         </div>
     </div>
 
@@ -311,9 +357,125 @@
     <!-- Bootstrap JS -->
     <script src="../static/js/bootstrap.bundle.min.js"></script>
     <script>
+        function showCheckingMask() {
+            document.getElementById('checking-mask').style.display = 'flex';
+        }
+        function hideCheckingMask() {
+            document.getElementById('checking-mask').style.display = 'none';
+        }
+        function showAiWriteMask() {
+            document.getElementById('ai-write-mask').style.display = 'flex';
+        }
+        function hideAiWriteMask() {
+            document.getElementById('ai-write-mask').style.display = 'none';
+        }
+
         function people() {
             window.location.href = "/people";
         }
+        const content = document.querySelector('#content');
+        const title = document.querySelector('#title');
+        const tips = document.querySelector('#tips');
+        title.addEventListener('input', function (e) {
+            e.preventDefault();
+            // 持续1s
+
+            const submit_ = document.querySelector('#submit_');
+            submit_.disabled = true;
+            console.log(e.target.value);
+            fetch('/checkCotentisVaild', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title: e.target.value })
+            }).then(response => response.json()).then(data => {
+
+                if (data.code === 1) {
+                    tips.innerHTML = data.msg;
+                    tips.style.color = 'green';
+                    submit_.disabled = false;
+                } else {
+                    tips.innerHTML = data.msg;
+                    tips.style.color = 'red';
+                    submit_.disabled = true;
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        })
+        const submit_ = document.querySelector('#submit_');
+        content.addEventListener('blur', function (e) {
+            e.preventDefault();
+
+            // 持续1s
+            showCheckingMask()
+            submit_.disabled = true;
+            console.log(e.target.value);
+            fetch('/checkCotentisVaild', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    content: e.target.value
+                })
+            }).then(response => response.json()).then(data => {
+                hideCheckingMask();
+                if (data.code === 1) {
+                    submit_.disabled = false;
+                } else {
+                    alert(data.msg)
+                    submit_.disabled = true;
+
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+
+        })
+
+
+        const aiWrite = document.querySelector('#aiWrite');
+        // AI写作按钮点击事件
+        aiWrite.addEventListener('click', function (e) {
+            e.preventDefault();
+            // 持续1s
+            showAiWriteMask()
+
+            const title = document.querySelector('#title');
+            const content_type = document.querySelector('#content_type');
+            const content = document.querySelector('#content');
+            submit_.disabled = true;
+            console.log(e.target.value);
+            fetch('/api/aiWrite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title.value,
+                    content_type: content_type.value,
+                    content: content.value,
+                })
+            }).then(response => response.json()).then(data => {
+                hideAiWriteMask();
+                if (data.code === 1) {
+                    alert('AI写作完成，请检查内容！');
+                    console.log(data.content);
+                    document.querySelector('#content').value = data.content;
+                    document.querySelector('#title').value = data.title;
+
+                    submit_.disabled = false;
+                } else {
+                    alert(data.msg);
+                    submit_.disabled = true;
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                hideAiWriteMask();
+            });
+        })
     </script>
 </body>
 

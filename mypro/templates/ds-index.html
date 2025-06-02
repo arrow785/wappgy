@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DS-AI智能助手</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/all.min.css">
     <style>
         :root {
             --primary-color: #4361ee;
@@ -32,9 +32,75 @@
         }
 
         .container {
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 1200px;
+            display: flex;
+            gap: 1.5rem;
             padding: 2rem;
+        }
+
+        .main-content {
+            flex: 3;
+        }
+
+        .sidebar {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .sidebar-content {
+            flex-grow: 1;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #ai-persona {
+            flex-grow: 1;
+            padding: 1rem;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            resize: none;
+            margin-bottom: 1rem;
+        }
+
+        #ai-persona {
+            flex-grow: 1;
+            padding: 1rem;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            resize: none;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            padding: 0.8rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: var(--dark-color);
         }
 
         header {
@@ -195,6 +261,7 @@
         /* 响应式设计 */
         @media (max-width: 768px) {
             .container {
+                flex-direction: column;
                 padding: 1rem;
             }
 
@@ -208,6 +275,11 @@
 
             .message {
                 max-width: 90%;
+            }
+
+            .sidebar {
+                height: auto;
+                margin-top: 1rem;
             }
         }
 
@@ -377,7 +449,7 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-robot"></i> DeepSeek AI助手 β版</h1>
+            <h1><i class="fas fa-robot"></i>AI 助手 β版 R3-0528</h1>
             <p>随时为您解答各种问题；由于是测试版，速度和内容排序不很好。</p>
 
         </header>
@@ -386,13 +458,31 @@
             <div id="chat-history"></div>
 
             <form id="askForm" class="input-area">
+                <p>
+                    <i class="fas fa-exclamation-triangle"></i> 如果不确定角色是否设定好，可以问AI：你的角色是什么？
+                </p>
                 <div class="input-group">
+
                     <input type="text" name="question" placeholder="输入您的问题..." autocomplete="off">
                     <button type="submit" id="submit-btn">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
             </form>
+        </div>
+        <!-- 新增的AI角色设定侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-cog"></i> AI角色设定</h3>
+            </div>
+            <div class="sidebar-content">
+                <textarea id="ai-persona" placeholder="例如：你是一个有趣的AI助手，擅长日常问题的回答..."></textarea>
+                <p id="tips"></p>
+                <div class="sidebar-actions">
+                    <button class="btn-primary" id="saveSettings_">保存设定</button>
+                    <button class="btn-secondary" id="resetSettings">重置</button>
+                </div>
+            </div>
         </div>
     </div>
 

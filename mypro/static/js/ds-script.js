@@ -2,9 +2,30 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('askForm');
     const chatHistory = document.getElementById('chat-history');
     const submitBtn = document.getElementById('submit-btn');
-
+    const saveSettingsBtn = document.getElementById('saveSettings_');
+    const resetSettingsBtn = document.getElementById('resetSettings');
+    const tips = document.getElementById('tips');
     // 初始化消息ID计数器
     let messageId = 0;
+
+    let DEEPSEEK_SYSTEM_INIT = `
+    你是一个有趣的AI助手，擅长日常问题的回答
+    
+    `
+    saveSettingsBtn.addEventListener('click', function () {
+        const x = document.querySelector('#ai-persona').value
+        if (!x) {
+            tips.innerHTML = `<i class="fas fa-exclamation-triangle"></i> 请输入AI助手的个性化设定！`;
+            return;
+        }
+        DEEPSEEK_SYSTEM_INIT = x;
+        tips.innerHTML = `<i class="fas fa-check-circle"></i> 设置已保存！`;
+    })
+    resetSettingsBtn.addEventListener('click', function () {
+        DEEPSEEK_SYSTEM_INIT = `你是一个有趣的AI助手，擅长日常问题的回答。`
+        document.querySelector('#ai-persona').value = DEEPSEEK_SYSTEM_INIT;
+        tips.innerHTML = `<i class="fas fa-check-circle"></i> 设置已重置！`;
+    })
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -14,27 +35,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // 生成唯一消息ID
         const currentMessageId = ++messageId;
-        
+
         try {
             // 添加用户消息
             addMessage(question, 'user', currentMessageId);
             input.value = '';
             toggleSubmitState(true);
-            
+
             // 显示加载状态
             const loadingElement = showLoading(currentMessageId);
-            
+            console.log(`用户设定为：${DEEPSEEK_SYSTEM_INIT}`);
+
             // 发送请求
             const response = await fetch('/ask', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                 },
-                body: `question=${encodeURIComponent(question)}`
+                body: JSON.stringify({
+                    question: `${encodeURIComponent(question)}`,
+                    sys_init: `${encodeURIComponent(DEEPSEEK_SYSTEM_INIT)}`,
+                })
             });
 
             if (!response.ok) throw new Error(`HTTP错误! 状态码: ${response.status}`);
-            
+
             const data = await response.json();
             removeLoading(loadingElement);
 
@@ -86,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${type}-message`;
         messageDiv.id = `msg-${id}`;
-        
+
         if (isError) {
             messageDiv.classList.add('error-message');
             messageDiv.innerHTML = `
@@ -124,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function toggleSubmitState(disabled) {
         submitBtn.disabled = disabled;
-        submitBtn.innerHTML = disabled 
+        submitBtn.innerHTML = disabled
             ? '<i class="fas fa-spinner fa-spin"></i> 处理中...'
             : '<i class="fas fa-paper-plane"></i> 发送';
     }

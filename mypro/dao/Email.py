@@ -27,13 +27,20 @@ def update_emial(username):
         return res if res else 0
 
 
-def select_emial(username):
-    sql = f"""select * from email where send_username = %s"""
-    with newConMysql.getConnect() as db:
-        cur = db.cursor()
-        cur.execute(sql, (username,))
-        res = cur.fetchall()
-        return res if res else []
+def select_emial_count(login_username):
+    sql = """select count(*) as number  from email where send_username = %s"""
+    try:
+
+        with newConMysql.getConnect() as db:
+            cur = db.cursor()
+            cur.execute(sql, (login_username,))
+            res = cur.fetchone()
+            return res.get("number") if res else 0
+    except Exception as e:
+        print(f"select_emial_count() 错误！=> {e}")
+        return 0
+    finally:
+        print("select_emial_count() 释放连接")
 
 
 def em_dy_data_(email_page, limit, username):

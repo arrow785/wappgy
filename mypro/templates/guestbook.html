@@ -226,6 +226,7 @@
 </head>
 
 <body>
+    {% set username =  session.get('username','d') %}
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
@@ -293,7 +294,7 @@
                 {% for i in datas %}
                 <div class="comment-item">
                     <div class="comment-header">
-                        <img src="{{request.url_root}}{{i['avatar']}}" alt="用户头像" class="comment-avatar">
+                        <img src="../{{i['avatar']}}" alt="用户头像" class="comment-avatar">
                         <div class="comment-user">
                             <div class="comment-username">{{ i['username'] }}</div>
                             <div class="comment-date">

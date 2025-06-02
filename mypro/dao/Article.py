@@ -4,18 +4,30 @@ from Tools import get_time
 newConMysql = ConMySQL()
 
 
+# 插入文章
 def insert_article(title, contents, username, type_id, cover_path):
+
     current_time = get_time()
-    sql = f"""
-            insert into article(title,username,contents,date,typeid,cover_url,likes_number) values (%s,%s,%s,%s,%s,%s,0)
+    sql = """
+            insert into 
+            article(title,username,contents,date,typeid,cover_url,likes_number) 
+            values (%s,%s,%s,%s,%s,%s,0)
         """
     try:
         with newConMysql.getConnect() as db:
             cursor = db.cursor()
             cursor.execute(
-                sql, (title, username, contents, current_time, type_id, cover_path)
+                sql,
+                (
+                    title,
+                    username,
+                    contents,
+                    current_time,
+                    type_id,
+                    cover_path,
+                ),
             )
-            res = cursor.rowcount
+            res = cursor.lastrowid  # 获取插入的最后一条记录的ID
             db.commit()
             return res if res else 0
     except Exception as e:
@@ -25,25 +37,35 @@ def insert_article(title, contents, username, type_id, cover_path):
         print("insert_article() finally 释放链接")
 
 
-# def select_all_content_type(title_id: int):
-#     connect, cursor = ConMySQL().mSQL()
-#     sql = """
-#         SELECT d.`explain` as `explain` FROM article_type as d
-#         LEFT JOIN wz_leibie as w
-#         on d.typeid = w.contentType
-#         WHERE w.wz_id = %s;
-#     """
-#     with cursor:
-#         cursor.execute(sql, title_id)
-#         result = cursor.fetchall()
-#         return result
+# 更新文章的附件url
+def update_file_url(title_id, file_paths):
+    if file_paths is None:
+        file_paths = ""  # 如果没有附件，设置为空字符串
+    sql = """
+            UPDATE article
+            SET file_url = %s
+            WHERE id = %s
+            """
+    try:
+        with newConMysql.getConnect() as db:
+            cursor = db.cursor()
+            cursor.execute(sql, (file_paths, title_id))
+            res = cursor.rowcount
+            db.commit()
+            return res if res else 0
+    except Exception as e:
+        print(f"未知错误！=> {e}")
+        return 0
+    finally:
+        print("update_file_url() finally 释放链接")
 
 
+# 查询文章内容
 def search_fy_articles(keyword, page, limit):
     offset = (page - 1) * limit
     print(page, limit)
     sql = """
-        SELECT id,title,username,date,contents FROM article WHERE title LIKE %s LIMIT %s OFFSET %s;
+        SELECT id,title,username,date,contents,cover_url FROM article WHERE title LIKE %s LIMIT %s OFFSET %s;
     """
     try:
         with newConMysql.getConnect() as db:
@@ -75,8 +97,8 @@ def select_search_count(keyword):
         print("select_search_count() finally 释放链接")
 
 
+# 获取所有文章类型
 def getAllType():
-
     sql = "SELECT * FROM article_type;"
     try:
         with newConMysql.getConnect() as db:
@@ -91,6 +113,7 @@ def getAllType():
         print("getAllType() finally 释放链接")
 
 
+# 文章的分页数据查询
 def art_fy_data(article_page, limit, username):
     offset = (article_page - 1) * limit
     sql = """
@@ -113,6 +136,7 @@ def art_fy_data(article_page, limit, username):
         print("art_fy_data() finally 释放链接")
 
 
+# 收藏的文章分页查询
 def star_fy_data(starbook_page, limit, username):
     offset = (starbook_page - 1) * limit
     sql = """
@@ -135,6 +159,7 @@ def star_fy_data(starbook_page, limit, username):
         print("star_fy_data() finally 释放链接")
 
 
+# 根据文章ID获取文章的总数
 def select_all_content_by_typeid(typeid, limit, current_page):
     offset = (current_page - 1) * limit
     sql = """
@@ -177,6 +202,7 @@ def select_all_content_by_typeid(typeid, limit, current_page):
         print("select_all_content_by_typeid() finally 释放链接")
 
 
+# 主页查询最新的三条文章
 def select_limit3_anyTypeInfo(typeid):
     sql = """
             	select c.*,a.nick_name,d.`explain` as `type_name` from article as c 
@@ -267,6 +293,7 @@ def cancel_likes(title_id, username, user_id):
         print("cancel_likes() finally 释放链接")
 
 
+# 获取点赞数量
 def getLikesNumber(title_id):
     sql = """
         SELECT likes_number FROM article WHERE id = %s
@@ -284,6 +311,7 @@ def getLikesNumber(title_id):
         print("getLikesNumber() finally 释放链接")
 
 
+# 获取当前登录用户的ID
 def getCurrentLoginId(username):
     sql = """
         SELECT id FROM users WHERE username = %s

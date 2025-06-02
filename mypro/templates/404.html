@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - 页面未找到</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            padding: 1rem;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+
+        .error-code {
+            font-size: 8rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .message {
+            font-size: 1.5rem;
+            color: #475569;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background: var(--gradient);
+            color: white;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.1);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px -1px rgba(99, 102, 241, 0.2);
+        }
+
+        .illustration {
+            width: 300px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 640px) {
+            .error-code { font-size: 6rem; }
+            .illustration { width: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <svg class="illustration" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path fill="none" stroke="#cbd5e1" stroke-width="2" 
+                  d="M40 120Q50 100 70 100Q90 100 100 120Q110 100 130 100Q150 100 160 120"
+                  stroke-linecap="round">
+                <animate attributeName="d" 
+                         dur="3s"
+                         repeatCount="indefinite"
+                         values="M40 120Q50 100 70 100Q90 100 100 120Q110 100 130 100Q150 100 160 120;
+                                 M40 120Q50 110 70 110Q90 110 100 120Q110 110 130 110Q150 110 160 120;
+                                 M40 120Q50 100 70 100Q90 100 100 120Q110 100 130 100Q150 100 160 120"/>
+            </path>
+        </svg>
+        
+        <h1 class="error-code">404</h1>
+        <p class="message">
+            🤔{{ msg }}<br>
+            
+        </p>
+        <button onclick="window.history.back()" class="action-btn">
+            返回
+        </button>
+    </div>
+</body>
+</html>

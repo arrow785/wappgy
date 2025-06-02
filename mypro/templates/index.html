@@ -319,6 +319,8 @@
 </style>
 
 <body>
+    <!-- 获取SESSION中存储 的用户名，如果没有则为'd' -->
+    {% set username = session.get('username', 'd') %}
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white">
         <div class="container">
@@ -349,14 +351,14 @@
                     {% if username == 'd' %}
                     <li class="nav-item">
                         <a class="nav-link" href="/login" target="_blank">
-                            <i class="fas fa-sign-in-alt me-1"></i>登录
+                            <i class="fas fa-sign-in-alt me-1"></i>登录 
                         </a>
                     </li>
                     {% else %}
                     <li class="nav-item">
                         <div class="navbar-avatar">
                             <a href="/people" target="_blank">
-                                <img src="{{ avatar_path }}" alt="用户头像">
+                                <img loading="lazy" src="../{{ avatar_path }}" alt="用户头像">
                             </a>
                         </div>
                     </li>
@@ -416,9 +418,8 @@
                             {{data.type_name}}</a>
                     </h3>
                     {% for article in data.infos %}
-                    <div class="article-item" onclick="information(`{{article.id}}`)" >
-                        <img src="{{article.cover_url}}" alt="" class="mb-1" width="100%"
-                        
+                    <div class="article-item" onclick="information(`{{article.id}}`)">
+                        <img loading="lazy" src="{{article.cover_url}}" alt="" class="mb-1" width="100%"
                             style="border-radius: 5px; opacity: 1;">
                         <h4 class="article-item-title">{{ article.title }}</h4>
                         <div class="article-meta">
@@ -434,7 +435,7 @@
                     {% else %}
                     <div class="empty-state">
                         <i class="far fa-file-alt"></i>
-                        <p>暂无这个类型的文章</p>
+                        <p>暂无这个类型的文章，去<a class="text-decoration" href="/write">发布</a></p>
                     </div>
                     {% endfor %}
                 </div>
@@ -454,7 +455,7 @@
         <!-- Bootstrap JS -->
         <script src="../static/js/bootstrap.bundle.min.js"></script>
         <script>
-            console.log('{{all_}}');
+
 
             function people() {
                 window.location.href = "/people";
@@ -483,6 +484,7 @@
                     })
 
             }
+
         </script>
 </body>
 

@@ -1,69 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>联系我</title>
-    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <title>联系我 - 个人论坛</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #6c757d;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            --border-radius: 12px;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .navbar {
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 1rem;
+            background-color: white !important;
         }
 
-        .container {
-            max-width: 1200px;
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .contact-container {
+            max-width: 600px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 2.5rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
         }
 
-        .contact-header {
-            background-color: #fff;
-            padding: 2rem;
+        .contact-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .contact-title img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .contact-tip {
+            color: #ff4d4f;
+            font-size: 1rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .form-control,
+        .form-select {
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
+            box-shadow: none;
+            border: 1px solid #e0e3e7;
+            transition: border-color 0.2s;
         }
 
-        .contact-header h2 {
-            margin: 0;
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 107, 255, 0.1);
         }
 
-        .contact-header p {
-            margin: 0;
-            color: #666;
-        }
-
-        .contact-form {
-            background-color: #fff;
-            padding: 2rem;
+        .submit-btn {
+            background: var(--primary-color);
+            color: #fff;
+            font-weight: 600;
+            border: none;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
+            padding: 0.6rem 2.2rem;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+            margin-top: 0.5rem;
         }
 
-        .footer {
-            background-color: #f8f9fa;
-            padding: 1rem 0;
-            text-align: center;
-            margin-top: auto;
+        .submit-btn:hover {
+            background: #274bdb;
+        }
+
+        @media (max-width: 768px) {
+            .contact-container {
+                padding: 1.2rem;
+            }
+            .contact-title {
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
 
 <body>
+    {% set username = session.get('username','d') %}
     <!-- 导航栏 -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/callme">联系我</a>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <i class="fas fa-comments me-2"></i>
+            <a class="navbar-brand" href="/">个人论坛</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -73,37 +136,37 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/">首页</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/callme">联系我</a>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- 容器 -->
-    <div class="container">
-        <!-- 联系我标题 -->
-        <div class="contact-header">
-            <h2>联系我 <img src="../static/img/pne.png" style="width: 30px;height: 30px;" alt="图片走丢了"></h2>
-            <p>有任何问题或合作意向，欢迎随时联系我！</p>
-        </div>
-
-        <!-- 联系表单 -->
-        <div class="contact-form">
-            <h2>发送消息</h2>
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <div class="contact-container">
+            <div class="contact-title">
+                <span>联系我</span>
+                <img src="../static/img/pne.png" alt="图片走丢了">
+            </div>
+            <p style="color:#666;margin-bottom:1.5rem;">有任何问题或合作意向，欢迎随时联系我！</p>
             <form action="/send_email" method="post">
                 {% if username == 'd'%}
-                <p style="color: red;">请注意，由于你未登录，如果不填邮箱则系统默认将以昵称为“游客1”、“youke@youke.com”发送📩。我会认真阅读，如果有必要请在内容中留下你的邮箱，谢谢你的留言。</p>
-<!--                <div class="mb-3">-->
-<!--                    <label for="message" class="form-label">留言内容</label>-->
-<!--                    <input type="email" class="form-control" name="email" id="email">-->
-<!--                </div>-->
+                <div class="contact-tip">
+                    请注意，由于你未登录，如果不填邮箱则系统默认将以昵称为“游客”、“youke@youke.com”发送📩。我会认真阅读，如果有必要请在内容中留下你的邮箱，谢谢你的留言。
+                </div>
                 {% else %}
-                <p style="color: red;">用户<i>{{username}}</i>，系统默认将以你设置的邮箱发送📩。谢谢你的留言。
+                <div class="contact-tip">
+                    用户 <i>{{username}}</i>，系统默认将以你设置的邮箱发送📩。谢谢你的留言。
+                </div>
                 {% endif %}
                 <div class="mb-3">
                     <label for="message" class="form-label">内容：</label>
                     <textarea class="form-control" name="msg" id="message" rows="5" required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">发送</button>
+                <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> 发送</button>
             </form>
         </div>
     </div>

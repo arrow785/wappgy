@@ -28,27 +28,34 @@ def insertUser(username, email, password, nickName, register_date):
         return res if res else 0
 
 
-def check_user(username, password):
+def check_user(*args):
+    print(f"check_user() username=>{args[0]},email =>{args[1]}")
     sql = """
-            SELECT a.id, a.power FROM users AS a WHERE a.username = %s AND a.pwd = %s;
+            SELECT a.username, a.id, a.power FROM users AS a WHERE (a.username = %s OR a.email = %s) AND a.pwd = %s;
         """
-    with newConMysql.getConnect() as db:
-        cur = db.cursor()
-        cur.execute(sql, (username, password))
-        result = cur.fetchone()
-        return result if result else None
+
+    try:
+        with newConMysql.getConnect() as db:
+            cur = db.cursor()
+            cur.execute(sql, (args[0], args[1], args[2]))
+            result = cur.fetchone()
+            return result if result else None
+    except Exception as e:
+        print(f"check_user() 错误！=> {e}")
+        return NotImplemented
+    finally:
+        print("check_user() finally")
 
 
 def check_(username):
     sql = """
-            SELECT COUNT(*) AS c FROM users AS a WHERE a.username = %s;
+            SELECT username,power AS c FROM users AS a WHERE a.username = %s AND a.power = 0;
         """
-
     with newConMysql.getConnect() as db:
         cursor = db.cursor()
         cursor.execute(sql, (username,))
         result = cursor.fetchone()
-        return result["c"] if result else 0
+        return result if result else {}
 
 
 # 登录时，检测账号密码是否正确
@@ -65,9 +72,11 @@ def d_login_check(username, password):
 
 # 重置密码
 def resetPwd(new_pwd, username):
-    if checkPwdIsExists(username, new_pwd):
+    resx = checkPwdIsExists(username=username, newpwd=new_pwd)
+    if resx:
         # 密码已存在
         return False
+
     else:
         sql = """
                 UPDATE users SET pwd = %s WHERE username = %s;
@@ -82,16 +91,16 @@ def resetPwd(new_pwd, username):
 
 def checkPwdIsExists(newpwd, username):
     sql = """
-            SELECT COUNT(*) AS c FROM users AS a WHERE a.username = %s AND a.pwd = %s;
+            SELECT count(*) AS `number` FROM users AS a WHERE a.username = %s AND a.pwd = %s;
         """
     with newConMysql.getConnect() as db:
         cursor = db.cursor()
         cursor.execute(sql, (username, newpwd))
         result = cursor.fetchone()
-        return result["c"] if result else None
+        return result if result else {}
 
 
-def selectAll(username):
+def select_login_all(username):
     if username == "d":
         return None
     sql = """
@@ -196,9 +205,10 @@ def insertGuestContext(username, context, avatar):
         print("insertGuestContext() finally")
 
 
-def select_star_books(loginname):
+# 计算用户收藏的文章数量
+def select_star_books_count(login_username):
     sql = """
-    SELECT s.content_id,s.login_name,c.title,c.username FROM article as c 
+    SELECT count(*) number FROM article as c 
         JOIN starbook as s 
         on s.content_id = c.id
         WHERE s.login_name = %s
@@ -206,12 +216,11 @@ def select_star_books(loginname):
     try:
         with newConMysql.getConnect() as db:
             cursor = db.cursor()
-            cursor.execute(sql, (loginname,))
-            data = cursor.fetchall()
-            # print(f"select_star_books() => {data}")
-            return data if data else []
+            cursor.execute(sql, (login_username,))
+            data = cursor.fetchone()
+            return data.get("number") if data else 0
     except Exception as e:
         print(f"select_star_books() 错误！=> {e}")
-        return []
+        return 0
     finally:
         print("select_star_books() 释放连接")

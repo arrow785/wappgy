@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>重置密码 - 个人论坛</title>
     <link href="../static/css/bootstrap.css" rel="stylesheet">
     <link href="../static/css/my.css" rel="stylesheet">
-     <link rel="stylesheet" href="../static/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/all.min.css">
     <style>
         :root {
             --primary-color: #4a6bff;
@@ -17,25 +18,25 @@
             --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
             --border-radius: 12px;
         }
-        
+
         body {
             background-color: #f5f7fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         /* 导航栏样式 */
         .navbar {
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 0.8rem 1rem;
             background-color: white !important;
         }
-        
+
         .navbar-brand {
             font-weight: 600;
             color: var(--primary-color);
             font-size: 1.3rem;
         }
-        
+
         /* 主容器 */
         .reset-container {
             max-width: 500px;
@@ -45,7 +46,7 @@
             border-radius: var(--border-radius);
             box-shadow: var(--card-shadow);
         }
-        
+
         /* 标题样式 */
         .reset-title {
             font-size: 1.75rem;
@@ -57,12 +58,12 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .reset-title i {
             margin-right: 0.75rem;
             color: var(--primary-color);
         }
-        
+
         /* 表单样式 */
         .form-label {
             font-weight: 600;
@@ -71,24 +72,24 @@
             display: flex;
             align-items: center;
         }
-        
+
         .form-label i {
             margin-right: 0.5rem;
             width: 20px;
         }
-        
+
         .form-control {
             border-radius: var(--border-radius);
             border: 1px solid #e0e0e0;
             padding: 0.9rem 1rem;
             transition: all 0.3s;
         }
-        
+
         .form-control:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.25rem rgba(74, 107, 255, 0.1);
         }
-        
+
         /* 按钮样式 */
         .btn-reset {
             padding: 0.9rem 1.5rem;
@@ -97,34 +98,35 @@
             transition: all 0.3s;
             width: 100%;
         }
-        
+
         .btn-reset:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(74, 107, 255, 0.2);
         }
-        
+
         /* 验证状态 */
         .is-valid {
             border-color: var(--success-color);
         }
-        
+
         .is-invalid {
             border-color: var(--danger-color);
         }
-        
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .reset-container {
                 padding: 2rem;
                 margin: 2rem auto;
             }
-            
+
             .reset-title {
                 font-size: 1.5rem;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-light">
@@ -140,41 +142,38 @@
         <h2 class="reset-title">
             <i class="fas fa-key"></i>重置密码
         </h2>
-        
+
         <form id="reset-form">
             <div class="mb-4">
                 <label for="username" class="form-label">
                     <i class="fas fa-user"></i>用户名
                 </label>
-                <input type="text" class="form-control" id="username" name="username" 
-                       placeholder="请输入您的用户名" required>
+                <input type="text" class="form-control" id="username" name="username" placeholder="请输入您的用户名" required>
                 <div id="username-feedback" class="invalid-feedback"></div>
             </div>
-            
+
             <div class="mb-4">
                 <label for="pwd" class="form-label">
                     <i class="fas fa-lock"></i>新密码
                 </label>
                 <div class="input-group">
-                    <input type="password" id="pwd" class="form-control" name="password"
+                    <input type="password" id="pwd" class="form-control" name="password" id="pwd"
                         placeholder="8位以上，包含数字、字母和符号" required>
-                    <button class="btn btn-outline-secondary" type="button"
-                        onclick="togglePassword('pwd')">
-                        <i class="bi bi-eye-fill"></i>
+                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('pwd')">
+                        <i class="fas fa-eye-slash"></i>
                     </button>
                 </div>
             </div>
-            
+
             <div class="mb-4">
                 <label for="pwd1" class="form-label">
                     <i class="fas fa-lock"></i>确认密码
                 </label>
                 <div class="input-group">
-                    <input type="password" id="pwd1" class="form-control" name="password-test" 
+                    <input type="password" id="pwd1" class="form-control" name="password-test" id="pwd1"
                         placeholder="再次输入新密码" required>
-                    <button class="btn btn-outline-secondary" type="button"
-                        onclick="togglePassword('pwd1')">
-                        <i class="bi bi-eye-fill"></i>
+                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('pwd1')">
+                        <i class="fas fa-eye-slash"></i>
                     </button>
                 </div>
             </div>
@@ -196,7 +195,7 @@
 
         // 实时验证用户名
         document.getElementById('username').addEventListener('blur', checkUsername);
-        
+
         // 实时验证密码
         document.getElementById('pwd').addEventListener('input', validatePassword);
         document.getElementById('pwd1').addEventListener('input', validatePassword);
@@ -204,7 +203,7 @@
         async function checkUsername() {
             const username = document.getElementById('username');
             const feedback = document.getElementById('username-feedback');
-            
+
             if (!username.value) {
                 username.classList.add('is-invalid');
                 feedback.textContent = '用户名不能为空';
@@ -214,14 +213,16 @@
             try {
                 const response = await fetch(`/check_username/${username.value}`);
                 const data = await response.json();
-                
+
                 if (data.exists) {
-                    username.classList.add('is-invalid');
-                    feedback.textContent = '用户名不存在';
-                } else {
+                    // 用户名存在
                     username.classList.remove('is-invalid');
                     username.classList.add('is-valid');
-                    feedback.textContent = '';
+                    feedback.textContent = data.msg;
+                } else {
+                    username.classList.add('is-invalid');
+                    feedback.textContent = data.msg;
+
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -276,7 +277,7 @@
                         password: SHA256(pwd.value)
                     })
                 });
-                
+
                 const data = await response.json();
                 alert(data.msg);
                 if (data.code === 1) {
@@ -302,12 +303,20 @@
             document.getElementById('pwd1').value = '';
         }
 
+        // 切换密码显示状态
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
             const icon = document.querySelector(`button[onclick="togglePassword('${inputId}')"] i`);
-            input.type = input.type === 'password' ? 'text' : 'password';
-            icon.className = input.type === 'password' ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill';
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
         }
     </script>
 </body>
+
 </html>
