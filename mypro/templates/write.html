@@ -322,14 +322,18 @@
                     <input type="file" class="form-control" id="zipfiles" name="zipfiles"
                         accept=".zip,.rar,.7z,.tar,.gz,.sql,.java,.ppt,.py,.txt,.ini,.doc,.pdf,.docx" multiple>
                 </div>
-                <div class="text-center">
-
-                    <button type="submit" id="submit_" class="btn btn-primary mb-2">
+                <div class="text-center d-flex justify-content-center align-items-center gap-2">
+                    <button type="submit" id="submit_" class="btn btn-primary mb-2 flex-grow-0">
                         <i class="fas fa-paper-plane"></i>发布文章
                     </button>
-                    <button type="submit" id="aiWrite" class="btn btn-danger mb-2">
+                    <button type="submit" id="aiWrite" class="btn btn-danger mb-2 flex-grow-0">
                         <i class="fas fa-magic"></i> AI写作
                     </button>
+                    <select class="form-select mb-2" style="width: 180px;"
+                        id="aiWriteType">
+                        <option value="v3">V3-模型</option>
+                        <option value="r1">R1-0528 深度思考</option>
+                    </select>
                 </div>
             </form>
         </div>
@@ -448,33 +452,53 @@
             const content = document.querySelector('#content');
             submit_.disabled = true;
             console.log(e.target.value);
-            fetch('/api/aiWrite', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    title: title.value,
-                    content_type: content_type.value,
-                    content: content.value,
-                })
-            }).then(response => response.json()).then(data => {
-                hideAiWriteMask();
-                if (data.code === 1) {
+            const urlx = `/api/aiWrite?title=${encodeURIComponent(title.value)}&content_type=${encodeURIComponent(content_type.value)}&content=${encodeURIComponent(content.value)}`;
+            const eventSource = new EventSource(urlx);
+            let htmlx = '';
+            eventSource.onmessage = function (event) {
+                if (event.data === 'end') {
+                    eventSource.close();
+                    hideAiWriteMask();
                     alert('AI写作完成，请检查内容！');
-                    console.log(data.content);
-                    document.querySelector('#content').value = data.content;
-                    document.querySelector('#title').value = data.title;
-
+                    document.querySelector('#content').value = htmlx;
+                    document.querySelector('#title').value = title.value;
                     submit_.disabled = false;
                 } else {
-                    alert(data.msg);
-                    submit_.disabled = true;
+                    htmlx += event.data;
+                    content.value = htmlx;
+                    content.scrollTop = content.scrollHeight;
                 }
-            }).catch(error => {
-                console.error('Error:', error);
-                hideAiWriteMask();
-            });
+            };
+
+
+
+            // fetch('/api/aiWrite', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({
+            //         title: title.value,
+            //         content_type: content_type.value,
+            //         content: content.value,
+            //     })
+            // }).then(response => response.json()).then(data => {
+            //     hideAiWriteMask();
+            //     if (data.code === 1) {
+            //         alert('AI写作完成，请检查内容！');
+            //         console.log(data.content);
+            //         document.querySelector('#content').value = data.content;
+            //         document.querySelector('#title').value = data.title;
+
+            //         submit_.disabled = false;
+            //     } else {
+            //         alert(data.msg);
+            //         submit_.disabled = true;
+            //     }
+            // }).catch(error => {
+            //     console.error('Error:', error);
+            //     hideAiWriteMask();
+            // });
         })
     </script>
 </body>

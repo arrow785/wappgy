@@ -9,6 +9,7 @@ from flask import (
     url_for,
     jsonify,
     send_from_directory,
+    Response,
 )
 from flask_cors import CORS
 import requests
@@ -1165,10 +1166,10 @@ def ask_question():
 
 
 # AI写作
-@app.route("/api/aiWrite", methods=["POST"])
+@app.route("/api/aiWrite", methods=["GET"])
 def ai_write():
     try:
-        data = request.get_json()
+        data = request.args
         title = data.get("title")
         content_type = data.get("content_type")
         tips = data.get("content")
@@ -1183,7 +1184,7 @@ def ai_write():
             核心功能：  
             1.多类型文章创作：根据用户提供的标题（{title}）、内容类型（{content_type}）和提示（{tips}）生成高质量文章。  
 
-            2.智能字数控制：默认输出 800-1200 字（用户未指定时）。  
+            2.字数控制：默认输出 800-1200 字（用户未指定时）。  
 
             技术文档优化：  
 
@@ -1224,37 +1225,40 @@ def ai_write():
             4.如果文章类型是“技术类型”，换行符使用 HTML 的 <br> 标签替换，但是TAB键使用实体 &emsp;替换
             4.无论什么类型的文章，都需要优化排版
     """
-        # 准备API请求
-        headers = {
-            "Authorization": f"Bearer {app.config['DEEPSEEK_API_KEY']}",
-            "Content-Type": "application/json",
-        }
-        # 准备请求负载
-        payload = {
-            "model": "deepseek-chat",
-            "messages": [
-                {"role": "system", "content": SYSTEM_INIT},
-                {"role": "user", "content": tips},
-            ],
-            "temperature": 1.3,
-        }
-        # 调用API
-        response = requests.post(
-            app.config["DEEPSEEK_API_URL"], headers=headers, json=payload
-        )
-        # 检查响应状态
-        response.raise_for_status()
+        # # 准备API请求
+        # headers = {
+        #     "Authorization": f"Bearer {app.config['DEEPSEEK_API_KEY']}",
+        #     "Content-Type": "application/json",
+        # }
+        # # 准备请求负载
+        # payload = {
+        #     "model": "deepseek-chat",
+        #     "messages": [
+        #         {"role": "system", "content": SYSTEM_INIT},
+        #         {"role": "user", "content": tips},
+        #     ],
+        #     "temperature": 1.3,
+        # }
+        # # 调用API
+        # response = requests.post(
+        #     app.config["DEEPSEEK_API_URL"], headers=headers, json=payload
+        # )
+        # # 检查响应状态
+        # response.raise_for_status()
 
-        # 解析响应
-        result = response.json()
-        ai_response = result["choices"][0]["message"]["content"]
-        title = ai_response.split("\n")[0]  # 假设第一行是标题
-        # 换行
-        ai_response = ai_response.replace("\n", "<br>")  # 替换换行符为HTML的<br>
-        # 返回AI生成的内容
-        return jsonify(
-            {"code": 1, "msg": "生成成功", "content": ai_response, "title": title}
-        )
+        # # 解析响应
+        # result = response.json()
+        # ai_response = result["choices"][0]["message"]["content"]
+        # title = ai_response.split("\n")[0]  # 假设第一行是标题
+        # # 换行
+        # ai_response = ai_response.replace("\n", "<br>")  # 替换换行符为HTML的<br>
+
+        # # 返回AI生成的内容
+        # return jsonify(
+        #     {"code": 1, "msg": "生成成功", "content": ai_response, "title": title}
+        # )
+
+        return Response(getStream(question=tips), mimetype="text/event-stream")
 
     except requests.exceptions.RequestException as e:
         return jsonify({"code": 0, "msg": f"API请求失败: {str(e)}"}), 500
