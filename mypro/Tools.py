@@ -206,6 +206,8 @@ def totalPage(total_count, limit):
 
 # 保存附件
 def save_attachment(files, title_id):
+    import re
+
     paths = []
     date = "-".join(get_time().split("-")[:2])
     file_path = ""
@@ -214,13 +216,21 @@ def save_attachment(files, title_id):
         return None
     try:
         for file in files:
-            fileName = secure_filename(file.filename)
             # 如果文件名中有逗号，则替换为下划线
-            newFileName = fileName.replace(",", "_").replace(" ", "_")
+            newFileName = file.filename.replace(",", "_").replace(" ", "_")
+            fileName = ""
+            pattern = re.compile(r"[\u4e00-\u9fff]").search(newFileName)
+            # 如果文件名中没有中文，则直接使用文件名
+            if pattern is None:
+                fileName = secure_filename(newFileName)
+            else:
+                ch_filename = file.filename.split(".")
+                fux = ch_filename[-1]  # 文件后缀
+                fileName = ch_filename[0] + f".{fux}"
 
             file_path = os.path.join(
                 createAttachmentPath(title_id),
-                f"{title_id}_{date}_{newFileName}",
+                f"{title_id}-{date}-{fileName}",
             )
             file.save(file_path)
             print(f"save_attachment() => 保存附件成功！路径：{file_path}")
@@ -233,42 +243,9 @@ def save_attachment(files, title_id):
         print(f"save_attachment() => 保存附件完成，路径：{file_path}")
 
 
-# AI流式输出
-def getStream(question="生成一段诗，500字以内"):
-    from openai import OpenAI
+# 导入
+from openai import OpenAI
+from flask import session
 
-    client = OpenAI(
-        api_key="sk-709b1426f00d42c880e1db9b43b22a3c",
-        base_url="https://api.deepseek.com",
-    )
 
-    # Round 1
-    messages = [{"role": "user", "content": question}]
-    response = client.chat.completions.create(
-        model="deepseek-reasoner", messages=messages, stream=True
-    )
-    # 用于存储推理内容和最终内容
-    # 可以用于多轮对话
-    reasoning_contents = []
-    contents = []
-    yield "data:thinking，不显示思考内容\n\n"  # 表示正在思考
-    for chunk in response:
-        if (
-            hasattr(chunk.choices[0].delta, "reasoning_content")
-            and chunk.choices[0].delta.reasoning_content
-        ):
-            # 记住推理内容
-            reasoning_content = chunk.choices[0].delta.reasoning_content
-            reasoning_contents.append(reasoning_content)
-            yield f"data:{reasoning_content}\n\n"
-
-        if (
-            hasattr(chunk.choices[0].delta, "content")
-            and chunk.choices[0].delta.content
-        ):
-            # 记住内容
-            content = chunk.choices[0].delta.content
-            contents.append(content)
-            # print(chunk.choices[0].delta.content, end="", flush=True)
-            yield f"data:{content}\n\n"
-    yield "data:end\n\n"  # 结束数据流
+# AI流式输出 R1

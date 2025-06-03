@@ -351,6 +351,7 @@
     {% include 'footer.html' %}
 
     <script src="../static/js/bootstrap.bundle.min.js"></script>
+
     <script>
         const PAGINATION_RANGE = 3;
         let globa_keyword = ''
@@ -369,7 +370,6 @@
             }, 300);
         }
 
-
         // 渲染函数
         function renderResults(article) {
 
@@ -387,7 +387,7 @@
                         
                         return `
                         <div class="article-card" onclick="window.open('/detalied/${article.id}','_blank')">
-                            <img src="${article.cover_url}" alt="" class="mb-1" width="100%"
+                            <img src="${article.cover_url}" alt="图片走丢了..." style="border-radius: 5px;" class="mb-1" width="100%"
                             <h4 class="article-title">${article.title}</h4>
                             <div class="article-meta">
                                 <span><i class="fas fa-user"></i>${article.username}</span>

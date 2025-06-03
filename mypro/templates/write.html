@@ -216,6 +216,25 @@
             flex-direction: column;
             align-items: center;
         }
+
+        #thinking-container {
+            background: #f8f9fa;
+            border-left: 4px solid #4a6bff;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            /* 保留换行和空格 */
+        }
+
+        #showthinking {
+            transition: all 0.3s;
+        }
+
+        #showthinking:hover {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 
@@ -306,6 +325,15 @@
 
                 <div class="form-group">
                     <label for="content" class="form-label">文章内容</label>
+                    <button id="showthinking" class="btn btn-info mb-2 flex-grow-0">
+                        <i class="fas fas fa-chevron-up" id="think_icon"></i>
+                        显示思考过程</button>
+                    <!-- 思考状态容器 (初始隐藏) -->
+                    <div id="thinking-container"
+                        style="display:none; background:#f8f9fa; padding:5px; border-radius:8px; margin-bottom:15px;">
+                        <p class="text-primary">AI思考过程:</p>
+                        <div id="thinking-content"></div>
+                    </div>
                     <textarea class="form-control" id="content" name="content"
                         placeholder="请输入文章内容，如果使用AI写作请填写描述，如果不进行字数要求，默认在800-1200字之间....." rows="12" required></textarea>
                 </div>
@@ -329,11 +357,15 @@
                     <button type="submit" id="aiWrite" class="btn btn-danger mb-2 flex-grow-0">
                         <i class="fas fa-magic"></i> AI写作
                     </button>
-                    <select class="form-select mb-2" style="width: 180px;"
-                        id="aiWriteType">
-                        <option value="v3">V3-模型</option>
-                        <option value="r1">R1-0528 深度思考</option>
-                    </select>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" name="model" value="v3" id="v3_model"
+                            checked><label for="v3_model">V3-模型</label>
+
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" name="model" value="r1" id="r1_model">
+                        <label for="r1_model">r1-模型（深度思考）</label>
+                    </div>
                 </div>
             </form>
         </div>
@@ -380,6 +412,8 @@
         const content = document.querySelector('#content');
         const title = document.querySelector('#title');
         const tips = document.querySelector('#tips');
+        const submit_ = document.querySelector('#submit_');
+
         title.addEventListener('input', function (e) {
             e.preventDefault();
             // 持续1s
@@ -408,7 +442,7 @@
                 console.error('Error:', error);
             });
         })
-        const submit_ = document.querySelector('#submit_');
+
         content.addEventListener('blur', function (e) {
             e.preventDefault();
 
@@ -441,65 +475,81 @@
 
 
         const aiWrite = document.querySelector('#aiWrite');
+        const showThinkingBtn = document.querySelector('#showthinking');
+        const thinkingContainer = document.querySelector('#thinking-container');
+        const thinkingContent = document.querySelector('#thinking-content');
+        const think_icon = document.querySelector('#think_icon');
+
+
+
+        // 显示思考/隐藏过程
+        showThinkingBtn.addEventListener('click', function (e) {
+
+            e.preventDefault();
+            thinkingContainer.style.display = thinkingContainer.style.display === 'none' ? 'block' : 'none';
+            if (thinkingContainer.style.display === 'block') {
+                showThinkingBtn.innerHTML = '隐藏思考过程';
+                // think_icon.classList.remove('fas fas fa-chevron-up')
+                think_icon.className = 'fas fa-chevron-down';
+            } else {
+                showThinkingBtn.innerHTML = '显示思考过程';
+                // think_icon.classList.remove('fas fas fa-chevron-down')
+                think_icon.className = 'fas fa-chevron-up';
+
+            }
+        });
         // AI写作按钮点击事件
         aiWrite.addEventListener('click', function (e) {
             e.preventDefault();
             // 持续1s
             showAiWriteMask()
+            // 获取被选中的单选按钮的值
+            // 清空之前的思考记录
+            thinkingContent.innerHTML = '';
+            thinkingContainer.style.display = 'none'; // 默认隐藏
+            // 获取被选中的单选按钮的值
+            const selectedModel = document.querySelector('input[name="model"]:checked').value;
 
             const title = document.querySelector('#title');
             const content_type = document.querySelector('#content_type');
             const content = document.querySelector('#content');
+            content.innerHTML = '';// 清空内容
             submit_.disabled = true;
-            console.log(e.target.value);
-            const urlx = `/api/aiWrite?title=${encodeURIComponent(title.value)}&content_type=${encodeURIComponent(content_type.value)}&content=${encodeURIComponent(content.value)}`;
+            const urlx = `/api/aiWrite?title=${encodeURIComponent(title.value)}&content_type=${encodeURIComponent(content_type.value)}&content=${encodeURIComponent(content.value)}&model=${encodeURIComponent(selectedModel)}&used=write`;
+            console.log(urlx);
+
             const eventSource = new EventSource(urlx);
             let htmlx = '';
             eventSource.onmessage = function (event) {
-                if (event.data === 'end') {
+                const data = event.data;
+
+                if (data.startsWith('[THINKING]')) {
+                    const think = data.replace('[THINKING]', '');
+                    thinkingContent.innerHTML += think;
+                    content.value += think;
+                    content.scrollTop = content.scrollHeight;
+                    return;
+                }
+                if (data === '[THINKING_END]') {
+                    // thinkingContainer.style.display = 'block';
+                    content.value = ''
+                    return;
+                }
+                if (data === '[END]') {
                     eventSource.close();
                     hideAiWriteMask();
-                    alert('AI写作完成，请检查内容！');
-                    document.querySelector('#content').value = htmlx;
-                    document.querySelector('#title').value = title.value;
                     submit_.disabled = false;
-                } else {
-                    htmlx += event.data;
-                    content.value = htmlx;
-                    content.scrollTop = content.scrollHeight;
+                    // 手动调用content.blur事件
+                    content.dispatchEvent(new Event('blur'));
                 }
-            };
+                htmlx += event.data.replace('[END]', '');
+                content.value = htmlx;
+                content.scrollTop = content.scrollHeight;
+            }
+
+        });
 
 
-
-            // fetch('/api/aiWrite', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify({
-            //         title: title.value,
-            //         content_type: content_type.value,
-            //         content: content.value,
-            //     })
-            // }).then(response => response.json()).then(data => {
-            //     hideAiWriteMask();
-            //     if (data.code === 1) {
-            //         alert('AI写作完成，请检查内容！');
-            //         console.log(data.content);
-            //         document.querySelector('#content').value = data.content;
-            //         document.querySelector('#title').value = data.title;
-
-            //         submit_.disabled = false;
-            //     } else {
-            //         alert(data.msg);
-            //         submit_.disabled = true;
-            //     }
-            // }).catch(error => {
-            //     console.error('Error:', error);
-            //     hideAiWriteMask();
-            // });
-        })
     </script>
 </body>
 

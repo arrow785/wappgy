@@ -6,16 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DS-AI智能助手</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../static/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3f37c9;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
-            --success-color: #4cc9f0;
-            --warning-color: #f8961e;
-            --danger-color: #f94144;
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #6c63ff;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --error: #f94144;
+            --ai-bubble: #f0f7ff;
+            --user-bubble: #4361ee;
+            --sidebar-bg: #ffffff;
+            --chat-bg: #ffffff;
+            --input-bg: #f8f9fa;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+            --radius-sm: 8px;
         }
 
         * {
@@ -26,201 +37,342 @@
 
         body {
             font-family: 'Noto Sans SC', sans-serif;
-            background-color: #f5f7fa;
-            color: var(--dark-color);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e6e9ff 100%);
+            color: var(--dark);
             line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
-            gap: 1.5rem;
-            padding: 2rem;
-        }
-
-        .main-content {
-            flex: 3;
-        }
-
-        .sidebar {
-            flex: 1;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            height: 70vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-header {
-            padding: 1rem;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .sidebar-content {
-            flex-grow: 1;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #ai-persona {
-            flex-grow: 1;
-            padding: 1rem;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            resize: none;
-            margin-bottom: 1rem;
-        }
-
-        #ai-persona {
-            flex-grow: 1;
-            padding: 1rem;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            resize: none;
-            margin-bottom: 1rem;
-        }
-
-        .btn-primary,
-        .btn-secondary {
-            padding: 0.8rem 1rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-secondary {
-            background-color: #e9ecef;
-            color: var(--dark-color);
+            gap: 24px;
         }
 
         header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 30px;
+            padding: 0 20px;
         }
 
         header h1 {
-            color: var(--primary-color);
+            color: var(--primary);
             font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
 
         header p {
-            color: #6c757d;
+            color: var(--gray);
             font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .chat-container {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            flex: 3;
+            background-color: var(--chat-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             overflow: hidden;
-            height: 70vh;
+            height: 75vh;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 16px 24px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #4ade80;
         }
 
         #chat-history {
             flex-grow: 1;
-            padding: 1.5rem;
+            padding: 24px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.05"><rect fill="none" stroke="%234361ee" stroke-width="2" x="10" y="10" width="80" height="80" rx="15" ry="15"/></svg>');
         }
 
         .input-area {
-            padding: 1rem;
-            background-color: #f8f9fa;
-            border-top: 1px solid #e9ecef;
+            padding: 16px 24px;
+            background-color: var(--input-bg);
+            border-top: 1px solid var(--light-gray);
         }
 
         .input-group {
             display: flex;
-            gap: 0.5rem;
+            gap: 12px;
         }
 
         .input-group input {
             flex-grow: 1;
-            padding: 0.8rem 1rem;
-            border: 1px solid #ced4da;
+            padding: 14px 20px;
+            border: 1px solid var(--light-gray);
             border-radius: 50px;
             font-size: 1rem;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
 
         .input-group input:focus {
-            border-color: var(--primary-color);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
         }
 
         .input-group button {
-            width: 50px;
-            height: 50px;
+            width: 56px;
+            height: 56px;
             border: none;
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border-radius: 50%;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
         }
 
         .input-group button:hover {
-            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(67, 97, 238, 0.4);
+        }
+
+        .input-group button:disabled {
+            background: var(--light-gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .message {
-            max-width: 80%;
-            padding: 0.8rem 1.2rem;
-            border-radius: 18px;
+            max-width: 85%;
+            padding: 16px 24px;
+            border-radius: 24px;
             position: relative;
-            animation: fadeIn 0.3s ease-out;
+            animation: fadeIn 0.4s ease-out;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            line-height: 1.7;
         }
 
         .user-message {
             align-self: flex-end;
-            background-color: var(--primary-color);
+            background: var(--user-bubble);
             color: white;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: 8px;
         }
 
         .ai-message {
             align-self: flex-start;
-            background-color: #e9ecef;
-            color: var(--dark-color);
-            border-bottom-left-radius: 4px;
+            background: var(--ai-bubble);
+            color: var(--dark);
+            border-bottom-left-radius: 8px;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .user-message .message-header {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .ai-message .message-header {
+            color: var(--primary);
+        }
+
+        .message-content {
+            font-size: 15px;
+        }
+
+        .sidebar {
+            flex: 1;
+            background: var(--sidebar-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            height: 75vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: var(--primary);
+            color: white;
+        }
+
+        .sidebar-content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #ai-persona {
+            flex-grow: 1;
+            padding: 16px;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            resize: none;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        #ai-persona:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        }
+
+        .sidebar-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--gray);
+            border: 1px solid var(--light-gray);
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .model-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .model-selector label {
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 15px;
+        }
+
+        #modelSelect {
+            height: 48px;
+            border-radius: var(--radius-sm);
+            background: white;
+            border: 1px solid var(--light-gray);
+            padding: 0 16px;
+            color: var(--dark);
+            font-size: 15px;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234361ee' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+        }
+
+        #modelSelect:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+            outline: none;
+        }
+
+        #tips {
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            margin: 12px 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #tips i {
+            font-size: 18px;
         }
 
         .loading {
-            background-color: #e9ecef;
-            width: 80px;
-            height: 40px;
+            background-color: var(--ai-bubble);
+            width: 100px;
+            height: 60px;
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
+            align-self: flex-start;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .loading-dots {
             display: flex;
-            gap: 6px;
+            gap: 8px;
         }
 
         .dot {
-            width: 8px;
-            height: 8px;
-            background-color: #6c757d;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary);
             border-radius: 50%;
             animation: bounce 1.4s infinite ease-in-out;
         }
@@ -259,245 +411,342 @@
         }
 
         /* 响应式设计 */
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .container {
                 flex-direction: column;
-                padding: 1rem;
             }
 
+            .chat-container,
+            .sidebar {
+                height: auto;
+                min-height: 50vh;
+            }
+        }
+
+        @media (max-width: 768px) {
             header h1 {
                 font-size: 2rem;
             }
 
-            .chat-container {
-                height: 80vh;
-            }
-
             .message {
                 max-width: 90%;
+                padding: 14px 20px;
             }
 
-            .sidebar {
-                height: auto;
-                margin-top: 1rem;
-            }
-        }
-
-        /* 在现有样式中添加以下内容 */
-
-        /* AI回答内容排版增强 */
-        .ai-message {
-            white-space: pre-wrap;
-            line-height: 1.8;
-            font-size: 15px;
-            padding: 1.2rem 1.5rem;
-        }
-
-        /* 分点内容 */
-        .ai-list {
-            margin: 0.8rem 0;
-            padding-left: 1.5rem;
-        }
-
-        .ai-list li {
-            margin: 0.5rem 0;
-            position: relative;
-            padding-left: 1.2rem;
-        }
-
-        .ai-list li::before {
-            content: "•";
-            color: var(--primary-color);
-            position: absolute;
-            left: 0;
-            font-weight: bold;
-        }
-
-        /* 代码块样式 */
-        .code-block {
-            background-color: rgba(0, 0, 0, 0.05);
-            border-radius: 6px;
-            padding: 1rem;
-            margin: 0.8rem 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            position: relative;
-        }
-
-        .code-block::before {
-            content: "CODE";
-            position: absolute;
-            top: 0;
-            right: 0;
-            background: var(--primary-color);
-            color: white;
-            font-size: 0.7em;
-            padding: 0.2rem 0.5rem;
-            border-radius: 0 6px 0 4px;
-        }
-
-        /* 强调文本 */
-        .em-text {
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-
-        /* 步骤说明 */
-        .step-block {
-            background: rgba(67, 97, 238, 0.08);
-            border-left: 3px solid var(--primary-color);
-            padding: 0.8rem 1rem;
-            margin: 1rem 0;
-            border-radius: 0 4px 4px 0;
-        }
-
-        /* 表格样式 */
-        .response-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .response-table th {
-            background: var(--primary-color);
-            color: white;
-            padding: 0.8rem;
-            text-align: left;
-        }
-
-        .response-table td {
-            padding: 0.8rem;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .response-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* 引用样式 */
-        .blockquote {
-            border-left: 4px solid var(--success-color);
-            margin: 1rem 0;
-            padding: 0.5rem 1rem;
-            background: rgba(76, 201, 240, 0.08);
-            color: #2c3e50;
-            border-radius: 0 4px 4px 0;
-        }
-
-        /* 响应式调整 */
-        @media (max-width: 768px) {
-            .ai-message {
-                font-size: 14px;
-                padding: 1rem;
+            .input-group input {
+                padding: 12px 16px;
             }
 
-            .code-block {
-                overflow-x: auto;
+            .input-group button {
+                width: 50px;
+                height: 50px;
+            }
+
+            .sidebar-actions {
+                flex-direction: column;
             }
         }
 
-        /* 错误消息样式 */
-        .error-message {
-            background: #fff5f5 !important;
-            border: 1px solid #ffd6d6;
-            color: #c53030 !important;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
+        /* 美化滚动条 */
+        #chat-history::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .error-message i {
-            font-size: 1.2em;
+        #chat-history::-webkit-scrollbar-track {
+            background: transparent;
         }
 
-        /* 代码块增强 */
-        .code-block {
-            position: relative;
-            margin: 1rem 0;
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 1rem;
+        #chat-history::-webkit-scrollbar-thumb {
+            background-color: rgba(67, 97, 238, 0.3);
+            border-radius: 4px;
         }
 
-        .code-lang {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background: var(--primary-color);
-            color: white;
-            padding: 0.2rem 0.8rem;
-            font-size: 0.8em;
-            border-radius: 0 8px 0 4px;
-        }
-
-        .code-block pre {
-            margin: 0;
-            overflow-x: auto;
-        }
-
-        .code-block code {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.9em;
+        #chat-history::-webkit-scrollbar-thumb:hover {
+            background-color: var(--primary);
         }
     </style>
 </head>
 
 <body>
+    
     <div class="container">
         <header>
-            <h1><i class="fas fa-robot"></i>AI 助手 β版 R3-0528</h1>
-            <p>随时为您解答各种问题；由于是测试版，速度和内容排序不很好。</p>
-
+            <h1><i class="fas fa-robot"></i> DeepSeek AI 助手</h1>
+            <p>智能对话，流畅体验 - 随时为您解答各种问题</p>
         </header>
 
         <div class="chat-container">
-            <div id="chat-history"></div>
+            <div class="chat-header">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>在线 · 准备就绪</span>
+                </div>
+                <div>β版 r1-0528</div>
+            </div>
+
+            <div id="chat-history">
+                <div class="message ai-message">
+                    <div class="message-header">
+                        <i class="fas fa-robot"></i>
+                        <span>AI助手</span>
+                    </div>
+                    <div class="message-content">
+                        您好！我是您的AI助手，有什么问题我可以帮您解答吗？
+                    </div>
+                </div>
+            </div>
 
             <form id="askForm" class="input-area">
-                <p>
-                    <i class="fas fa-exclamation-triangle"></i> 如果不确定角色是否设定好，可以问AI：你的角色是什么？
-                </p>
                 <div class="input-group">
-
                     <input type="text" name="question" placeholder="输入您的问题..." autocomplete="off">
                     <button type="submit" id="submit-btn">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
+                <p style="margin-top: 12px; font-size: 14px; color: var(--gray);">
+                    <i class="fas fa-lightbulb"></i> 提示：您可以询问"你的角色是什么？"来确认当前设定
+                </p>
             </form>
         </div>
-        <!-- 新增的AI角色设定侧边栏 -->
+
         <div class="sidebar">
             <div class="sidebar-header">
                 <h3><i class="fas fa-cog"></i> AI角色设定</h3>
             </div>
             <div class="sidebar-content">
-                <textarea id="ai-persona" placeholder="例如：你是一个有趣的AI助手，擅长日常问题的回答..."></textarea>
-                <p id="tips"></p>
+                <textarea id="ai-persona" placeholder="例如：你是一个专业的AI助手，擅长技术问题解答和编程帮助...">你是一个有趣的AI助手，擅长日常问题的回答</textarea>
+
+                <div id="tips">
+                    <i class="fas fa-info-circle"></i> 设置AI的角色和个性特征
+                </div>
+
                 <div class="sidebar-actions">
-                    <button class="btn-primary" id="saveSettings_">保存设定</button>
-                    <button class="btn-secondary" id="resetSettings">重置</button>
+                    <button class="btn btn-primary" id="saveSettings_">
+                        <i class="fas fa-save"></i> 保存设定
+                    </button>
+                    <button class="btn btn-secondary" id="resetSettings">
+                        <i class="fas fa-undo"></i> 重置
+                    </button>
+                </div>
+
+                <div class="model-selector">
+                    <label for="modelSelect"><i class="fas fa-microchip"></i> 模型选择</label>
+                    <select id="modelSelect">
+                        <option value="v3">快速响应 v3</option>
+                        <option value="r1">深度思考 r1</option>
+                    </select>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 加载动画模板 -->
-    <div id="loading-template" style="display: none;">
-        <div class="message loading">
-            <div class="loading-dots">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-            </div>
-        </div>
-    </div>
+    <script>
+      
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('askForm');
+            const chatHistory = document.getElementById('chat-history');
+            const submitBtn = document.getElementById('submit-btn');
+            const saveSettingsBtn = document.getElementById('saveSettings_');
+            const resetSettingsBtn = document.getElementById('resetSettings');
+            const tips = document.getElementById('tips');
+            const modelSelect = document.getElementById('modelSelect');
 
-    <script src="../static/js/ds-script.js"></script>
+            // 初始化消息ID计数器
+            let messageId = 0;
+            let currentEventSource = null;
+            let DEEPSEEK_SYSTEM_INIT = `你是一个有趣的AI助手，擅长日常问题的回答`;
+
+            // 保存设置
+            saveSettingsBtn.addEventListener('click', function () {
+                const x = document.querySelector('#ai-persona').value;
+                if (!x) {
+                    tips.innerHTML = `<i class="fas fa-exclamation-triangle"></i> 请输入AI助手的个性化设定！`;
+                    tips.style.color = 'var(--error)';
+                    tips.style.background = 'rgba(249, 65, 68, 0.1)';
+                    return;
+                }
+                DEEPSEEK_SYSTEM_INIT = x;
+                tips.innerHTML = `<i class="fas fa-check-circle"></i> 设置已保存！`;
+                tips.style.color = 'var(--success)';
+                tips.style.background = 'rgba(76, 201, 240, 0.1)';
+            });
+
+            // 重置设置
+            resetSettingsBtn.addEventListener('click', function () {
+                DEEPSEEK_SYSTEM_INIT = `你是一个有趣的AI助手，擅长日常问题的回答`;
+                document.querySelector('#ai-persona').value = DEEPSEEK_SYSTEM_INIT;
+                tips.innerHTML = `<i class="fas fa-check-circle"></i> 设置已重置！`;
+                tips.style.color = 'var(--success)';
+                tips.style.background = 'rgba(76, 201, 240, 0.1)';
+            });
+
+            // 表单提交
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const input = form.question;
+                const question = input.value.trim();
+                if (!question) return;
+
+                // 生成唯一消息ID
+                const currentMessageId = ++messageId;
+                let responseContent = '';
+
+                try {
+                    // 添加用户消息
+                    addMessage(question, 'user', currentMessageId);
+                    input.value = '';
+                    toggleSubmitState(true);
+
+                    // 显示加载状态
+                    const loadingElement = showLoading(currentMessageId);
+
+                    // 关闭之前的EventSource连接（如果有）
+                    if (currentEventSource) {
+                        currentEventSource.close();
+                    }
+                    const urlx = `/ask?id=${currentMessageId}&sys_init=${encodeURIComponent(DEEPSEEK_SYSTEM_INIT)}&model=${encodeURIComponent(modelSelect.value)}&q=${encodeURIComponent(question)}&used=ask`
+                    console.log(urlx);
+
+                    // 创建新的EventSource连接
+                    currentEventSource = new EventSource(urlx
+                    );
+
+                    // 移除加载状态
+                    removeLoading(loadingElement);
+
+                    // 创建AI消息容器
+                    const aiMessageElement = createAiMessageContainer(currentMessageId);
+
+                    // 处理流式数据
+                    currentEventSource.onmessage = function (e) {
+                        if (e.data === '[END]') {
+                            currentEventSource.close();
+                            currentEventSource = null;
+                        } else {
+                            responseContent += e.data;
+                            updateMessageContent(aiMessageElement, formatResponse(responseContent));
+                        }
+                    };
+
+                    // 处理错误
+                    currentEventSource.onerror = function (e) {
+                        console.error('EventSource error:', e);
+                        currentEventSource.close();
+                        currentEventSource = null;
+                        updateMessageContent(aiMessageElement, '连接中断，请重试', true);
+                    };
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    removeLoading(document.querySelector(`#msg-${currentMessageId} .loading`));
+                    addMessage(`请求失败: ${error.message}`, 'ai', currentMessageId, true);
+                } finally {
+                    toggleSubmitState(false);
+                }
+            });
+
+            // 添加消息到聊天历史
+            function addMessage(content, sender, id, isError = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+                messageDiv.id = `msg-${id}`;
+
+                const senderName = sender === 'user' ? '您' : 'AI助手';
+                const icon = sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
+
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <i class="${icon}"></i>
+                        <span>${senderName}</span>
+                    </div>
+                    <div class="message-content">${content}</div>
+                `;
+
+                if (isError) {
+                    messageDiv.style.background = 'rgba(249, 65, 68, 0.1)';
+                    messageDiv.style.color = 'var(--error)';
+                }
+
+                chatHistory.appendChild(messageDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+                return messageDiv;
+            }
+
+            // 创建AI消息容器
+            function createAiMessageContainer(id) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message ai-message';
+                messageDiv.id = `msg-${id}`;
+
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <i class="fas fa-robot"></i>
+                        <span>AI助手</span>
+                    </div>
+                    <div class="message-content"></div>
+                `;
+
+                chatHistory.appendChild(messageDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+                return messageDiv;
+            }
+
+            // 更新消息内容
+            function updateMessageContent(messageElement, content, isError = false) {
+                const contentElement = messageElement.querySelector('.message-content');
+                contentElement.innerHTML = content;
+
+                if (isError) {
+                    messageElement.style.background = 'rgba(249, 65, 68, 0.1)';
+                    messageElement.style.color = 'var(--error)';
+                }
+
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
+
+            // 显示加载动画
+            function showLoading(id) {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'loading';
+                loadingDiv.id = `msg-${id}`;
+                loadingDiv.innerHTML = `
+                    <div class="loading-dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                `;
+                chatHistory.appendChild(loadingDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+                return loadingDiv;
+            }
+
+            // 移除加载动画
+            function removeLoading(element) {
+                if (element && element.parentNode) {
+                    element.parentNode.removeChild(element);
+                }
+            }
+
+            // 切换提交按钮状态
+            function toggleSubmitState(disabled) {
+                submitBtn.disabled = disabled;
+                if (disabled) {
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    submitBtn.style.background = 'var(--light-gray)';
+                } else {
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                    submitBtn.style.background = 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)';
+                }
+            }
+
+            // 格式化响应内容（处理换行、链接等）
+            function formatResponse(text) {
+                // 将换行符转换为<br>
+                return text.replace(/\n/g, '<br>');
+            }
+        });
+    </script>
 </body>
 
 </html>

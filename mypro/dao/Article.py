@@ -345,3 +345,20 @@ def getCoverByid(title_id):
         return {}
     finally:
         print("getCoverByid() finally 释放链接")
+
+
+def getContentTypeById(typeid):
+    sql = """
+        SELECT `explain` FROM article_type WHERE id = %s
+    """
+    try:
+        with newConMysql.getConnect() as db:
+            cursor = db.cursor()
+            cursor.execute(sql, (typeid,))
+            result = cursor.fetchone()
+            return result["explain"] if result else "生活"
+    except Exception as e:
+        print(f"未知错误！=> {e}")
+        return "生活"
+    finally:
+        print("getContentTypeById() finally 释放链接")

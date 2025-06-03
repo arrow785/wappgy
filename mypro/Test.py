@@ -1,5 +1,6 @@
 import datetime as dt
 
+
 import os
 
 
@@ -39,3 +40,64 @@ strx = """
 
 
 # print(vail(strx))
+import re, time, random
+from werkzeug.utils import secure_filename
+
+stex = """Java发展史：从Oak到云时代的演进Java的诞生可追溯至1991年。当时Sun公司的帕特里克·诺顿团队启动"Green项目"，旨在开发嵌入式系统语言。最初命名为Oak（橡树），后因商标问题于1995年正式更名为Java。
+"""
+
+
+def x(s):
+    for i in s:
+        x = random.uniform(0.025, 0.075)
+        time.sleep(x)
+        yield f"{i}"
+    yield "data:end"
+
+
+# for chunk in x(stex):
+#     print(chunk, end="", flush=True)
+newFileName = "JavaXXX.pdf"
+pattern = re.compile(r"[\u4e00-\u9fff]").search(newFileName)
+# 如果文件名中没有中文，则直接使用文件名
+fileName = ""
+if pattern is None:
+    fileName = secure_filename(newFileName)
+else:
+    ch_filename = newFileName.split(".")
+    fux = ch_filename[-1]  # 文件后缀
+    fileName = ch_filename[0] + "_" + f".{fux}"
+
+print(fileName)
+
+lsj = [
+    {"role": "system", "content": "你是一个AI助手"},
+    {"role": "user", "content": "你好"},
+]
+newarr = []
+arr = lsj.copy()
+newarr = lsj.copy() if newarr else []
+newarr.append({"role": "assistant", "content": "你好"})
+newarr = lsj.copy() if newarr else []
+print(newarr)
+
+from sql_flask.MySQL_DB import ConMySQL
+from Tools import get_time
+
+newConMysql = ConMySQL()
+
+history_arr = []
+cur = newConMysql.getConnect().cursor()
+cur.execute("select role,content from chat_history where user_id = 1")
+res = cur.fetchall()
+for i in res:
+    history_arr.append(i)
+print(history_arr)
+cur.close()
+tx = [
+    {"role": "system", "content": "1+1=2？"},
+    {"role": "assistant", "content": "1+1=2？"},
+]
+f = []
+f = tx
+print(f"f=>{f}")

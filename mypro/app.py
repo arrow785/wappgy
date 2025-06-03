@@ -24,6 +24,7 @@ from dao.Article import *
 from dao.Detailed import *
 from dao.Email import *
 from dao.Admin import *
+from dao.Chat import *
 from config import Config
 from Tools import *
 import json
@@ -84,7 +85,7 @@ loginUser: dict = {}
 
 # 登录装饰器
 def my_login_required(func):
-    @wraps(func)
+
     @wraps(func)  # 使用装饰器wraps来保留被装饰函数的元数据
     def wrapper(*args, **kwargs):
         # 打印调试信息，检查会话状态
@@ -1101,64 +1102,167 @@ def tag_articles():
 
 # ---------------------------------------- 人工智能相关路由 ---------------------------------------------------
 # ---------------------------------------- 人工智能相关路由 ---------------------------------------------------
+
+
 @app.route("/todeepseek", methods=["GET"])
 def todeepseek():
+    if session.get("username", "d") == "d":
+        return """
+    <script>
+    alert("请先登录")
+    window.location.href = "/login"
+    </script>
+"""
     return render_template("ds-index.html")
 
 
 import datetime as dt
 
+# 定义全局变量，记录对话记录
+v3_history_ask = []
+r1_history_ask = []
+
+
+# V3 模型
+def V3_model(
+    used,
+    question="",
+    SYSTEM_INIT="你是一个通用AI助手(V3模型)，提供快速响应",
+):
+
+    client = OpenAI(
+        api_key="sk-709b1426f00d42c880e1db9b43b22a3c",
+        base_url="https://api.deepseek.com",
+    )
+    # 从数据库中获取历史记录
+    user_id = information.get("data", {}).get("id")
+    history = getHistory(user_id=user_id, used=used)
+    msg = []
+    if not history or SYSTEM_INIT != "你是一个有趣的AI助手，擅长日常问题的回答":
+        msg.append({"role": "system", "content": SYSTEM_INIT})
+        insert_msg(
+            user_id=user_id, role="system", content=SYSTEM_INIT, model="v3", used=used
+        )
+    else:
+        # 获取历史记录
+        msg = history
+    msg.append({"role": "user", "content": question})
+    insert_msg(user_id=user_id, role="user", content=question, model="v3", used=used)
+    response = client.chat.completions.create(
+        model="deepseek-chat",
+        messages=msg,
+        stream=True,
+        temperature=0.5,
+    )
+
+    ai_content = ""
+    for chunk in response:
+        if (
+            hasattr(chunk.choices[0].delta, "content")
+            and chunk.choices[0].delta.content
+        ):
+            content = chunk.choices[0].delta.content
+            ai_content += content
+            yield f"data:{content}\n\n"
+
+    row = insert_msg(
+        user_id=user_id, role="assistant", content=ai_content, model="v3", used=used
+    )
+    if not row:
+        yield f"data:[ERROR]\n\n"
+    yield f"data:[END]\n\n"
+
+
+def R1_model(
+    used,
+    question="生成一段舒心的诗，500字以内",
+    SYSTEM_INIT="你是一个深度思考的AI助手(R1模型)，擅长逻辑推理和深入分析。",
+):
+    client = OpenAI(
+        api_key="sk-709b1426f00d42c880e1db9b43b22a3c",
+        base_url="https://api.deepseek.com",
+    )
+    # 从数据库中获取历史记录
+    user_id = information.get("data", {}).get("id")
+    history = getHistory(user_id=user_id, used=used)
+    msg = []
+    if not history or SYSTEM_INIT != "你是一个有趣的AI助手，擅长日常问题的回答":
+        msg.append({"role": "system", "content": SYSTEM_INIT})
+        insert_msg(
+            user_id=user_id, role="system", content=SYSTEM_INIT, model="r1", used=used
+        )
+    else:
+        # 获取历史记录
+        msg = history
+    msg.append({"role": "user", "content": question})
+    insert_msg(user_id=user_id, role="user", content=question, model="r1", used=used)
+    response = client.chat.completions.create(
+        model="deepseek-reasoner",
+        messages=msg,
+        stream=True,
+    )
+    ai_reasoning_content = ""
+    reasoning_contents = ""
+    yield "data:[THINKING]\n\n"
+    thinking_complated = False
+    for chunk in response:
+        if (
+            hasattr(chunk.choices[0].delta, "reasoning_content")
+            and chunk.choices[0].delta.reasoning_content
+        ):
+            ai_reasoning_content += chunk.choices[0].delta.reasoning_content
+            yield f"data:[THINKING]{chunk.choices[0].delta.reasoning_content}\n\n"
+
+        if (
+            hasattr(chunk.choices[0].delta, "content")
+            and chunk.choices[0].delta.content
+        ):
+            if not thinking_complated:
+                yield "data:[THINKING_END]\n\n"
+                thinking_complated = True
+            reasoning_contents += chunk.choices[0].delta.content
+            yield f"data:{chunk.choices[0].delta.content}\n\n"
+    insert_msg(
+        user_id=user_id,
+        role="assistant",
+        content=f"[思考过程] {ai_reasoning_content} [最终输出] {reasoning_contents}",
+        model="r1",
+        used=used,
+    )
+    # 这里不再操作 session，只返回数据
+    yield "data:[END]\n\n"
+
 
 # 深思考问答接口
-@app.route("/ask", methods=["POST"])
+
+
+@app.route("/ask", methods=["GET"])
 def ask_question():
+
     try:
-        data = request.get_json()
-        question = data.get("question", "").strip()
+        data = request.args
+        question = data.get("q", "").strip()
         sys_init = data.get("sys_init", "").strip()
+        model = data.get("model", "v3").strip()
+        used = data.get("used", "ask")
+
         if not question:
             return jsonify({"error": "问题不能为空"}), 400
         SYSTEM_INIT = f"{sys_init}，现在的日期是{dt.datetime.now()}"
-        # 初始化或获取对话历史（使用Flask的session或数据库）
-        if "conversation_history" not in session:
-            session["conversation_history"] = [
-                {
-                    "role": "system",
-                    "content": SYSTEM_INIT,
-                }
-            ]
 
-        # 添加用户新消息到历史
-        session["conversation_history"].append({"role": "user", "content": question})
+        if model == "v3":
+            return Response(
+                V3_model(question=question, SYSTEM_INIT=SYSTEM_INIT, used=used),
+                mimetype="text/event-stream",
+            )
+        elif model == "r1":
 
-        # 准备API请求
-        headers = {
-            "Authorization": f"Bearer {app.config['DEEPSEEK_API_KEY']}",
-            "Content-Type": "application/json",
-        }
-        payload = {
-            "model": "deepseek-reasoner",
-            "messages": session["conversation_history"],
-            "temperature": 1.0,  # 注意：1.3可能过高，建议0.7~1.0
-        }
-
-        # 调用API
-        response = requests.post(
-            app.config["DEEPSEEK_API_URL"], headers=headers, json=payload
-        )
-        #  检查响应状态
-        response.raise_for_status()
-
-        # 解析响应并保存AI回复到历史
-        result = response.json()
-
-        ai_response = result["choices"][0]["message"]["content"]
-        session["conversation_history"].append(
-            {"role": "assistant", "content": ai_response}
-        )
-
-        return jsonify({"answer": ai_response})
-
+            return Response(
+                R1_model(question=question, SYSTEM_INIT=SYSTEM_INIT, used=used),
+                mimetype="text/event-stream",
+            )
+        else:
+            return Response("无效的模型", mimetype="text/event-stream")
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"API请求失败: {str(e)}"}), 500
     except Exception as e:
@@ -1170,50 +1274,57 @@ def ask_question():
 def ai_write():
     try:
         data = request.args
+        model = data.get("model", "v3")
         title = data.get("title")
-        content_type = data.get("content_type")
+        content_id = data.get("content_type")
         tips = data.get("content")
+        used = data.get("used", "write")
         if title is None or tips is None:
             return jsonify({"code": 0, "msg": "标题或者提示不能为空"}), 400
         # 定义AI角色
+        content_type = getContentTypeById(content_id)
         SYSTEM_INIT = f"""
             角色描述  
 
             角色名称：AI 写作助手  
 
-            核心功能：  
+        一、核心功能：  
             1.多类型文章创作：根据用户提供的标题（{title}）、内容类型（{content_type}）和提示（{tips}）生成高质量文章。  
 
-            2.字数控制：默认输出 800-1200 字（用户未指定时）。  
+            2.字数控制：当用户没有指定字数（中文字符）要求时，默认输出 800-1200 中文字符。  
 
-            技术文档优化：  
+        二、技术文档优化：  
+            当类型为技术类时，你的定位为代码小能手；优化技术文档的格式和结构，提高可读性。  
 
             1.代码块使用 <code> 标签包裹，并标注语言类型（如 <code language="python">）。  
 
             2.确保代码与正文排版清晰，增强可读性。  
             格式规范：  
 
-            1.禁止使用 Markdown 语法，所有内容以纯文本形式输出。  
+            3.禁止使用 Markdown 语法，但是可以使用HTML语言中标签（但是不能包括HTML、Body等结构标签）
 
-            2.技术类文档需优化段落、标题和代码块的排版结构。  
-            内容安全：自动过滤敏感词汇，确保输出合规。  
-
-            内容要求：  
-            1.逻辑性与连贯性：文章结构清晰，论点明确，行文流畅。  
-
-            技术文档规范：  
+            4.技术类文档需优化段落、标题和代码块的排版结构。  
+            5.内容安全：自动过滤敏感词汇，确保输出合规。  
+            
+        三、技术文档规范：  
 
             1.代码示例需完整、可运行（如适用）。  
 
             2.技术术语解释准确，避免歧义。  
-
+            
             输出示例：  
             本文介绍 Python 的基本语法。以下是示例代码：  
             <code language="python">
             def hello_world():
                 print("Hello, World!")
             </code>
+            其中，空格使用html的实体转义符替换，换行使用<br>，TAB使用&nbsp;，如果需要在标签中使用样式，
+            比如:
+                <div style="color:red;"> This a div <div>
+            必须结构需要清楚，不能出现标签名和属性黏在一块：<divstyle="color:red;"> This a div <div>
+      四、内容要求：  
             
+            无论任何类型的文章，必须逻辑性与连贯性：文章结构清晰，论点明确，行文流畅。  
 
             适用场景：  
             技术教程、学术论文、商业文案、创意写作等各类文本生成需求。  
@@ -1222,44 +1333,28 @@ def ai_write():
             1.严格禁用 Markdown。  
             2.代码必须通过 <code> 标签标注语言类型。  
             3.不生成任何敏感或违规内容。  
-            4.如果文章类型是“技术类型”，换行符使用 HTML 的 <br> 标签替换，但是TAB键使用实体 &emsp;替换
             4.无论什么类型的文章，都需要优化排版
+            5.无论什么类型的文章，换行使用<br>，如果需要分点则使用ul或者ol，段落使用p标签，段落的首字符缩进两个字符。
+            标题使用h2标签。
     """
-        # # 准备API请求
-        # headers = {
-        #     "Authorization": f"Bearer {app.config['DEEPSEEK_API_KEY']}",
-        #     "Content-Type": "application/json",
-        # }
-        # # 准备请求负载
-        # payload = {
-        #     "model": "deepseek-chat",
-        #     "messages": [
-        #         {"role": "system", "content": SYSTEM_INIT},
-        #         {"role": "user", "content": tips},
-        #     ],
-        #     "temperature": 1.3,
-        # }
-        # # 调用API
-        # response = requests.post(
-        #     app.config["DEEPSEEK_API_URL"], headers=headers, json=payload
-        # )
-        # # 检查响应状态
-        # response.raise_for_status()
 
-        # # 解析响应
-        # result = response.json()
-        # ai_response = result["choices"][0]["message"]["content"]
-        # title = ai_response.split("\n")[0]  # 假设第一行是标题
-        # # 换行
-        # ai_response = ai_response.replace("\n", "<br>")  # 替换换行符为HTML的<br>
+        if model == "v3":
+            return Response(
+                V3_model(question=tips, SYSTEM_INIT=SYSTEM_INIT, used=used),
+                mimetype="text/event-stream",
+            )
+        elif model == "r1":
+            return Response(
+                R1_model(question=tips, SYSTEM_INIT=SYSTEM_INIT, used=used),
+                mimetype="text/event-stream",
+            )
 
-        # # 返回AI生成的内容
-        # return jsonify(
-        #     {"code": 1, "msg": "生成成功", "content": ai_response, "title": title}
-        # )
-
-        return Response(getStream(question=tips), mimetype="text/event-stream")
-
+        else:
+            return """
+                        <script>
+                            alert("请选择正确的模型");
+                        </script>
+                """
     except requests.exceptions.RequestException as e:
         return jsonify({"code": 0, "msg": f"API请求失败: {str(e)}"}), 500
     except Exception as e:
