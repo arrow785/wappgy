@@ -1012,7 +1012,7 @@ def admin_delete_article():
 def admin_deleteUserById():
     username = request.get_json().get("username")
     userid = request.get_json().get("id")
-    if deleteUserById(username=username, userid=userid):
+    if deleteUserById(username=username):
         return jsonify({"status": 200})
     return jsonify({"status": 400})
 
