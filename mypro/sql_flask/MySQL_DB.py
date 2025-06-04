@@ -19,11 +19,6 @@ class ConMySQL:
         db_name="blog",
         pool_size=9,
     ):
-        self.host = host
-        self.port = port
-        self.password = password
-        self.user = user
-        self.db_name = db_name
         self.poool = PooledDB(
             creator=pymysql,
             maxconnections=pool_size,
@@ -31,11 +26,11 @@ class ConMySQL:
             maxcached=3,
             blocking=True,  # 阻塞连接，当连接数达到最大时，后续连接请求会阻塞
             ping=0,  # 检测连接是否可用
-            host=self.host,
-            port=self.port,
-            user=self.user,
-            password=self.password,
-            db=self.db_name,
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            db=db_name,
             charset="utf8mb4",
             cursorclass=pymysql.cursors.DictCursor,
         )

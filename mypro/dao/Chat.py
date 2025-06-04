@@ -8,16 +8,16 @@ def getHistory(user_id, used):
     sql = "select role,content from chat_history where user_id = %s and used = %s"
     try:
         with newConMysql.getConnect() as db:
-            cur = db.cursor()
-            cur.execute(
-                sql,
-                (
-                    user_id,
-                    used,
-                ),
-            )
-            result = cur.fetchall()
-            return result if result else []
+            with db.cursor() as cur:
+                cur.execute(
+                    sql,
+                    (
+                        user_id,
+                        used,
+                    ),
+                )
+                result = cur.fetchall()
+                return result if result else []
     except Exception as e:
         print(f"getHistory() 获取历史记录错误！=> {e}")
         return []
@@ -32,20 +32,20 @@ def insert_msg(user_id, role, content, model, used):
     """
     try:
         with newConMysql.getConnect() as db:
-            cur = db.cursor()
-            cur.execute(
-                sql,
-                (
-                    user_id,
-                    role,
-                    content,
-                    model,
-                    used,
-                ),
-            )
-            db.commit()
-            res = cur.rowcount
-            return res > 0
+            with db.cursor() as cur:
+                cur.execute(
+                    sql,
+                    (
+                        user_id,
+                        role,
+                        content,
+                        model,
+                        used,
+                    ),
+                )
+                db.commit()
+                res = cur.rowcount
+                return res > 0
     except Exception as e:
         print(f"insert_msg() 插入历史记录错误！=> {e}")
         return False

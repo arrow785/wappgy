@@ -25,9 +25,8 @@ from dao.Detailed import *
 from dao.Email import *
 from dao.Admin import *
 from dao.Chat import *
-from config import Config
+from chat_config import Ai_Config
 from Tools import *
-import json
 
 
 def split_filter_jinja2(value, sub=None):
@@ -40,7 +39,7 @@ def split_filter_jinja2(value, sub=None):
 flask = _Flask(app_name=__name__, port=5002, host="localhost", debug=True)
 
 app = flask.app
-app.config.from_object(Config)
+app.config.from_object(Ai_Config)
 app.jinja_env.filters["split"] = split_filter_jinja2
 CORS(app)
 
@@ -594,8 +593,7 @@ def send_email():
     try:
         row1 = insert_email(username=name, email=email, content=content)
         mail.send(msg)
-        row2 = update_emial(username=name)
-        if row1 and row2:
+        if row1:
             return """
                     <script>
                         alert('发送成功！')
@@ -608,6 +606,8 @@ def send_email():
                 location.assign('/callme')
             </script>"""
     except Exception as e:
+        # 如果发送失败，则更新数据中的对应email的状态为“失败”
+        update_emial(username=name, eid=row1)
         return f"""
             <script>
                 alert('发送失败！服务器错误，请联系管理员！error=>{e}')
@@ -1131,8 +1131,8 @@ def V3_model(
 ):
 
     client = OpenAI(
-        api_key="sk-709b1426f00d42c880e1db9b43b22a3c",
-        base_url="https://api.deepseek.com",
+        api_key=app.config["DEEPSEEK_API_KEY"],
+        base_url=app.config["DEEPSEEK_API_URL"],
     )
     # 从数据库中获取历史记录
     user_id = information.get("data", {}).get("id")
@@ -1179,8 +1179,8 @@ def R1_model(
     SYSTEM_INIT="你是一个深度思考的AI助手(R1模型)，擅长逻辑推理和深入分析。",
 ):
     client = OpenAI(
-        api_key="sk-709b1426f00d42c880e1db9b43b22a3c",
-        base_url="https://api.deepseek.com",
+        api_key=app.config["DEEPSEEK_API_KEY"],
+        base_url=app.config["DEEPSEEK_API_URL"],
     )
     # 从数据库中获取历史记录
     user_id = information.get("data", {}).get("id")

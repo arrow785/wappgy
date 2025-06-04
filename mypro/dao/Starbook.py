@@ -14,6 +14,7 @@ def isStarBook(username: str, content_id):
 				WHERE s.login_name = %s and s.content_id = %s
 				GROUP BY s.content_id
         """
+
     with newConMysql.getConnect() as db:
         cur = db.cursor()
         cur.execute(sql, (username, content_id))

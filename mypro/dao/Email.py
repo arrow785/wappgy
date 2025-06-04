@@ -7,21 +7,27 @@ newConMysql = ConMySQL()
 def insert_email(username, email, content):
     curr_time = get_time()
     sql = f"""
-            insert into email(send_username,send_email,send_content,send_date,is_send) values (%s,%s,%s,%s,'失败')
+            insert into email(send_username,send_email,send_content,send_date,is_send) values (%s,%s,%s,%s,'成功')
         """
     with newConMysql.getConnect() as db:
         cur = db.cursor()
         cur.execute(sql, (username, email, content, curr_time))
         db.commit()
-        res = cur.rowcount
+        res = cur.lastrowid
         return res if res else 0
 
 
-def update_emial(username):
-    sql = f"""update email set is_send = '成功' where send_username = %s"""
+def update_emial(username, eid):
+    sql = """update email set is_send = '失败' where send_username = %s id = %s"""
     with newConMysql.getConnect() as db:
         cur = db.cursor()
-        cur.execute(sql, (username,))
+        cur.execute(
+            sql,
+            (
+                username,
+                eid,
+            ),
+        )
         db.commit()
         res = cur.rowcount
         return res if res else 0
